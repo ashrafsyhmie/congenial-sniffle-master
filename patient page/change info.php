@@ -3,6 +3,95 @@
 session_start();
 $patient_id = $_SESSION['patient_id'];
 $patient_name = $_SESSION['patient_name'];
+$errorMsg = "";
+$successMsg = "";
+
+
+require_once("db conn.php");
+
+function getPatientData($conn, $patient_id)
+{
+  $sql = "SELECT * FROM patient WHERE patient_id=?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $patient_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc();
+}
+
+
+
+$row = getPatientData($conn, $patient_id);
+
+if (!$row) {
+  die("Patient not found.");
+}
+
+// Populate fields
+$patient_name = $row["patient_name"];
+$address = $row["address"];
+$email = $row["email"];
+$gender = $row["gender"];
+$phone_number = $row["phone number"];
+$emergency = $row["emerg_num"];
+$dob = $row["d_o_b"];
+$ic_number = $row["ic number"];
+$imageData = $row["patient_photo"];
+
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $patient_name = $_POST['patient_name'] ?? '';
+  $address = $_POST['address'] ?? '';
+  $email = $_POST['email'] ?? '';
+  $gender = $_POST['gender'] ?? '';
+  $phone_number = $_POST['phone_number'] ?? '';
+  $emergency = $_POST['emergency'] ?? '';
+  $dob = $_POST['dob'] ?? '';
+  $ic_number = $_POST['ic_number'] ?? '';
+  $imageData = $_FILES['image']['name'] ?? '';
+
+  // Validate required fields
+  if (!empty($patient_name) && !empty($email)) {
+    $sql = "UPDATE patient SET patient_name=?, `ic number`=?, address=?, email=?, `phone number`=?, gender=?, emerg_num=?, d_o_b=?, patient_photo=? WHERE patient_id=?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssssssssi", $patient_name, $ic_number, $address, $email, $phone_number, $gender, $emergency, $dob, $imageData, $patient_id);
+
+    if ($stmt->execute()) {
+      $successmsg = "Patient information updated successfully.";
+    } else {
+      $errorMsg = "Error updating patient information: " . $stmt->error;
+    }
+  } else {
+    $errorMsg = "Please fill out all required fields.";
+  }
+
+  if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    $imageType = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+
+    // Validate image type and size
+    if (in_array($imageType, ['jpg', 'jpeg', 'png']) && $_FILES['image']['size'] < 5000000) { // Limit size to 5MB
+      $imageData = file_get_contents($_FILES['image']['tmp_name']);
+
+      // Prepare SQL query to update doctor information
+      $sql = "UPDATE patient SET patient_photo = ? WHERE patient_id = 1";
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param("s", $imageData);
+
+      // Execute the query
+      if ($stmt->execute()) {
+        $successMsg = "patient information updated successfully.";
+      } else {
+        $errorMsg = "Error updating patient information: " . $conn->error;
+      }
+    } else {
+      $errorMsg = "Invalid image file type or size.";
+    }
+  } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+    $errorMsg = "Error uploading image.";
+  }
+}
+
 
 ?>
 
@@ -43,6 +132,19 @@ $patient_name = $_SESSION['patient_name'];
 </head>
 
 <body id="page-top">
+  <style>
+    .mini-photo {
+      width: 45px;
+      /* set the width */
+      height: 45px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+  </style>
   <!-- Page Wrapper -->
   <div id="wrapper">
     <!-- Sidebar -->
@@ -194,9 +296,9 @@ $patient_name = $_SESSION['patient_name'];
                 aria-haspopup="true"
                 aria-expanded="false">
                 <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $patient_name; ?></span>
-                <img
-                  class="img-profile rounded-circle"
-                  src="../img/undraw_profile.svg" />
+                <?php
+                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['patient_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
+                ?>
               </a>
               <!-- Dropdown - User Information -->
               <div
@@ -241,46 +343,83 @@ $patient_name = $_SESSION['patient_name'];
           </div>
 
           <!-- Content Row -->
-          <form action="#">
-            <div class="row">
-              <div class="col-lg-6 mb-4">
-                <div class="card card-body p-5">
-                  <h5 class="card-title text-dark">Change Information</h5>
-                  <div class="name p-2">
-                    <label for="name">Nameㅤ:ㅤ</label>
-                    <input class="ml-2" type="text" id="name" />
-                  </div>
-                  <div class="email p-2">
-                    <label for="email">Email ㅤ :ㅤ</label>
-                    <input class="ml-1" type="email" id="email" />
-                  </div>
-                  <div class="phone p-2">
-                    <label for="phone">Phoneㅤ:ㅤ</label>
-                    <input class="ml-2" type="tel" id="phone" />
-                  </div>
-                  <br />
-                  <button class="change-info-btn btn btn-primary mt-4">
-                    Change Information
-                  </button>
-                </div>
-              </div>
-              <div class="col-lg-6 mb-4">
-                <div class="card card-body p-5">
-                  <h5 class="card-title text-dark">Change Password</h5>
-                  <div class="name p-2">
-                    <label for="password">Passwordㅤ: </label>
-                    <input class="ml-5" type="password" id="password" />
-                  </div>
-                  <div class="email p-2">
-                    <label for="confirm-password">Confirm Passwordㅤ:</label>
-                    <input type="password" id="confirm-password" />
-                  </div>
+          <form method="post" action="./change info.php" enctype="multipart/form-data">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <tbody>
+                    <div class="container-fluid">
+                      <?php if ($successMsg): ?>
+                        <div class="alert alert-success" role="alert">
+                          <?php echo $successMsg; ?>
+                        </div>
+                      <?php endif; ?>
 
-                  <br />
-                  <button class="change-info-btn btn btn-primary mt-4">
-                    Change Password
-                  </button>
-                </div>
+                      <?php if ($errorMsg): ?>
+                        <div class="alert alert-danger" role="alert">
+                          <?php echo $errorMsg; ?>
+                        </div>
+                      <?php endif; ?>
+
+
+                      <input type="hidden" name="patient_id" value="<?php echo htmlspecialchars($patient_id); ?>">
+
+                      <div class="form-group">
+                        <label for="patient_name">Patient Name</label>
+                        <input type="text" class="form-control" id="patient_name" name="patient_name" value="<?php echo htmlspecialchars($patient_name); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="ic_number">IC Number</label>
+                        <input type="text" class="form-control" id="ic_number" name="ic_number" value="<?php echo htmlspecialchars($ic_number); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" value="<?php echo htmlspecialchars($address); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select class="form-control" id="gender" name="gender" required>
+                          <option value="Male" <?php echo $gender == 'Male' ? 'selected' : ''; ?>>Male</option>
+                          <option value="Female" <?php echo $gender == 'Female' ? 'selected' : ''; ?>>Female</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="phone_number">Phone Number</label>
+                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="emergency">Emergency Contact</label>
+                        <input type="text" class="form-control" id="emergency" name="emergency" value="<?php echo htmlspecialchars($emergency); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" class="form-control" id="dob" name="dob" value="<?php echo htmlspecialchars($dob); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="image">Profile Image</label>
+                        <input type="file" class="form-control-file" id="image" name="image">
+                      </div>
+
+                      <div class="form-group d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary">Update Info</button>
+                      </div>
+
+
+                    </div>
+                  </tbody>
+                </table>
               </div>
             </div>
           </form>

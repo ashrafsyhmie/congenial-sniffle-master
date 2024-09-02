@@ -45,6 +45,63 @@ $patient_name = $_SESSION['patient_name'];
 </head>
 
 <body id="page-top">
+  <style>
+    .status-done {
+      background-color: green;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      display: inline-block;
+    }
+
+    .status-canceled {
+      background-color: red;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      display: inline-block;
+    }
+
+    .status-upcoming {
+      background-color: orange;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      display: inline-block;
+    }
+
+    .doctor-photo {
+      width: 95px;
+      /* set the width */
+      height: 95px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+
+    td {
+      text-align: center;
+    }
+
+    th {
+      text-align: center;
+    }
+
+    .mini-photo {
+      width: 45px;
+      /* set the width */
+      height: 45px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+  </style>
   <!-- Page Wrapper -->
   <div id="wrapper">
     <!-- Sidebar -->
@@ -196,9 +253,9 @@ $patient_name = $_SESSION['patient_name'];
                 aria-haspopup="true"
                 aria-expanded="false">
                 <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $patient_name; ?></span>
-                <img
-                  class="img-profile rounded-circle"
-                  src="../img/undraw_profile.svg" />
+                <?php
+                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['patient_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
+                ?>
               </a>
               <!-- Dropdown - User Information -->
               <div
@@ -384,6 +441,8 @@ $patient_name = $_SESSION['patient_name'];
                       <th>Date </th>
                       <th>Time</th>
                       <th>Status</th>
+
+
                     </tr>
                   </thead>
                   <tbody>
@@ -410,12 +469,21 @@ $patient_name = $_SESSION['patient_name'];
 
                       echo "<tr>";
                       echo "<td>" . $row['appointment_id'] . "</td>";
-                      echo '<td><img src="' . $row["doctor_photo"] . '" alt="Doctor Photo" width="50" height="50"></td>';
-                      
+                      echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>';
+
                       echo "<td>" . $row['doctor_name'] . "</td>";
                       echo "<td>" . $row['date'] . "</td>";
                       echo "<td>" . $row['timeslot'] .  "</td>";
-                      echo "<td>" . $row['status'] .  "</td>";
+
+
+
+                      if ($row['status'] == 'done') {
+                        echo '<td><span class="status-done">ok</span></td>';
+                      } elseif ($row['status'] == 'cancelled') {
+                        echo "<td><span class='status-canceled'>Cancelled</span></td>";
+                      } elseif ($row['status'] == 'upcoming') {
+                        echo "<td><span class='status-upcoming'>Upcoming</span></td>";
+                      }
                       echo "</tr>";
                     }
 
