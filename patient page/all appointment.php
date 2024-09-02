@@ -383,6 +383,7 @@ $patient_name = $_SESSION['patient_name'];
                       <th>Name</th>
                       <th>Date </th>
                       <th>Time</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -394,7 +395,8 @@ $patient_name = $_SESSION['patient_name'];
 
 
 
-                    $sql = "SELECT * FROM appointment JOIN doctor on appointment.doctor_id=doctor.doctor_id  WHERE patient_id = $patient_id AND status = 'upcoming'";
+                    $sql = "SELECT * FROM appointment JOIN doctor on appointment.doctor_id=doctor.doctor_id  WHERE patient_id = $patient_id";
+                    //  AND status = 'upcoming'
                     $result = mysqli_query($conn, $sql);
 
                     while ($row = mysqli_fetch_assoc($result)) {
@@ -409,9 +411,11 @@ $patient_name = $_SESSION['patient_name'];
                       echo "<tr>";
                       echo "<td>" . $row['appointment_id'] . "</td>";
                       echo '<td><img src="' . $row["doctor_photo"] . '" alt="Doctor Photo" width="50" height="50"></td>';
+                      
                       echo "<td>" . $row['doctor_name'] . "</td>";
                       echo "<td>" . $row['date'] . "</td>";
                       echo "<td>" . $row['timeslot'] .  "</td>";
+                      echo "<td>" . $row['status'] .  "</td>";
                       echo "</tr>";
                     }
 

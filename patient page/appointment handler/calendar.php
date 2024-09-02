@@ -31,7 +31,7 @@ $date = "2024-09-3"; // Example date
 
 
 
-function displayAvailableSlots($date, $mysqli)
+function displayAvailableSlots($date, $doctor_id, $mysqli)
 {
     // Define slot parameters
     $duration = 30; // Duration of each slot in minutes
@@ -43,13 +43,13 @@ function displayAvailableSlots($date, $mysqli)
     $all_slots = timeslots($duration, $cleanup, $start, $end);
 
     // Prepare the SQL statement to get booked slots
-    $stmt = $mysqli->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ?");
+    $stmt = $mysqli->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND doctor_id = ?");
     if (!$stmt) {
         die('Prepare failed: ' . $mysqli->error);
     }
 
     // Bind parameters and execute
-    $stmt->bind_param('s', $date);
+    $stmt->bind_param('ss', $date, $doctor_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $booked_slots = [];
@@ -62,7 +62,7 @@ function displayAvailableSlots($date, $mysqli)
     $available_slots = array_diff($all_slots, $booked_slots);
 
     if (empty($available_slots)) {
-        echo "<p>No available slots.</p>";
+
         return true;
     }
 }
@@ -160,7 +160,7 @@ function build_calendar($month, $year, $patient_id, $mysqli)
         $today = $date == date('Y-m-d') ? "today" : "";
 
         // $fullyBooked = isDateFullyBooked($date, $doctor_id, $mysqli);
-        $fullyBooked = displayAvailableSlots($date, $mysqli);
+        $fullyBooked = displayAvailableSlots($date, $doctor_id, $mysqli);
 
         if ($fullyBooked || $date < date('Y-m-d')) {
             // Date is fully booked or in the past, display as not clickable

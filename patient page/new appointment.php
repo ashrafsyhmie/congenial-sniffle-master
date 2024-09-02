@@ -267,7 +267,8 @@ require_once "db conn.php";
               while ($row = $result->fetch_assoc()) {
                 $doctor_id = $row["doctor_id"];
                 echo '<tr>
-                <td><img src="' . $row["doctor_photo"] . '" alt="Doctor Photo" width="50" height="50"></td>
+                <td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>
+               
                 <td>' . $row["doctor_name"] . '<br />' . $row["specialization"] . '</td>
                 <td>
                   <a href="./appointment handler/calendar.php?doctor_id=' . $row["doctor_id"] . '">
