@@ -299,126 +299,7 @@ $patient_name = $_SESSION['patient_name'];
             </h1>
           </div>
 
-          <!-- All Appointment table -->
-          <!-- <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">
-                List of All Appointments
-              </h6>
-            </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table
-                  class="table table-striped table-border-0"
-                  id="dataTable"
-                  width="100%"
-                  cellspacing="0">
-                  <thead>
-                    <td></td>
-                    <td>Name</td>
-                    <td>Date and Time</td>
-                    <td></td>
-                    <td></td>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Photo</td>
-                      <td>
-                        Doctor 1
-                        <br />
-                        Cardiologist
-                      </td>
-                      <td>
-                        9:30 am
-                        <br />
-                        27/1/2025
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn btn-secondary"
-                          data-toggle="modal"
-                          data-target="#cancelAppModal">
-                          Cancel
-                        </button>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn btn-primary"
-                          data-toggle="modal"
-                          data-target="#RescheduleAppModal">
-                          Reschedule
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Photo</td>
-                      <td>
-                        Doctor 2
-                        <br />
-                        Psychiatrist
-                      </td>
-                      <td>
-                        10:30 am
-                        <br />
-                        28/1/2025
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn btn-secondary"
-                          data-toggle="modal"
-                          data-target="#cancelAppModal">
-                          Cancel
-                        </button>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn btn-primary"
-                          data-toggle="modal"
-                          data-target="#RescheduleAppModal">
-                          Reschedule
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Photo</td>
-                      <td>
-                        Doctor 3
-                        <br />
-                        Neurosurgeon
-                      </td>
-                      <td>
-                        11:30 am
-                        <br />
-                        29/1/2025
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn btn-secondary"
-                          data-toggle="modal"
-                          data-target="#cancelAppModal">
-                          Cancel
-                        </button>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn btn-primary"
-                          data-toggle="modal"
-                          data-target="#RescheduleAppModal">
-                          Reschedule
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div> -->
+
 
           <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -447,12 +328,6 @@ $patient_name = $_SESSION['patient_name'];
                   </thead>
                   <tbody>
                     <?php
-
-
-
-
-
-
 
                     $sql = "SELECT * FROM appointment JOIN doctor on appointment.doctor_id=doctor.doctor_id  WHERE patient_id = $patient_id";
                     //  AND status = 'upcoming'

@@ -2,14 +2,42 @@
 session_start();
 $patient_id = $_SESSION['patient_id'];
 
-$mysqli = new mysqli('localhost', 'root', '', 'medassist 2');
-if ($mysqli->connect_error) {
-    die("Connection failed: " . $mysqli->connect_error);
-}
+require_once '../db conn.php';
 
 $date = isset($_GET['date']) ? $_GET['date'] : '';
 $doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
-echo $doctor_id;
+
+
+$sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
+
+// Execute the query
+$result = mysqli_query($conn, $sql);
+
+// Check for errors
+if (!$result) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
+$row = mysqli_fetch_assoc($result);
+
+$patient_name = $row['patient_name'];
+
+
+$sql = "SELECT * FROM doctor WHERE doctor_id = $doctor_id";
+
+// Execute the query
+$result = mysqli_query($conn, $sql);
+
+// Check for errors
+if (!$result) {
+    die("Query failed: " . mysqli_error($conn));
+}
+
+$row = mysqli_fetch_assoc($result);
+
+$doctor_name = $row['doctor_name'];
+
+
 $booked_timeslot = isset($_GET['booked_timeslot']) ? $_GET['booked_timeslot'] : '';
 $bookings = [];
 
@@ -19,8 +47,9 @@ if ($booked_timeslot) {
 
 // Retrieve existing bookings for the selected date and doctor_id (including all patients)
 if (!empty($date)) {
-    $stmt = $mysqli->prepare("SELECT timeslot FROM appointment WHERE DATE = ? AND doctor_id = ?");
-    $stmt->bind_param('ss', $date, $doctor_id);
+    $stmt = $conn->prepare("SELECT timeslot FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
+    $stmt->bind_param('sss', $date, $doctor_id, $patient_id);
+
     if ($stmt->execute()) {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
@@ -38,7 +67,7 @@ if (isset($_POST['submit'])) {
     $timeslot = $_POST['timeslot'];
 
     // Check if the timeslot is already booked for the patient_id
-    $stmt = $mysqli->prepare("SELECT * FROM appointment WHERE DATE = ? AND TIMESLOT = ? AND patient_id = ? AND doctor_id = ?");
+    $stmt = $conn->prepare("SELECT * FROM appointment WHERE DATE = ? AND TIMESLOT = ? AND patient_id = ? AND doctor_id = ?");
     $stmt->bind_param('ssss', $date, $timeslot, $patient_id, $doctor_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -47,7 +76,7 @@ if (isset($_POST['submit'])) {
         $msg = "<div class='alert alert-danger'>Already Booked</div>";
     } else {
         // Insert the booking into the database with patient_id
-        $stmt = $mysqli->prepare("INSERT INTO appointment (DATE, TIMESLOT, patient_id,doctor_id) VALUES (?, ?, ?,?)");
+        $stmt = $conn->prepare("INSERT INTO appointment (DATE, TIMESLOT, patient_id,doctor_id) VALUES (?, ?, ?,?)");
         $stmt->bind_param('ssss', $date, $timeslot, $patient_id, $doctor_id);
 
         if ($stmt->execute()) {
@@ -152,30 +181,51 @@ $timeslots = timeslots($duration, $cleanup, $start, $end);
                             <input readonly type="text" class="form-control" id="timeslot" name="timeslot">
                         </div>
                         <?php
-                        $stmt = $mysqli->prepare("SELECT appointment.timeslot, patient.patient_name, doctor.doctor_name 
+                        $stmt = $conn->prepare("SELECT appointment.timeslot, patient.patient_name, doctor.doctor_name 
                                                   FROM appointment 
                                                   JOIN doctor ON appointment.doctor_id = doctor.doctor_id 
                                                   JOIN patient ON appointment.patient_id = patient.patient_id 
                                                   WHERE appointment.patient_id = ?");
                         $stmt->bind_param('i', $patient_id);
+
                         $stmt->execute();
                         $result = $stmt->get_result();
 
-                        while ($row = $result->fetch_assoc()) {
-                            $timeslot = htmlspecialchars($row['timeslot']);
-                            $patientName = htmlspecialchars($row['patient_name']);
-                            $doctorName = htmlspecialchars($row['doctor_name']);
+                        $row = mysqli_fetch_assoc($result);
+
+
+
+                        // $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
+
+                        // // Execute the query
+                        // $result = mysqli_query($conn, $sql);
+
+                        // // Check for errors
+                        // if (!$result) {
+                        //     die("Query failed: " . mysqli_error($conn));
+                        // }
+
+                        // $row = mysqli_fetch_assoc($result);
+                        // echo $row['patient_name'];
+
+
                         ?>
-                            <div class="form-group">
-                                <label for="patientName">Patient Name</label>
-                                <input readonly type="text" class="form-control" id="patientName" name="patientName" value="<?php echo $patientName; ?>">
-                            </div>
-                            <div class="form-group">
-                                <label for="doctorName">Doctor Name</label>
-                                <input readonly type="text" class="form-control" id="doctorName" name="doctorName" value="<?php echo $doctorName; ?>">
-                            </div>
+                        <div class="form-group">
+                            <label for="date">Date</label>
+                            <input readonly type="text" class="form-control" id="dateBooked" name="dateBooked" value="<?php echo date('F d, Y', strtotime($date)); ?>">
+                        </div>
+                        <div class="form-group">
+                            <label for="patientName">Patient Name</label>
+                            <input readonly type="text" class="form-control" id="patientName" name="patientName" value="<?php echo $patient_name; ?>">
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorName">Doctor Name</label>
+                            <input readonly type="text" class="form-control" id="doctorName" name="doctorName" value="<?php echo $doctor_name ?>">
+                        </div>
+
                         <?php
-                        }
+
+
                         $stmt->close();
                         ?>
                     </div>

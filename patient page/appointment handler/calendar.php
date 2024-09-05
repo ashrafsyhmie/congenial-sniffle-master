@@ -2,7 +2,6 @@
 session_start();
 $patient_id = $_SESSION['patient_id'];
 $doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
-echo $doctor_id;
 
 
 // Database connection

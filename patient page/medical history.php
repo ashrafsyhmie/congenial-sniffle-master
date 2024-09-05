@@ -4,6 +4,8 @@ session_start();
 $patient_id = $_SESSION['patient_id'];
 $patient_name = $_SESSION['patient_name'];
 
+require_once('./db conn.php');
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,6 +50,18 @@ $patient_name = $_SESSION['patient_name'];
 
     th {
       text-align: center;
+    }
+
+    .doctor-photo {
+      width: 95px;
+      /* set the width */
+      height: 95px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
     }
 
     .mini-photo {
@@ -274,69 +288,54 @@ $patient_name = $_SESSION['patient_name'];
                   width="100%"
                   cellspacing="0">
                   <thead>
-                    <td>#Appointment ID</td>
-                    <td>Name</td>
-                    <td>Date and Time</td>
+                    <td>Appointment ID</td>
+                    <td>Doctor Photo</td>
+                    <td>Doctor Name</td>
+                    <td>Date</td>
+                    <td>Time</td>
                     <td></td>
+
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>01</td>
-                      <td>
-                        Doctor 1
-                        <br />
-                        Cardiologist
-                      </td>
-                      <td>
-                        9:30 am
-                        <br />
-                        27/1/2025
-                      </td>
-                      <td>
-                        <a
-                          href="./medical history handler/medical history view.html"><button type="button" class="btn btn-primary">
-                            View
-                          </button></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>02</td>
-                      <td>
-                        Doctor 2
-                        <br />
-                        Psychiatrist
-                      </td>
-                      <td>
-                        10:30 am
-                        <br />
-                        28/1/2025
-                      </td>
-                      <td>
-                        <a
-                          href="./medical history handler/medical history view.html"><button type="button" class="btn btn-primary">
-                            View
-                          </button></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>03</td>
-                      <td>
-                        Doctor 3
-                        <br />
-                        Neurosurgeon
-                      </td>
-                      <td>
-                        11:30 am
-                        <br />
-                        29/1/2025
-                      </td>
-                      <td>
-                        <a
-                          href="./medical history handler/medical history view.html"><button type="button" class="btn btn-primary">
-                            View
-                          </button></a>
-                      </td>
-                    </tr>
+                    <?php
+
+                    $sql = "SELECT * FROM appointment JOIN doctor on appointment.doctor_id=doctor.doctor_id  WHERE patient_id = $patient_id AND status = 'done'";
+                    //  AND status = 'upcoming'
+                    $result = mysqli_query($conn, $sql);
+
+                    while ($row = mysqli_fetch_assoc($result)) {
+
+                      //   $doctor_id = $row['doctor_id'];
+                      //   $sql2 = "SELECT * FROM `doctor` WHERE `doctor_id` = '$doctor_id'";
+                      //   $result2 = mysqli_query($connection, $sql2);
+                      //   $row2 = mysqli_fetch_assoc($result2);
+
+                      //   $doctor_name = $row2['doctor_name'];
+
+                      echo "<tr>";
+                      echo "<td>" . $row['appointment_id'] . "</td>";
+                      echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>';
+
+                      echo "<td>" . $row['doctor_name'] . "</td>";
+                      echo "<td>" . $row['date'] . "</td>";
+                      echo "<td>" . $row['timeslot'] .  "</td>";
+                      // echo '<td><a href="./appointment handler/calendar.php?appointment_id=' . $row["appointment_id"] . '"><button type="button" class="btn btn-primary">Select</button></a></td>';
+                      echo '<td><a href="./medical history handler/medical history view.php?appointment_id=' . $row["appointment_id"] . '"><button type="button" class="btn btn-primary">Select</button></a></td>';
+
+
+                      // if ($row['status'] == 'done') {
+                      //   echo '<td><span class="status-done">Done</span></td>';
+                      // } elseif ($row['status'] == 'cancelled') {
+                      //   echo "<td><span class='status-canceled'>Cancelled</span></td>";
+                      // } elseif ($row['status'] == 'upcoming') {
+                      //   echo "<td><span class='status-upcoming'>Upcoming</span></td>";
+                      // }
+                      echo "</tr>";
+                    }
+
+
+
+                    ?>
                   </tbody>
                 </table>
               </div>
