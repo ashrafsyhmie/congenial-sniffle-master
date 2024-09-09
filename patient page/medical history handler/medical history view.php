@@ -9,7 +9,7 @@ require_once('../db conn.php');
 
 
 
-$appointment_id = 86; // Or dynamically set this with $_GET['appointment_id']
+$appointment_id = $_GET['appointment_id']; // Or dynamically set this with $_GET['appointment_id']
 
 // Fetch all patient information
 $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
@@ -94,6 +94,10 @@ foreach ($allPatientInfo as $patient) {
 
 $patient_name = $_SESSION['patient_name'];
 
+
+
+
+
 // Function to fetch all appointment information
 function fetchAllAppointmentInfo($conn, $appointment_id)
 {
@@ -115,6 +119,34 @@ foreach ($allAppointmentInfo as $appointment) {
   $_SESSION['patient_id'] = $appointment['patient_id'];
   $_SESSION['doctor_id'] = $appointment['doctor_id'];
 }
+
+
+$doctor_id = $appointment['doctor_id'];
+
+
+function fetchAllDoctorInfo($conn, $doctor_id)
+{
+  $sql = "SELECT * FROM doctor WHERE doctor_id = $doctor_id";
+  $result = mysqli_query($conn, $sql);
+
+  $doctorInfo = array();
+  while ($row = mysqli_fetch_assoc($result)) {
+    $doctorInfo[] = $row;
+  }
+
+  return $doctorInfo;
+}
+
+// Fetch all doctor information
+$allDoctorInfo = fetchAllDoctorInfo($conn, $doctor_id);
+
+foreach ($allDoctorInfo as $doctor) {
+  $_SESSION['doctor_name'] = $doctor['doctor_name'];
+  $_SESSION['doctor_photo'] = $doctor['doctor_photo'];
+}
+
+$doctor_name = $_SESSION['doctor_name'];
+
 
 
 
@@ -525,7 +557,7 @@ foreach ($allAppointmentInfo as $appointment) {
             <tr>
               <td>
                 <p>Doctor Name</p>
-                <p><?php echo $appointment['doctor_id']  ?></p>
+                <p><?php echo $doctor['doctor_name']  ?></p>
               </td>
               <td>
                 <p>Doctor Signature</p>

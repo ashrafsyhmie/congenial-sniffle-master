@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $imageData = file_get_contents($_FILES['image']['tmp_name']);
 
             // Prepare SQL query to update doctor information
-            $sql = "UPDATE doctor SET doctor_photo = ? WHERE doctor_id = 1";
+            $sql = "UPDATE doctor SET doctor_photo = ? WHERE doctor_id = 3";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $imageData);
 

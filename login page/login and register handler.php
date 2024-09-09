@@ -1,16 +1,11 @@
 <?php
 
 session_start();
-
-// Database connection
-$servername = "localhost";
-$dbusername = "root";
-$dbpassword = "";
-$dbname = "medassist 2";
+require_once '../patient page/db conn.php';
 
 global $conn;
 
-$conn = mysqli_connect($servername, $dbusername, $dbpassword, $dbname);
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST["login_submit"])) {

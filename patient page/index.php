@@ -9,7 +9,6 @@ $patient_id = $_SESSION['patient_id'];
 // Function to fetch all information from the patient table
 function fetchAllPatientInfo($conn)
 {
-
   global $patient_id;
   $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
   $result = mysqli_query($conn, $sql);

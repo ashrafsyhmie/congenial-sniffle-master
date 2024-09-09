@@ -353,7 +353,7 @@ $patient_name = $_SESSION['patient_name'];
 
 
                       if ($row['status'] == 'done') {
-                        echo '<td><span class="status-done">ok</span></td>';
+                        echo '<td><span class="status-done">Done</span></td>';
                       } elseif ($row['status'] == 'cancelled') {
                         echo "<td><span class='status-canceled'>Cancelled</span></td>";
                       } elseif ($row['status'] == 'upcoming') {

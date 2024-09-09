@@ -34,7 +34,7 @@ function timeslots()
             break;
         }
 
-        $slots[] = $intStart->format("H:iA") . " - " . $endPeriod->format("H:iA");
+        $slots[] = $intStart->format("g:iA") . " - " . $endPeriod->format("g:iA");
     }
 
     return $slots;
