@@ -3,6 +3,7 @@ session_start();
 $patient_id = $_SESSION['patient_id'];
 
 require_once '../db conn.php';
+require './timeslots-function.php';
 
 $date = isset($_GET['date']) ? $_GET['date'] : '';
 $doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
@@ -91,31 +92,33 @@ if (isset($_POST['submit'])) {
     }
 }
 
-function timeslots($duration, $cleanup, $start, $end)
-{
-    $start = new DateTime($start);
-    $end = new DateTime($end);
-    $interval = new DateInterval("PT" . $duration . "M");
-    $cleanupInterval = new DateInterval("PT" . $cleanup . "M");
-    $slots = [];
+// function timeslots($duration, $cleanup, $start, $end)
+// {
+//     $start = new DateTime($start);
+//     $end = new DateTime($end);
+//     $interval = new DateInterval("PT" . $duration . "M");
+//     $cleanupInterval = new DateInterval("PT" . $cleanup . "M");
+//     $slots = [];
 
-    for ($intStart = $start; $intStart < $end; $intStart->add($interval)->add($cleanupInterval)) {
-        $endPeriod = clone $intStart;
-        $endPeriod->add($interval);
-        if ($endPeriod > $end) {
-            break;
-        }
-        $slots[] = $intStart->format("H:iA") . " - " . $endPeriod->format("H:iA");
-    }
+//     for ($intStart = $start; $intStart < $end; $intStart->add($interval)->add($cleanupInterval)) {
+//         $endPeriod = clone $intStart;
+//         $endPeriod->add($interval);
+//         if ($endPeriod > $end) {
+//             break;
+//         }
+//         $slots[] = $intStart->format("H:iA") . " - " . $endPeriod->format("H:iA");
+//     }
 
-    return $slots;
-}
+//     return $slots;
+// }
 
-$duration = 30;
-$cleanup = 10;
-$start = "08:00";
-$end = "17:00";
-$timeslots = timeslots($duration, $cleanup, $start, $end);
+// $duration = 30;
+// $cleanup = 10;
+// $start = "08:00";
+// $end = "17:00";
+// $timeslots = timeslots($duration, $cleanup, $start, $end);
+
+$timeslots = timeslots();
 ?>
 
 <!doctype html>

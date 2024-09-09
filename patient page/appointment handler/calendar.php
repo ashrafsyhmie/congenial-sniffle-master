@@ -25,21 +25,15 @@ require './timeslots-function.php';
 
 $date = "2024-09-3"; // Example date
 
-// displayAvailableSlots($date, $mysqli);
-
-
 
 
 function displayAvailableSlots($date, $doctor_id, $mysqli)
 {
     // Define slot parameters
-    $duration = 30; // Duration of each slot in minutes
-    $cleanup = 10;  // Cleanup time in minutes
-    $start = "08:00"; // Start time
-    $end = "17:00";   // End time
+
 
     // Generate all possible time slots for the day
-    $all_slots = timeslots($duration, $cleanup, $start, $end);
+    $all_slots = timeslots();
 
     // Prepare the SQL statement to get booked slots
     $stmt = $mysqli->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND doctor_id = ?");

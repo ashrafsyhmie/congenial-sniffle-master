@@ -305,12 +305,6 @@ require_once('./db conn.php');
 
                     while ($row = mysqli_fetch_assoc($result)) {
 
-                      //   $doctor_id = $row['doctor_id'];
-                      //   $sql2 = "SELECT * FROM `doctor` WHERE `doctor_id` = '$doctor_id'";
-                      //   $result2 = mysqli_query($connection, $sql2);
-                      //   $row2 = mysqli_fetch_assoc($result2);
-
-                      //   $doctor_name = $row2['doctor_name'];
 
                       echo "<tr>";
                       echo "<td>" . $row['appointment_id'] . "</td>";
@@ -322,14 +316,6 @@ require_once('./db conn.php');
                       // echo '<td><a href="./appointment handler/calendar.php?appointment_id=' . $row["appointment_id"] . '"><button type="button" class="btn btn-primary">Select</button></a></td>';
                       echo '<td><a href="./medical history handler/medical history view.php?appointment_id=' . $row["appointment_id"] . '"><button type="button" class="btn btn-primary">Select</button></a></td>';
 
-
-                      // if ($row['status'] == 'done') {
-                      //   echo '<td><span class="status-done">Done</span></td>';
-                      // } elseif ($row['status'] == 'cancelled') {
-                      //   echo "<td><span class='status-canceled'>Cancelled</span></td>";
-                      // } elseif ($row['status'] == 'upcoming') {
-                      //   echo "<td><span class='status-upcoming'>Upcoming</span></td>";
-                      // }
                       echo "</tr>";
                     }
 
