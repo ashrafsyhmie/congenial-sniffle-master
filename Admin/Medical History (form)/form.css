@@ -1,0 +1,104 @@
+* {
+    font-family: Poppins;
+    margin: 7.5px; /* 75% of the original 10px */
+    background-color: FAFBFC;
+  }
+/* Styling for the form container */
+.med-form {
+    border-radius: 15px;
+    background-color: #5d5fef;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    position: relative;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+ 
+}
+
+/* Styling for the labels */
+.med-form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: black;
+    font-size: 20px;
+}
+
+/* Styling for the input fields */
+.med-form input[type="text"],
+.med-form input[type="date"],
+.med-form input[type="number"],
+.med-form textarea,
+.med-form select {
+    width: 90%;
+    padding: 5px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* Styling for radio buttons and checkboxes */
+.med-form input[type="radio"],
+.med-form input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+/* Styling for the form headings */
+.med-form h1 {
+    text-align: center;
+    color: 	#ffffff;
+    font-size: 35px;
+}
+
+.med-form h2 {
+    text-align: center;
+    text-decoration-line: underline;
+    text-decoration-style: solid;    
+    font-size: 30px;
+}
+
+.med-form h4{
+    text-align: center;
+    text-decoration-line: underline;
+    text-decoration-style: solid;  
+}
+
+/* Styling for the submit button */
+.med-form button[type="submit"] {
+    background-color: #2E2F77;
+    color: white;
+    padding: 10px 20px;
+    border: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    font-size: 19px;
+}
+
+.med-form button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Styling for the container holding the form */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f2f2f2;
+    padding: 20px;
+}
+
+.center {
+    margin: 0;
+    justify-content: center;
+    align-items: center;
+  }
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; /* Add some space above the button if needed */
+}

@@ -1,13 +1,42 @@
 <?php
-session_start();
-
-$patient_id = $_SESSION['patient_id'];
-$patient_name = $_SESSION['patient_name'];
 
 require_once "../db conn.php";
+session_start();
 
+$_SESSION['admin_id'] = 1;
+
+$admin_id = $_SESSION['admin_id'];
+
+function fetchAllAdminInfo($conn)
+{
+
+  global $admin_id;
+  $sql = "SELECT * FROM admin WHERE admin_id = $admin_id";
+  $result = mysqli_query($conn, $sql);
+
+  // Initialize an array to store the results
+  $adminInfo = array();
+
+  // Fetch each row and store it in the array
+  while ($row = mysqli_fetch_assoc($result)) {
+    $adminInfo[] = $row;
+  }
+
+  // Return the array containing all patient information
+  return $adminInfo;
+}
+
+$allAdminInfo = fetchAllAdminInfo($conn);
+
+foreach ($allAdminInfo as $admin) {
+  $_SESSION['admin_name'] = $admin['admin_name'];
+}
+
+$admin_name = $_SESSION['admin_name'];
 
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,7 +49,7 @@ require_once "../db conn.php";
   <meta name="description" content="" />
   <meta name="author" content="" />
 
-  <title>New Appointment</title>
+  <title>Home Page</title>
 
   <!-- Custom fonts for this template-->
 
@@ -45,36 +74,32 @@ require_once "../db conn.php";
 
 <body id="page-top">
   <style>
-    .doctor-photo {
-      width: 95px;
-      /* set the width */
-      height: 95px;
-      /* set the height */
-      object-fit: cover;
-      /* to maintain the aspect ratio and cover the area */
-      border-radius: 50%;
-      /* for a circular shape */
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    .card-article {
+
+      background: #fff;
+      display: inline-block;
+      border: 1px solid #ddd;
     }
 
-    td {
-      text-align: center;
+    .image-article {
+
+      float: left;
+      background: #000;
+      height: 100%;
+
     }
 
-    th {
-      text-align: center;
+    .content-article {
+      float: left;
+      height: 140px;
+      width: 73%;
+      overflow: hidden;
+      padding: 5px;
+
     }
 
-    .mini-photo {
-      width: 45px;
-      /* set the width */
-      height: 45px;
-      /* set the height */
-      object-fit: cover;
-      /* to maintain the aspect ratio and cover the area */
-      border-radius: 50%;
-      /* for a circular shape */
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    .content h4 {
+      margin: 5px 0;
     }
   </style>
   <!-- Page Wrapper -->
@@ -86,42 +111,42 @@ require_once "../db conn.php";
       <!-- Sidebar - Brand -->
       <a
         class="sidebar-brand d-flex align-items-center justify-content-center"
-        href="index.php">
+        href="./homepage.php">
         <div class="sidebar-brand-icon">
-          <img src="../img/svg/logo-only.svg" />
+          <img src="./img/svg/logo-only.svg" />
         </div>
         <div class="sidebar-brand-text mx-2">MedAssist</div>
       </a>
 
       <!-- Nav Item - Dashboard -->
-      <li class="nav-item ml-1">
-        <a class="nav-link" href="index.php">
+      <li class="nav-item active ml-1">
+        <a class="nav-link" href="homepage.php">
           <i class="fa-solid fa-house"></i>
           <span>Home</span></a>
       </li>
 
-      <li class="nav-item active ml-1">
-        <a class="nav-link" href="new appointment.php">
-          <i class="fa-solid fa-plus"></i>
-          <span>New Appointment</span></a>
+      <li class="nav-item ml-1">
+        <a class="nav-link" href="./manage doctor/view all doctors.php">
+          <i class="fa-solid fa-stethoscope"></i>
+          <span>View All Doctors</span></a>
       </li>
 
       <li class="nav-item ml-1">
-        <a class="nav-link" href="all appointment.php">
+        <a class="nav-link" href="./manage patient/view all patient.php ">
+          <i class="fa-regular fa-user"></i>
+          <span>View All Patients</span></a>
+      </li>
+
+      <li class="nav-item ml-1">
+        <a class="nav-link" href="./manage appointment/view all appointment.php">
           <i class="fa-solid fa-bookmark"></i>
-          <span>My Appointment</span></a>
-      </li>
-
-      <li class="nav-item ml-1">
-        <a class="nav-link" href="medical history.php">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          <span>Medical History</span></a>
+          <span>View All Appointment</span></a>
       </li>
 
       <li class="nav-item ml-1">
         <a
           class="nav-link collapsed"
-          href="settings.php"
+          href="settings.html"
           data-toggle="collapse"
           data-target="#collapseTwo"
           ria-expanded="true"
@@ -135,13 +160,8 @@ require_once "../db conn.php";
           data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Settings</h6>
-            <a class="collapse-item" href="change info.php">Change Info</a>
-            <div
-              class="collapse-item"
-              data-toggle="modal"
-              data-target="#DeleteAccModal">
-              Delete Account
-            </div>
+            <a class="collapse-item" href="change info.html">Change Info</a>
+            <a class="collapse-item" href="settings.html"> Delete Account </a>
           </div>
         </div>
       </li>
@@ -217,6 +237,7 @@ require_once "../db conn.php";
               </div>
             </li>
 
+
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a
@@ -227,10 +248,10 @@ require_once "../db conn.php";
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $_SESSION['patient_name']; ?></span>
-                <?php
-                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['patient_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
-                ?>
+                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin['admin_name']  ?></span>
+                <img
+                  class="img-profile rounded-circle"
+                  src="img/undraw_profile.svg" />
               </a>
               <!-- Dropdown - User Information -->
               <div
@@ -266,125 +287,103 @@ require_once "../db conn.php";
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
-          <!-- Page Heading -->
-          <div
-            class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
-              New Appointment
-            </h1>
-          </div>
+          <!-- Page Heading and Button in the same row -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">Home Page</h1>
 
-          <!-- New Appointment table -->
-          <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">
-                Book New Appointment
-              </h6>
-            </div>
-            <?php
-            // Assuming the connection has been made as shown above
-
-            // Query to get doctors
-            $sql = "SELECT doctor_id, doctor_name, specialization, doctor_photo FROM doctor"; // Adjust the column names and table name as needed
-            $result = $conn->query($sql);
-
-
-
-            if ($result->num_rows > 0) {
-              echo '<div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-striped table-border-0" id="dataTable" width="100%" cellspacing="0">
-                  <tbody>';
-
-              // Output data of each row
-              while ($row = $result->fetch_assoc()) {
-                $doctor_id = $row["doctor_id"];
-                echo '<tr>
-                <td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>
-               
-                <td>' . $row["doctor_name"] . '<br />' . $row["specialization"] . '</td>
-                <td>
-                  <a href="./appointment handler/calendar.php?doctor_id=' . $row["doctor_id"] . '">
-                    <button type="button" class="btn btn-primary">Select</button>
-                  </a>
-                </td>
-              </tr>';
-              }
-
-              echo '      </tbody>
-                </table>
-              </div>
-            </div>';
-            } else {
-              echo "0 results";
-            }
-
-            // Close connection
-            $conn->close();
-            ?>
-
-            <!-- <div class="card-body">
-              <div class="table-responsive">
-                <table
-                  class="table table-striped table-border-0"
-                  id="dataTable"
-                  width="100%"
-                  cellspacing="0">
-                  <tbody>
-                    <tr>
-                      <td>Photo</td>
-                      <td>
-                        Doctor 1
-                        <br />
-                        Cardiologist
-                      </td>
-                      <td>
-                        <a href="./appointment handler/calendar.php"><button type="button" class="btn btn-primary">
-                            Select
-                          </button></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Photo</td>
-                      <td>
-                        Doctor 2
-                        <br />
-                        Psychiatrist
-                      </td>
-                      <td>
-                        <a href="./appointment handler/calendar.php"><button type="button" class="btn btn-primary">
-                            Select
-                          </button></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Photo</td>
-                      <td>
-                        Doctor 3
-                        <br />
-                        Neurosurgeon
-                      </td>
-                      <td>
-                        <a href="./appointment handler/calendar.php"><button type="button" class="btn btn-primary">
-                            Select
-                          </button></a>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div> -->
+            <!-- Button aligned to the right -->
+            <a href="./manage article/manage_article.php" class="btn btn-primary mb-2">
+              <i class="fa fa-plus mr-1"></i> Manage Article
+            </a>
           </div>
         </div>
-        <!-- /.container-fluid -->
-      </div>
-      <!-- End of Main Content -->
 
-      <!-- Footer -->
-      <footer class="sticky-footer bg-white"></footer>
-      <!-- End of Footer -->
+        <!-- Welcome Section -->
+        <div
+          class="welcome-section p-4 ml-1 mb-5 border-2 rounded-lg justify-content-center"
+          style="background-image: url(./img/background.png)">
+          <h1 class="h4 text-dark">Welcome!</h1>
+          <p class="">Hi, <?php echo $admin['admin_name']  ?></p>
+          <br />
+          <br />
+          <br />
+          <br />
+          <form
+            class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control bg-light border-0 small"
+                placeholder="Search for..."
+                aria-label="Search"
+                aria-describedby="basic-addon2" />
+              <div class="input-group-append">
+                <button class="btn btn-primary" type="button">
+                  <i class="fas fa-search fa-sm"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+
+
+        <!-- Content Column -->
+
+        <div class="container">
+          <div class="row">
+            <?php
+            // Assuming connection to the database is established in $conn
+
+            // Fetch only visible articles
+            $query = "SELECT * FROM article WHERE visibility = 'show'";
+            $result = $conn->query($query);
+
+            if ($result->num_rows > 0) {
+              while ($article = $result->fetch_assoc()) {
+                // Base64 encode the image
+                $imageSrc = 'data:image/jpeg;base64,' . base64_encode($article['image']);
+
+            ?>
+                <div class="card-wrap">
+                  <div class="card-header one">
+                    <!-- You can replace the icon dynamically if needed -->
+                    <img src="<?= htmlspecialchars($imageSrc); ?>" alt="Article image" style="width: 200px; height: 100%;">
+
+                  </div>
+                  <div class="card-content">
+                    <h3 class="card-title"><?= htmlspecialchars($article['title']); ?></h3>
+                    <p class="card-text"><?= htmlspecialchars($article['description']); ?></p>
+                    <button class="card-btn one">
+                      <a href="<?= htmlspecialchars($article['link']); ?>" style="color: inherit; text-decoration: none;">
+                        Read More
+                      </a>
+                    </button>
+                  </div>
+                </div>
+            <?php
+              }
+            } else {
+              echo '<p>No articles found.</p>';
+            }
+
+            $result->free();
+            $conn->close();
+            ?>
+          </div>
+        </div>
+
+
+      </div>
+      <!-- /.container-fluid -->
     </div>
-    <!-- End of Content Wrapper -->
+    <!-- End of Main Content -->
+
+    <!-- Footer -->
+    <footer class="sticky-footer bg-white"></footer>
+    <!-- End of Footer -->
+  </div>
+  <!-- End of Content Wrapper -->
   </div>
   <!-- End of Page Wrapper -->
 
@@ -392,6 +391,7 @@ require_once "../db conn.php";
   <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
   </a>
+
 
   <!-- Logout Modal-->
   <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -417,7 +417,6 @@ require_once "../db conn.php";
     </div>
   </div>
 
-  <!-- Bootstrap core JavaScript-->
   <!-- Bootstrap core JavaScript-->
   <script src="../vendor/jquery/jquery.min.js"></script>
   <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

@@ -1,5 +1,5 @@
 <?php
-require_once('./db conn.php'); // Ensure this file contains a valid connection to your database
+require_once('../db conn.php'); // Ensure this file contains a valid connection to your database
 
 $errorMsg = "";
 $successMsg = "";

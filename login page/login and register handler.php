@@ -1,7 +1,7 @@
 <?php
 
 session_start();
-require_once '../patient page/db conn.php';
+require_once '../db conn.php';
 
 global $conn;
 
@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['admin_id'] = $userData['id'];
                     echo "<script>
                     alert('Successfully logged in!');
-                    window.location.href = ' http://localhost/congenial-sniffle-master/admin%20page/homepage.html';
+                    window.location.href = ' http://localhost/congenial-sniffle-master/admin/homepage.php';
                   </script>";
 
                     break;
@@ -46,7 +46,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     break;
             }
         } else {
-            echo "Login Failed";
+            echo "<script>
+                    alert('Successfully logged in!');
+                    window.location.href = ' http://localhost/congenial-sniffle-master/patient%20page/index.php';
+                  </script>";
         }
     } elseif (isset($_POST["register_submit"])) {
         // Handle register section

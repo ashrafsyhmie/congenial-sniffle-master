@@ -7,7 +7,7 @@ $errorMsg = "";
 $successMsg = "";
 
 
-require_once("db conn.php");
+require_once("../db conn.php");
 
 function getPatientData($conn, $patient_id)
 {

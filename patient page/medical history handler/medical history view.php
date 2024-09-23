@@ -5,7 +5,7 @@ session_start();
 $patient_id = $_SESSION['patient_id'];
 $patient_name = $_SESSION['patient_name'];
 
-require_once('../db conn.php');
+require_once('../../db conn.php');
 
 
 
@@ -283,6 +283,24 @@ $doctor_name = $_SESSION['doctor_name'];
       </div>
     </section>
 
+    <!-- Notes -->
+    <section>
+      <div class="notes container mt-5">
+        <table class="table" style="background-color: #fafbfc">
+          <h4 class="h4">Notes</h4>
+          <tr>
+            <th>Appointment Notes</th>
+          </tr>
+          <tr>
+            <td>
+              <?php echo $medical_record['notes']  ?>
+            </td>
+          </tr>
+        </table>
+
+      </div>
+    </section>
+
     <!-- Medication -->
 
 
@@ -335,12 +353,6 @@ $doctor_name = $_SESSION['doctor_name'];
                 <td>
                   <p>Alcohol Consumption</p>
                   <p><?php echo $row['alcohol_consumption']; ?></p>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  <p>Substance Abuse History</p>
-                  <p><?php echo $row['substance_abuse_history']; ?></p>
                 </td>
               </tr>
               <tr>

@@ -1,5 +1,5 @@
 <?php
-require_once "db conn.php";
+require_once "../db conn.php";
 global $conn;
 session_start();
 

@@ -2,7 +2,7 @@
 session_start();
 $patient_id = $_SESSION['patient_id'];
 
-require_once '../db conn.php';
+require_once '../../db conn.php';
 require './timeslots-function.php';
 
 $date = isset($_GET['date']) ? $_GET['date'] : '';

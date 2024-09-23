@@ -3,7 +3,7 @@
 $server = "localhost";
 $user = "root";
 $pass = "";
-$db = "try_test_data";
+$db = "medassisst_try_gabung";
 
 $conn = mysqli_connect($server, $user, $pass, $db);
 

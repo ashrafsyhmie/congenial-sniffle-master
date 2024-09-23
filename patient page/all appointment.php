@@ -2,7 +2,7 @@
 
 session_start();
 
-require_once("db conn.php");
+require_once("../db conn.php");
 
 $patient_id = $_SESSION['patient_id'];
 $patient_name = $_SESSION['patient_name'];

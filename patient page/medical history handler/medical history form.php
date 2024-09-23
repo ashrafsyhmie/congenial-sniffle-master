@@ -1,3 +1,87 @@
+<?php
+
+session_start();
+require_once('../../db conn.php');
+
+
+function getAppointmentData($conn, $appointment_id)
+{
+  $sql = "SELECT * FROM appointment WHERE appointment_id=?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $appointment_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc();
+}
+
+$appointment_id = 1;
+// $appointment_id = $_GET['appointment_id'];
+// if (!isset($_GET['appointment_id'])) {
+//   die("Appointment ID not provided.");
+// }
+
+
+
+$Appointmentrow = getAppointmentData($conn, $appointment_id);
+
+$doctor_id = $Appointmentrow['doctor_id'];
+
+function getDoctorData($conn, $doctor_id)
+{
+  $sql = "SELECT * FROM doctor WHERE doctor_id=?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $doctor_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc();
+}
+
+$DoctorRow = getDoctorData($conn, $doctor_id);
+
+if (!$DoctorRow) {
+  die("Doctor not found.");
+}
+
+$doctor_name = $DoctorRow['doctor_name'];
+
+
+
+// $_SESSION['patient_id'] = $_GET['patient_id'];
+$_SESSION['patient_id'] = 1;
+$patient_id = $_SESSION['patient_id'];
+
+
+
+
+function getPatientData($conn, $patient_id)
+{
+  $sql = "SELECT * FROM patient WHERE patient_id=?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $patient_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc();
+}
+
+
+
+$PatientRow = getPatientData($conn, $patient_id);
+
+if (!$PatientRow) {
+  die("Patient not found.");
+}
+
+if ($PatientRow['patient_id'] != $patient_id) {
+  die("Invalid patient ID.");
+}
+
+$patient_name = $PatientRow['patient_name'];
+$patient_gender = $PatientRow['gender'];
+$patient_email = $PatientRow['email'];
+$patient_phone = $PatientRow['phone number'];
+$patient_address = $PatientRow['address'];
+$patient_em_contact = $PatientRow['emerg_num'];
+$patient_dob = $PatientRow['d_o_b'];
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -37,7 +121,7 @@
     }
   </style>
 
-  <form id="content" method="post">
+  <form id="content" method="post" action="./medical history handler.php">
     <!-- Header -->
     <header>
       <div class="container text-center bg-primary p-4 mb-5">
@@ -60,42 +144,57 @@
         <table class="table" style="background-color: #fafbfc">
           <tr>
             <td>
+              <label for="appointment_id">Appointment ID</label>
+              <input type="text" name="appointment_id" class="form-control">
               <label for="patient-name">Patient Name</label>
-              <input type="text" name="patient-name" class="form-control" />
+              <input type="text" name="patient-name" class="form-control" disabled value="
+              <?php echo $patient_name; ?>" />
             </td>
             <td>
               <label for="patient-age">Age</label>
-              <input type="text" name="patient-age" class="form-control" />
+              <input type="text" name="patient-age" class="form-control" disabled value="
+              <?php
+              // Create DateTime objects for the date of birth and the current date
+              $dob = new DateTime($patient_dob);
+              $now = new DateTime();
+
+              // Calculate the difference between the two dates
+              $age = $now->diff($dob)->y;
+
+              // Output the age
+              echo $age; ?>" />
             </td>
           </tr>
           <tr>
             <td>
               <label for="phone-number">Phone Number</label>
-              <input type="text" name="phone-number" class="form-control" />
+              <input type="text" name="phone-number" class="form-control" disabled value="
+              <?php echo $patient_phone; ?>" />
             </td>
             <td>
               <label for="dob">Date of Birth</label>
-              <input type="date" name="dob" class="form-control" />
+              <input type="date" name="dob" class="form-control" disabled value="<?php echo $patient_dob ?>" />
+
             </td>
           </tr>
           <tr>
             <td>
               <label for="email">Email</label>
-              <input type="email" name="email" class="form-control" />
+              <input type="email" name="email" class="form-control" disabled value="<?php echo $patient_email ?>" />
             </td>
             <td>
               <div class="form-group">
-                <label for="gender">Gender:</label>
+                <label for="gender">Gender</label>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="gender" id="male" value="male" />
+                  <input class="form-check-input" type="radio" name="gender" id="male" value="male" <?php if ($patient_gender == 'Male') echo 'checked'; ?> />
                   <label class="form-check-label" for="male">Male</label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="gender" id="female" value="female" />
+                  <input class="form-check-input" type="radio" name="gender" id="female" value="female" <?php if ($patient_gender == 'Female') echo 'checked'; ?> />
                   <label class="form-check-label" for="female">Female</label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="gender" id="other" value="other" />
+                  <input class="form-check-input" type="radio" name="gender" id="other" value="other" <?php if ($patient_gender == 'other') echo 'checked'; ?> />
                   <label class="form-check-label" for="other">Other</label>
                 </div>
               </div>
@@ -104,14 +203,22 @@
           <tr>
             <td>
               <label for="patient-address">Address</label>
-              <input type="text" name="patient-address" class="form-control" />
+              <input type="text" name="patient-address" class="form-control" disabled value="<?php echo $patient_address ?>" />
             </td>
             <td>
               <label for="patient-em-contact">Emergency Contact Number</label>
-              <input type="text" name="patient-em-contact" class="form-control" />
+              <input type="text" name="patient-em-contact" class="form-control" disabled value="<?php echo $patient_em_contact ?>" />
             </td>
           </tr>
         </table>
+      </div>
+    </section>
+
+    <!-- Notes -->
+    <section>
+      <div class="notes container mt-5">
+        <label for="notes">Notes</label>
+        <input type="text" name="notes" id="notes" class="form-control">
       </div>
     </section>
 
@@ -132,20 +239,17 @@
           <thead>
             <th>Medication</th>
             <th>Purpose</th>
+            <th>Test 123</th>
             <th>Dosage</th>
             <th>Frequency</th>
           </thead>
 
 
           <tr>
-            <td>
-              <input type="text" name="medication" class="form-control" placeholder="Medication" />
-            </td>
-            <td><input type="text" name="purpose" class="form-control" placeholder="Purpose" /></td>
-            <td><input type="text" name="dosage" class="form-control" placeholder="Dosage" /></td>
-            <td>
-              <input type="text" name="frequency" class="form-control" placeholder="Frequency" />
-            </td>
+            <td><input type="text" name="medication_name[]" class="form-control" placeholder="Medication" value="Test Name" /></td>
+            <td><input type="text" name="purpose[]" class="form-control" placeholder="Purpose" /></td>
+            <td><input type="text" name="dosage[]" class="form-control" placeholder="Dosage" value="Test Dosage" /></td>
+            <td><input type="text" name="frequency[]" class="form-control" placeholder="Frequency" value="Test Frequency" /></td>
           </tr>
         </table>
 
@@ -170,12 +274,12 @@
                 <div class="form-group">
 
                   <div class="form-check">
-                    <input class="form-check-input" type="radio" name="smoking" id="no" value="no" />
+                    <input class="form-check-input" type="radio" name="smoking" value="No" />
                     <label class="form-check-label" for="no">No</label>
                   </div>
                   <div class="form-check">
-                    <input class="form-check-input" type="radio" name="smoking" id="yes" value="yes" />
-                    <label class="form-check-label" for="yes">Yes</label>
+                    <input class="form-check-input" type="radio" name="smoking" value="Yes" />
+                    <label class="form-check-label">Yes</label>
                   </div>
 
                 </div>
@@ -183,27 +287,31 @@
               <td>
                 <label for="alcohol">Alcohol Consumption</label>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="alcohol" id="no" value="no" />
-                  <label class="form-check-label" for="no">No</label>
+                  <input class="form-check-input" type="radio" name="alcohol" value="No" />
+                  <label class="form-check-label">No</label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="alcohol" id="yes" value="yes" />
-                  <label class="form-check-label" for="yes">Yes</label>
+                  <input class="form-check-input" type="radio" name="alcohol" value="Yes" />
+                  <label class="form-check-label">Yes</label>
                 </div>
               </td>
             </tr>
 
             <tr>
               <td colspan="2">
-                <label for="alcohol">Allergence History</label>
+                <label for="allergies">Allergence History</label>
+
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="alcohol" id="no" value="no" />
+                  <input class="form-check-input" type="radio" name="allergies" id="no" value="no" />
                   <label class="form-check-label" for="no">No</label>
                 </div>
-                <div class="form-check ">
-                  <input class="form-check-input" type="radio" name="alcohol" id="yes" value="yes" />
+
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="allergies" id="yes" value="yes" />
                   <label class="form-check-label" for="yes">Yes; Specify</label>
-                  <input type="text" name="allergies" class="form-control ">
+
+                  <!-- Specify allergies text input -->
+                  <input type="text" name="allergies" class="form-control" id="allergies-input" style="display:none;" placeholder="Specify allergies">
                 </div>
               </td>
             </tr>
@@ -386,9 +494,9 @@
               <th>Result</th>
             </thead>
             <tr>
-              <td><input type='text' name='procedure name' class='form-control' placeholder="Procedure Name" /></td>
-              <td><input type='text' name='purpose' class='form-control' placeholder="Purpose" /></td>
-              <td><input type='text' name='result' class='form-control' placeholder="Result" /></td>
+              <td><input type='text' name='procedure_name[]' class='form-control' placeholder="Procedure Name" /></td>
+              <td><input type='text' name='diagnosis_purpose[]' class='form-control' placeholder="Purpose" /></td>
+              <td><input type='text' name='diagnosis_result[]' class='form-control' placeholder="Result" /></td>
             </tr>
           </table>
         </div>
@@ -405,7 +513,7 @@
             <tr>
               <td>
                 <p>Doctor Name</p>
-                <input type="doctor name" class="form-control" readonly>
+                <input type="doctor name" class="form-control" disabled value="<?php echo $doctor_name ?>">
               </td>
               <td>
                 <p>Doctor Signature</p>
@@ -431,6 +539,8 @@
     <br><br>
   </form>
 
+
+
   <!-- Bootstrap JS and jQuery -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.9.3/dist/umd/popper.min.js"></script>
@@ -438,7 +548,7 @@
 
 
 
-  <script>
+  <!-- <script>
     $(document).ready(function() {
       // Add and remove event listeners for all table types
       addEventListeners('#addRowBtnMed', '#removeRowBtnMed', '#medicationTable', [{
@@ -503,6 +613,86 @@
         $tableBody.find('tr:last').remove();
       }
     }
+  </script> -->
+
+  <script>
+    $(document).ready(function() {
+      // Add and remove event listeners for all table types
+      addEventListeners('#addRowBtnMed', '#removeRowBtnMed', '#medicationTable', [{
+          name: 'medication_name',
+          placeholder: 'Medication'
+        },
+        {
+          name: 'purpose',
+          placeholder: 'Purpose'
+        },
+        {
+          name: 'abc123',
+          placeholder: 'abc123'
+        },
+        {
+          name: 'dosage',
+          placeholder: 'Dosage'
+        },
+        {
+          name: 'frequency',
+          placeholder: 'Frequency'
+        }
+      ]);
+
+      addEventListeners('#addRowBtnDiagnosis', '#removeRowBtnDiagnosis', '#diagnosisTable', [{
+          name: 'procedure_name',
+          placeholder: 'Procedure Name'
+        },
+        {
+          name: 'diagnosis_purpose',
+          placeholder: 'Purpose'
+        },
+        {
+          name: 'diagnosis_result',
+          placeholder: 'Result'
+        }
+      ]);
+    });
+
+    function addEventListeners(addBtnSelector, removeBtnSelector, tableSelector, columns) {
+      $(addBtnSelector).click(function(event) {
+        event.preventDefault();
+        addRow(tableSelector, columns);
+      });
+
+      $(removeBtnSelector).click(function(event) {
+        event.preventDefault();
+        removeRow(tableSelector);
+      });
+    }
+
+    function addRow(tableSelector, columns) {
+      let markup = "<tr>";
+      columns.forEach((column, index) => {
+        markup += `<td><input type='text' name='${column.name}[]' class='form-control' placeholder='${column.placeholder}' /></td>`;
+      });
+      markup += "</tr>";
+      $(tableSelector + ' tbody').append(markup);
+    }
+
+    function removeRow(tableSelector) {
+      var $tableBody = $(tableSelector + ' tbody');
+      if ($tableBody.find('tr').length > 1) {
+        $tableBody.find('tr:last').remove();
+      }
+    }
+  </script>
+
+  <script>
+    // JavaScript to show/hide allergies input field based on Yes/No selection
+    document.getElementById('yes').addEventListener('click', function() {
+      document.getElementById('allergies-input').style.display = 'block';
+    });
+
+    document.getElementById('no').addEventListener('click', function() {
+      document.getElementById('allergies-input').style.display = 'none';
+    });
   </script>
 
 

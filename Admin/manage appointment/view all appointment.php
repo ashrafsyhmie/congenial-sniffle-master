@@ -1,13 +1,16 @@
 <?php
+
+
 session_start();
+$admin_id = $_SESSION['admin_id'];
+$admin_name = $_SESSION['admin_name'];
 
-$patient_id = $_SESSION['patient_id'];
-$patient_name = $_SESSION['patient_name'];
-
-require_once "../db conn.php";
+require_once "../../db conn.php";
 
 
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -20,7 +23,7 @@ require_once "../db conn.php";
   <meta name="description" content="" />
   <meta name="author" content="" />
 
-  <title>New Appointment</title>
+  <title>View All Patient</title>
 
   <!-- Custom fonts for this template-->
 
@@ -32,7 +35,7 @@ require_once "../db conn.php";
     referrerpolicy="no-referrer" />
 
   <link
-    href="../vendor/fontawesome-free/css/all.min.css"
+    href="../../vendor/fontawesome-free/css/all.min.css"
     rel="stylesheet"
     type="text/css" />
   <link
@@ -40,43 +43,88 @@ require_once "../db conn.php";
     rel="stylesheet" />
 
   <!-- Custom styles for this template-->
-  <link href="../css/sb-admin-2.min.css" rel="stylesheet" />
+  <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
+  <style>
+    .patient-photo {
+      width: 98px;
+      /* set the width */
+      height: 98px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+
+    .doctor-photo {
+      width: 98px;
+      /* set the width */
+      height: 98px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+
+
+    .pagination-container {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .pagination-container a {
+      color: #007bff;
+      font-size: 15px;
+      padding: 8px 10px;
+      text-decoration: none;
+      border-radius: 4px;
+      border: 1px solid #007bff;
+      margin: 0 5px;
+    }
+
+    .pagination-container a:hover {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .page-number {
+      font-size: 15px;
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: 1px solid #007bff;
+      margin: 0 5px;
+    }
+
+    .status-done {
+      background-color: green;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      display: inline-block;
+    }
+
+    .status-canceled {
+      background-color: red;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      display: inline-block;
+    }
+
+    .status-upcoming {
+      background-color: orange;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      display: inline-block;
+    }
+  </style>
 </head>
 
 <body id="page-top">
-  <style>
-    .doctor-photo {
-      width: 95px;
-      /* set the width */
-      height: 95px;
-      /* set the height */
-      object-fit: cover;
-      /* to maintain the aspect ratio and cover the area */
-      border-radius: 50%;
-      /* for a circular shape */
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
-    }
-
-    td {
-      text-align: center;
-    }
-
-    th {
-      text-align: center;
-    }
-
-    .mini-photo {
-      width: 45px;
-      /* set the width */
-      height: 45px;
-      /* set the height */
-      object-fit: cover;
-      /* to maintain the aspect ratio and cover the area */
-      border-radius: 50%;
-      /* for a circular shape */
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
-    }
-  </style>
   <!-- Page Wrapper -->
   <div id="wrapper">
     <!-- Sidebar -->
@@ -86,7 +134,7 @@ require_once "../db conn.php";
       <!-- Sidebar - Brand -->
       <a
         class="sidebar-brand d-flex align-items-center justify-content-center"
-        href="index.php">
+        href="../homepage.php">
         <div class="sidebar-brand-icon">
           <img src="../img/svg/logo-only.svg" />
         </div>
@@ -95,33 +143,33 @@ require_once "../db conn.php";
 
       <!-- Nav Item - Dashboard -->
       <li class="nav-item ml-1">
-        <a class="nav-link" href="index.php">
+        <a class="nav-link" href="../homepage.php">
           <i class="fa-solid fa-house"></i>
           <span>Home</span></a>
       </li>
 
+      <li class="nav-item ml-1">
+        <a class="nav-link" href="../manage doctor/view all doctors.php">
+          <i class="fa-solid fa-stethoscope"></i>
+          <span>View All Doctors</span></a>
+      </li>
+
+      <li class="nav-item ml-1">
+        <a class="nav-link" href="../manage patient/view all patient.php ">
+          <i class="fa-regular fa-user"></i>
+          <span>View All Patients</span></a>
+      </li>
+
       <li class="nav-item active ml-1">
-        <a class="nav-link" href="new appointment.php">
-          <i class="fa-solid fa-plus"></i>
-          <span>New Appointment</span></a>
-      </li>
-
-      <li class="nav-item ml-1">
-        <a class="nav-link" href="all appointment.php">
+        <a class="nav-link" href="./view all appointment.php">
           <i class="fa-solid fa-bookmark"></i>
-          <span>My Appointment</span></a>
-      </li>
-
-      <li class="nav-item ml-1">
-        <a class="nav-link" href="medical history.php">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          <span>Medical History</span></a>
+          <span>View All Appointment</span></a>
       </li>
 
       <li class="nav-item ml-1">
         <a
           class="nav-link collapsed"
-          href="settings.php"
+          href="settings.html"
           data-toggle="collapse"
           data-target="#collapseTwo"
           ria-expanded="true"
@@ -135,13 +183,8 @@ require_once "../db conn.php";
           data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Settings</h6>
-            <a class="collapse-item" href="change info.php">Change Info</a>
-            <div
-              class="collapse-item"
-              data-toggle="modal"
-              data-target="#DeleteAccModal">
-              Delete Account
-            </div>
+            <a class="collapse-item" href="change info.html">Change Info</a>
+            <a class="collapse-item" href="settings.html"> Delete Account </a>
           </div>
         </div>
       </li>
@@ -217,6 +260,7 @@ require_once "../db conn.php";
               </div>
             </li>
 
+
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a
@@ -227,10 +271,10 @@ require_once "../db conn.php";
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $_SESSION['patient_name']; ?></span>
-                <?php
-                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['patient_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
-                ?>
+                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
+                <img
+                  class="img-profile rounded-circle"
+                  src="../img/undraw_profile.svg" />
               </a>
               <!-- Dropdown - User Information -->
               <div
@@ -267,122 +311,86 @@ require_once "../db conn.php";
         <!-- Begin Page Content -->
         <div class="container-fluid">
           <!-- Page Heading -->
-          <div
-            class="d-sm-flex align-items-center justify-content-between mb-4">
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
-              New Appointment
+              View Appointment Record
             </h1>
           </div>
 
-          <!-- New Appointment table -->
+          <!-- All Appointment table -->
           <div class="card shadow mb-4">
             <div class="card-header py-3">
               <h6 class="m-0 font-weight-bold text-primary">
-                Book New Appointment
+                Appointment Record
               </h6>
             </div>
-            <?php
-            // Assuming the connection has been made as shown above
 
-            // Query to get doctors
-            $sql = "SELECT doctor_id, doctor_name, specialization, doctor_photo FROM doctor"; // Adjust the column names and table name as needed
-            $result = $conn->query($sql);
-
-
-
-            if ($result->num_rows > 0) {
-              echo '<div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-striped table-border-0" id="dataTable" width="100%" cellspacing="0">
-                  <tbody>';
-
-              // Output data of each row
-              while ($row = $result->fetch_assoc()) {
-                $doctor_id = $row["doctor_id"];
-                echo '<tr>
-                <td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>
-               
-                <td>' . $row["doctor_name"] . '<br />' . $row["specialization"] . '</td>
-                <td>
-                  <a href="./appointment handler/calendar.php?doctor_id=' . $row["doctor_id"] . '">
-                    <button type="button" class="btn btn-primary">Select</button>
-                  </a>
-                </td>
-              </tr>';
-              }
-
-              echo '      </tbody>
-                </table>
-              </div>
-            </div>';
-            } else {
-              echo "0 results";
-            }
-
-            // Close connection
-            $conn->close();
-            ?>
-
-            <!-- <div class="card-body">
+            <div class="card-body">
               <div class="table-responsive">
                 <table
                   class="table table-striped table-border-0"
                   id="dataTable"
                   width="100%"
                   cellspacing="0">
+                  <thead>
+                    <td>Appointment ID</td>
+                    <td></td>
+                    <td>Doctor Name</td>
+                    <td></td>
+                    <td>Patient Name</td>
+                    <td>Date</td>
+                    <td>Time</td>
+                    <td>Status</td>
+
+                  </thead>
+
                   <tbody>
-                    <tr>
-                      <td>Photo</td>
-                      <td>
-                        Doctor 1
-                        <br />
-                        Cardiologist
-                      </td>
-                      <td>
-                        <a href="./appointment handler/calendar.php"><button type="button" class="btn btn-primary">
-                            Select
-                          </button></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Photo</td>
-                      <td>
-                        Doctor 2
-                        <br />
-                        Psychiatrist
-                      </td>
-                      <td>
-                        <a href="./appointment handler/calendar.php"><button type="button" class="btn btn-primary">
-                            Select
-                          </button></a>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Photo</td>
-                      <td>
-                        Doctor 3
-                        <br />
-                        Neurosurgeon
-                      </td>
-                      <td>
-                        <a href="./appointment handler/calendar.php"><button type="button" class="btn btn-primary">
-                            Select
-                          </button></a>
-                      </td>
-                    </tr>
+                    <?php
+
+                    $sql = "SELECT * FROM appointment JOIN patient ON appointment.patient_id = patient.patient_id JOIN doctor ON appointment.doctor_id = doctor.doctor_id";
+
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                      while ($row = $result->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($row['appointment_id']) . "</td>";
+                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Patient photo" class="patient-photo"></td>';
+                        echo  "<td>" . htmlspecialchars($row['doctor_name']) . "</td>";
+                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class="patient-photo"></td>';
+                        echo "<td>" . htmlspecialchars($row['patient_name']) . "<br>" . htmlspecialchars($row['ic number']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['date']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['timeslot']) . "</td>";
+                        echo '<td>';
+                        echo '<a href="patient_profile.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm">View</a> ';
+                        echo '<a href="delete.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-danger btn-sm btn-delete" onclick="return confirm(\'Are you sure you want to delete this patient?\');">';
+                        echo '<i class="fa fa-trash"></i>';
+                        echo '</a>';
+                        echo '</td>';
+                        echo "</tr>";
+                      }
+                    } else {
+                      echo "<tr><td colspan='4'>No patient found.</td></tr>";
+                    }
+                    ?>
                   </tbody>
                 </table>
               </div>
-            </div> -->
+            </div>
           </div>
         </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination-container">
+          <a href="#" class="previous round">&#8249;</a>
+          <span class="page-number">1</span>
+          <a href="#" class="next round">&#8250;</a>
+        </div>
+
         <!-- /.container-fluid -->
       </div>
       <!-- End of Main Content -->
 
-      <!-- Footer -->
-      <footer class="sticky-footer bg-white"></footer>
-      <!-- End of Footer -->
     </div>
     <!-- End of Content Wrapper -->
   </div>
@@ -394,12 +402,22 @@ require_once "../db conn.php";
   </a>
 
   <!-- Logout Modal-->
-  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div
+    class="modal fade"
+    id="logoutModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <button
+            class="close"
+            type="button"
+            data-dismiss="modal"
+            aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -407,33 +425,76 @@ require_once "../db conn.php";
           Select "Logout" below if you are ready to end your current session.
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <!-- Form for logout -->
-          <form action="./logout_modal.php" method="post">
-            <button type="submit" class="btn btn-primary">Logout</button>
-          </form>
+          <button
+            class="btn btn-secondary"
+            type="button"
+            data-dismiss="modal">
+            Cancel
+          </button>
+          <a class="btn btn-primary" href="login.html">Logout</a>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Bootstrap core JavaScript-->
-  <!-- Bootstrap core JavaScript-->
-  <script src="../vendor/jquery/jquery.min.js"></script>
-  <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
   <!-- Core plugin JavaScript-->
-  <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
   <!-- Custom scripts for all pages-->
-  <script src="../js/sb-admin-2.min.js"></script>
+  <script src="js/sb-admin-2.min.js"></script>
 
   <!-- Page level plugins -->
-  <script src="../vendor/chart.js/Chart.min.js"></script>
+  <script src="vendor/chart.js/Chart.min.js"></script>
 
   <!-- Page level custom scripts -->
-  <script src="../js/demo/chart-area-demo.js"></script>
-  <script src="../js/demo/chart-pie-demo.js"></script>
+  <script src="js/demo/chart-area-demo.js"></script>
+  <script src="js/demo/chart-pie-demo.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const rowsPerPage = 5; //number of row per page (kalau nak tukar kat sini tau)
+      const table = document.querySelector('#dataTable');
+      const rows = table.querySelectorAll('tbody tr');
+      const totalRows = rows.length;
+      const totalPages = Math.ceil(totalRows / rowsPerPage);
+      let currentPage = 1;
+
+      function showPage(page) {
+        const start = (page - 1) * rowsPerPage;
+        const end = page * rowsPerPage;
+
+        rows.forEach((row, index) => {
+          row.style.display = (index >= start && index < end) ? '' : 'none';
+        });
+
+        document.querySelector('.page-number').textContent = page;
+      }
+
+      function setupPagination() {
+        document.querySelector('.previous').addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--;
+            showPage(currentPage);
+          }
+        });
+
+        document.querySelector('.next').addEventListener('click', () => {
+          if (currentPage < totalPages) {
+            currentPage++;
+            showPage(currentPage);
+          }
+        });
+      }
+
+      showPage(currentPage);
+      setupPagination();
+    });
+  </script>
 </body>
 
 </html>
