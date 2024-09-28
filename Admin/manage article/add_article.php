@@ -1,6 +1,6 @@
 <?php
 
-require_once "db conn.php";
+require_once "../../db conn.php";
 session_start();
 
 $_SESSION['admin_id'] = 1;
@@ -32,6 +32,47 @@ foreach ($allAdminInfo as $admin) {
     $_SESSION['admin_name'] = $admin['admin_name'];
 }
 
+
+// Establish your MySQLi connection (assuming you have a separate file for this)
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
+
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+
+    // Handle file upload
+    $image = null;
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $image = file_get_contents($_FILES['image']['tmp_name']);
+    }
+
+    // Prepare SQL query with placeholders
+    $query = "INSERT INTO article (title, description, image) VALUES (?, ?, ?)";
+
+    // Prepare the statement
+    $stmt = $conn->prepare($query);
+
+    // Check if the statement was prepared successfully
+    if ($stmt === false) {
+        die('Prepare failed: ' . htmlspecialchars($conn->error));
+    }
+
+    // Bind parameters
+    $stmt->bind_param('sss', $title, $description, $image);
+
+    // Execute the statement
+    if ($stmt->execute()) {
+        echo "Article inserted successfully.";
+    } else {
+        echo "Error executing statement: " . htmlspecialchars($stmt->error);
+    }
+
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+}
+
+
 ?>
 
 
@@ -59,7 +100,7 @@ foreach ($allAdminInfo as $admin) {
         referrerpolicy="no-referrer" />
 
     <link
-        href="vendor/fontawesome-free/css/all.min.css"
+        href="../../vendor/fontawesome-free/css/all.min.css"
         rel="stylesheet"
         type="text/css" />
     <link
@@ -67,7 +108,7 @@ foreach ($allAdminInfo as $admin) {
         rel="stylesheet" />
 
     <!-- Custom styles for this template-->
-    <link href="css/sb-admin-2.min.css" rel="stylesheet" />
+    <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
 </head>
 
 <body id="page-top">
@@ -80,34 +121,36 @@ foreach ($allAdminInfo as $admin) {
             <!-- Sidebar - Brand -->
             <a
                 class="sidebar-brand d-flex align-items-center justify-content-center"
-                href="index.html">
+                href="../homepage.php">
                 <div class="sidebar-brand-icon">
-                    <img src="./img/svg/logo-only.svg" />
+                    <img src="../img/svg/logo-only.svg" />
                 </div>
                 <div class="sidebar-brand-text mx-2">MedAssist</div>
             </a>
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active ml-1">
-                <a class="nav-link" href="homepage.php">
+                <a class="nav-link" href="../homepage.php">
                     <i class="fa-solid fa-house"></i>
                     <span>Home</span></a>
             </li>
 
             <li class="nav-item ml-1">
-                <a class="nav-link" href="view all doctors.php">
+                <a class="nav-link" href="../manage doctor/view all doctors.php">
                     <i class="fa-solid fa-stethoscope"></i>
                     <span>View All Doctors</span></a>
             </li>
 
             <li class="nav-item ml-1">
-                <a class="nav-link" href="view all patient.php">
+                <a class="nav-link" href="../manage patient/view all patient.php ">
                     <i class="fa-regular fa-user"></i>
                     <span>View All Patients</span></a>
             </li>
 
             <li class="nav-item ml-1">
-                <a class="nav-link" href="view all appointment.php">
+                <a
+                    class="nav-link"
+                    href="../manage appointment/view all appointment.php ">
                     <i class="fa-solid fa-bookmark"></i>
                     <span>View All Appointment</span></a>
             </li>
@@ -115,7 +158,7 @@ foreach ($allAdminInfo as $admin) {
             <li class="nav-item ml-1">
                 <a
                     class="nav-link collapsed"
-                    href="settings.html"
+                    href="../settings.html"
                     data-toggle="collapse"
                     data-target="#collapseTwo"
                     ria-expanded="true"
@@ -206,159 +249,6 @@ foreach ($allAdminInfo as $admin) {
                             </div>
                         </li>
 
-                        <!-- Nav Item - Alerts -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a
-                                class="nav-link dropdown-toggle"
-                                href="#"
-                                id="alertsDropdown"
-                                role="button"
-                                data-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="fas fa-bell fa-fw"></i>
-                                <!-- Counter - Alerts -->
-                                <span class="badge badge-danger badge-counter">3+</span>
-                            </a>
-                            <!-- Dropdown - Alerts -->
-                            <div
-                                class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="alertsDropdown">
-                                <h6 class="dropdown-header">Alerts Center</h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-primary">
-                                            <i class="fas fa-file-alt text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 12, 2019</div>
-                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-success">
-                                            <i class="fas fa-donate text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 7, 2019</div>
-                                        $290.29 has been deposited into your account!
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="mr-3">
-                                        <div class="icon-circle bg-warning">
-                                            <i class="fas fa-exclamation-triangle text-white"></i>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="small text-gray-500">December 2, 2019</div>
-                                        Spending Alert: We've noticed unusually high spending for
-                                        your account.
-                                    </div>
-                                </a>
-                                <a
-                                    class="dropdown-item text-center small text-gray-500"
-                                    href="#">Show All Alerts</a>
-                            </div>
-                        </li>
-
-                        <!-- Nav Item - Messages -->
-                        <li class="nav-item dropdown no-arrow mx-1">
-                            <a
-                                class="nav-link dropdown-toggle"
-                                href="#"
-                                id="messagesDropdown"
-                                role="button"
-                                data-toggle="dropdown"
-                                aria-haspopup="true"
-                                aria-expanded="false">
-                                <i class="fas fa-envelope fa-fw"></i>
-                                <!-- Counter - Messages -->
-                                <span class="badge badge-danger badge-counter">7</span>
-                            </a>
-                            <!-- Dropdown - Messages -->
-                            <div
-                                class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                aria-labelledby="messagesDropdown">
-                                <h6 class="dropdown-header">Message Center</h6>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img
-                                            class="rounded-circle"
-                                            src="img/undraw_profile_1.svg"
-                                            alt="..." />
-                                        <div class="status-indicator bg-success"></div>
-                                    </div>
-                                    <div class="font-weight-bold">
-                                        <div class="text-truncate">
-                                            Hi there! I am wondering if you can help me with a
-                                            problem I've been having.
-                                        </div>
-                                        <div class="small text-gray-500">Emily Fowler · 58m</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img
-                                            class="rounded-circle"
-                                            src="img/undraw_profile_2.svg"
-                                            alt="..." />
-                                        <div class="status-indicator"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">
-                                            I have the photos that you ordered last month, how would
-                                            you like them sent to you?
-                                        </div>
-                                        <div class="small text-gray-500">Jae Chun · 1d</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img
-                                            class="rounded-circle"
-                                            src="img/undraw_profile_3.svg"
-                                            alt="..." />
-                                        <div class="status-indicator bg-warning"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">
-                                            Last month's report looks great, I am very happy with
-                                            the progress so far, keep up the good work!
-                                        </div>
-                                        <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                                    </div>
-                                </a>
-                                <a class="dropdown-item d-flex align-items-center" href="#">
-                                    <div class="dropdown-list-image mr-3">
-                                        <img
-                                            class="rounded-circle"
-                                            src="https://source.unsplash.com/Mv9hjnEUHR4/60x60"
-                                            alt="..." />
-                                        <div class="status-indicator bg-success"></div>
-                                    </div>
-                                    <div>
-                                        <div class="text-truncate">
-                                            Am I a good boy? The reason I ask is because someone
-                                            told me that people say this to all dogs, even if they
-                                            aren't good...
-                                        </div>
-                                        <div class="small text-gray-500">
-                                            Chicken the Dog · 2w
-                                        </div>
-                                    </div>
-                                </a>
-                                <a
-                                    class="dropdown-item text-center small text-gray-500"
-                                    href="#">Read More Messages</a>
-                            </div>
-                        </li>
-
-                        <div class="topbar-divider d-none d-sm-block"></div>
-
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a
@@ -372,7 +262,7 @@ foreach ($allAdminInfo as $admin) {
                                 <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin['admin_name']  ?></span>
                                 <img
                                     class="img-profile rounded-circle"
-                                    src="img/undraw_profile.svg" />
+                                    src="../img/undraw_profile.svg" />
                             </a>
                             <!-- Dropdown - User Information -->
                             <div
@@ -446,20 +336,19 @@ foreach ($allAdminInfo as $admin) {
                                     </div>
                         </div>
 
+
+                        <div class="d-flex justify-content-center">
+                            <div class="mr-2">
+                                <!-- Back Button -->
+                                <a href="manage_article.php">
+                                    <button type="button" class="btn btn-primary mb-2">
+                                        <i class="fa-solid fa-chevron-left mr-1"></i> Back
+                                    </button>
+                                </a>
+                            </div>
+                            <div><button class="btn btn-primary mx-2" name="btnSubmit" id="btnSubmit">Submit</button></div>
+                        </div>
                         </form>
-                        <form action="manage_article.php" method="post">
-                                        <div class="d-flex justify-content-center">
-                                            <div class="mr-2">
-                                                <!-- Back Button -->
-                                                <a href="manage_article.php">
-                                                    <button type="button" class="btn btn-primary mb-2">
-                                                        <i class="fa-solid fa-chevron-left mr-1"></i> Back
-                                                    </button>
-                                                </a>
-                                            </div>
-                                            <div><button class="btn btn-primary mx-2" name="btnSubmit" id="btnSubmit">Submit</button></div>
-                                        </div>
-                                    </form>
                         <?php
                         if (!empty($successmsg)) {
                             echo "<script>alert('" . htmlspecialchars($successmsg) . "')</script>";
@@ -545,44 +434,3 @@ foreach ($allAdminInfo as $admin) {
 </body>
 
 </html>
-
-<?php
-// Establish your MySQLi connection (assuming you have a separate file for this)
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
-
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-
-    // Handle file upload
-    $image = null;
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $image = file_get_contents($_FILES['image']['tmp_name']);
-    }
-
-    // Prepare SQL query with placeholders
-    $query = "INSERT INTO article (title, description, image) VALUES (?, ?, ?)";
-
-    // Prepare the statement
-    $stmt = $conn->prepare($query);
-
-    // Check if the statement was prepared successfully
-    if ($stmt === false) {
-        die('Prepare failed: ' . htmlspecialchars($conn->error));
-    }
-
-    // Bind parameters
-    $stmt->bind_param('sss', $title, $description, $image);
-
-    // Execute the statement
-    if ($stmt->execute()) {
-        echo "Article inserted successfully.";
-    } else {
-        echo "Error executing statement: " . htmlspecialchars($stmt->error);
-    }
-
-    // Close the statement and connection
-    $stmt->close();
-    $conn->close();
-}
-?>

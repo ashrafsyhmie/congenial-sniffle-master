@@ -427,24 +427,10 @@ $patient_name = $_SESSION['patient_name'];
                   <tbody>
                     <?php
 
-
-
-
-
-
-
                     $sql = "SELECT * FROM appointment JOIN doctor on appointment.doctor_id=doctor.doctor_id  WHERE patient_id = $patient_id AND status = 'upcoming'";
                     $result = mysqli_query($conn, $sql);
 
                     while ($row = mysqli_fetch_assoc($result)) {
-
-                      //   $doctor_id = $row['doctor_id'];
-                      //   $sql2 = "SELECT * FROM `doctor` WHERE `doctor_id` = '$doctor_id'";
-                      //   $result2 = mysqli_query($connection, $sql2);
-                      //   $row2 = mysqli_fetch_assoc($result2);
-
-                      //   $doctor_name = $row2['doctor_name'];
-
                       echo "<tr>";
                       echo "<td>" . $row['appointment_id'] . "</td>";
                       echo "<td>" . $row['doctor_name'] . "</td>";
@@ -452,8 +438,6 @@ $patient_name = $_SESSION['patient_name'];
                       echo "<td>" . $row['timeslot'] .  "</td>";
                       echo "</tr>";
                     }
-
-
 
                     ?>
                   </tbody>

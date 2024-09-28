@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['doctor_id'] = $userData['id'];
                     echo "<script>
                     alert('Successfully logged in!');
-                    window.location.href = ' http://localhost/congenial-sniffle-master/doctor%20page/homepage.html';
+                    window.location.href = 'http://localhost/congenial-sniffle-master/doctor%20page/homepage.php';
                   </script>";
 
                     break;

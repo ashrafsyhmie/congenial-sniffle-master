@@ -1,12 +1,48 @@
 <?php
 
+require_once "../db conn.php";
+global $conn;
 session_start();
 
-require_once("../db conn.php");
+$doctor_id = $_SESSION['doctor_id'];
 
-$patient_id = $_SESSION['patient_id'];
-$patient_name = $_SESSION['patient_name'];
+function fetchAllDoctorInfo($conn)
+{
+  global $doctor_id;
+  $sql = "SELECT * FROM doctor WHERE doctor_id = $doctor_id";
+  $result = mysqli_query($conn, $sql);
 
+  // Initialize an array to store the results
+  $doctorInfo = array();
+
+  // Fetch each row and store it in the array
+  while ($row = mysqli_fetch_assoc($result)) {
+    $doctorInfo[] = $row;
+  }
+
+  // Return the array containing all patient information
+  return $doctorInfo;
+}
+
+
+
+// Fetch all patient information
+$allDoctorInfo = fetchAllDoctorInfo($conn);
+
+
+
+// Output the fetched information
+
+
+foreach ($allDoctorInfo as $doctor) {
+
+
+  $_SESSION['doctor_name'] = $doctor['doctor_name'];
+  $_SESSION['doctor_photo'] = $doctor['doctor_photo'];
+}
+
+
+$doctor_name = $_SESSION['doctor_name'];
 ?>
 
 <!DOCTYPE html>
@@ -21,7 +57,7 @@ $patient_name = $_SESSION['patient_name'];
   <meta name="description" content="" />
   <meta name="author" content="" />
 
-  <title>All Appointment</title>
+  <title>Title</title>
 
   <!-- Custom fonts for this template-->
 
@@ -46,50 +82,6 @@ $patient_name = $_SESSION['patient_name'];
 
 <body id="page-top">
   <style>
-    .status-done {
-      background-color: green;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 15px;
-      display: inline-block;
-    }
-
-    .status-canceled {
-      background-color: red;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 15px;
-      display: inline-block;
-    }
-
-    .status-upcoming {
-      background-color: orange;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 15px;
-      display: inline-block;
-    }
-
-    .doctor-photo {
-      width: 95px;
-      /* set the width */
-      height: 95px;
-      /* set the height */
-      object-fit: cover;
-      /* to maintain the aspect ratio and cover the area */
-      border-radius: 50%;
-      /* for a circular shape */
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
-    }
-
-    td {
-      text-align: center;
-    }
-
-    th {
-      text-align: center;
-    }
-
     .mini-photo {
       width: 45px;
       /* set the width */
@@ -111,7 +103,7 @@ $patient_name = $_SESSION['patient_name'];
       <!-- Sidebar - Brand -->
       <a
         class="sidebar-brand d-flex align-items-center justify-content-center"
-        href="index.php">
+        href="homepage.php">
         <div class="sidebar-brand-icon">
           <img src="../img/svg/logo-only.svg" />
         </div>
@@ -120,33 +112,27 @@ $patient_name = $_SESSION['patient_name'];
 
       <!-- Nav Item - Dashboard -->
       <li class="nav-item ml-1">
-        <a class="nav-link" href="index.php">
+        <a class="nav-link" href="homepage.php">
           <i class="fa-solid fa-house"></i>
           <span>Home</span></a>
       </li>
 
       <li class="nav-item ml-1">
-        <a class="nav-link" href="new appointment.php">
-          <i class="fa-solid fa-plus"></i>
-          <span>New Appointment</span></a>
+        <a class="nav-link" href="appointment record.php">
+          <i class="fa-solid fa-calendar"></i>
+          <span>View Appointment</span></a>
+      </li>
+
+      <li class="nav-item ml-1">
+        <a class="nav-link" href="view all patient.php">
+          <i class="fa-solid fa-bookmark"></i>
+          <span>View All Patient</span></a>
       </li>
 
       <li class="nav-item active ml-1">
-        <a class="nav-link" href="all appointment.php">
-          <i class="fa-solid fa-bookmark"></i>
-          <span>My Appointment</span></a>
-      </li>
-
-      <li class="nav-item ml-1">
-        <a class="nav-link" href="medical history.php">
-          <i class="fa-solid fa-clock-rotate-left"></i>
-          <span>Medical History</span></a>
-      </li>
-
-      <li class="nav-item ml-1">
         <a
           class="nav-link collapsed"
-          href="settings.php"
+          href="settings.html"
           data-toggle="collapse"
           data-target="#collapseTwo"
           ria-expanded="true"
@@ -160,13 +146,7 @@ $patient_name = $_SESSION['patient_name'];
           data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Settings</h6>
-            <a class="collapse-item" href="change info.php">Change Info</a>
-            <div
-              class="collapse-item"
-              data-toggle="modal"
-              data-target="#DeleteAccModal">
-              Delete Account
-            </div>
+            <a class="collapse-item active" href="change info.html">Change Info</a>
           </div>
         </div>
       </li>
@@ -242,6 +222,7 @@ $patient_name = $_SESSION['patient_name'];
               </div>
             </li>
 
+
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a
@@ -252,9 +233,9 @@ $patient_name = $_SESSION['patient_name'];
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $patient_name; ?></span>
+                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $doctor['doctor_name']  ?></span>
                 <?php
-                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['patient_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
+                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($doctor['doctor_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
                 ?>
               </a>
               <!-- Dropdown - User Information -->
@@ -295,68 +276,54 @@ $patient_name = $_SESSION['patient_name'];
           <div
             class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
-              All Appointment
+              Change Information
             </h1>
           </div>
 
+          <!-- Content Row -->
+          <form action="#">
+            <div class="row">
+              <div class="col-lg-6 mb-4">
+                <div class="card card-body p-5">
+                  <h5 class="card-title text-dark">Change Information</h5>
+                  <div class="name p-2">
+                    <label for="name">Nameㅤ:ㅤ</label>
+                    <input class="ml-2" type="text" id="name" />
+                  </div>
+                  <div class="email p-2">
+                    <label for="email">Email ㅤ :ㅤ</label>
+                    <input class="ml-1" type="email" id="email" />
+                  </div>
+                  <div class="phone p-2">
+                    <label for="phone">Phoneㅤ:ㅤ</label>
+                    <input class="ml-2" type="tel" id="phone" />
+                  </div>
+                  <br />
+                  <button class="change-info-btn btn btn-primary mt-4">
+                    Change Information
+                  </button>
+                </div>
+              </div>
+              <div class="col-lg-6 mb-4">
+                <div class="card card-body p-5">
+                  <h5 class="card-title text-dark">Change Password</h5>
+                  <div class="name p-2">
+                    <label for="password">Passwordㅤ: </label>
+                    <input class="ml-5" type="password" id="password" />
+                  </div>
+                  <div class="email p-2">
+                    <label for="confirm-password">Confirm Passwordㅤ:</label>
+                    <input type="password" id="confirm-password" />
+                  </div>
 
-
-          <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">
-                Upcoming Appointment
-              </h6>
-            </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table
-                  class="table table-bordered"
-                  id="dataTable"
-                  width="100%"
-                  cellspacing="0">
-                  <thead>
-                    <tr>
-                      <th>Appointment ID</th>
-                      <th>Photo</th>
-                      <th>Name</th>
-                      <th>Date </th>
-                      <th>Time</th>
-                      <th>Status</th>
-
-
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-
-                    $sql = "SELECT * FROM appointment JOIN doctor on appointment.doctor_id=doctor.doctor_id  WHERE patient_id = $patient_id";
-                    //  AND status = 'upcoming'
-                    $result = mysqli_query($conn, $sql);
-
-                    while ($row = mysqli_fetch_assoc($result)) {
-                      echo "<tr>";
-                      echo "<td>" . $row['appointment_id'] . "</td>";
-                      echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>';
-
-                      echo "<td>" . $row['doctor_name'] . "</td>";
-                      echo "<td>" . $row['date'] . "</td>";
-                      echo "<td>" . $row['timeslot'] .  "</td>";
-
-                      if ($row['status'] == 'done') {
-                        echo '<td><span class="status-done">Done</span></td>';
-                      } elseif ($row['status'] == 'cancelled') {
-                        echo "<td><span class='status-canceled'>Cancelled</span></td>";
-                      } elseif ($row['status'] == 'upcoming') {
-                        echo "<td><span class='status-upcoming'>Upcoming</span></td>";
-                      }
-                      echo "</tr>";
-                    }
-                    ?>
-                  </tbody>
-                </table>
+                  <br />
+                  <button class="change-info-btn btn btn-primary mt-4">
+                    Change Password
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          </form>
         </div>
         <!-- /.container-fluid -->
       </div>
@@ -376,12 +343,22 @@ $patient_name = $_SESSION['patient_name'];
   </a>
 
   <!-- Logout Modal-->
-  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div
+    class="modal fade"
+    id="logoutModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+          <button
+            class="close"
+            type="button"
+            data-dismiss="modal"
+            aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -389,87 +366,13 @@ $patient_name = $_SESSION['patient_name'];
           Select "Logout" below if you are ready to end your current session.
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-          <!-- Form for logout -->
-          <form action="./logout_modal.php" method="post">
-            <button type="submit" class="btn btn-primary">Logout</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Cancel Appointment Modal -->
-  <div
-    class="modal fade"
-    id="cancelAppModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">
-            Do You Want to Cancel Appointment?
-          </h5>
-          <button
-            class="close"
-            type="button"
-            data-dismiss="modal"
-            aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          Select "Yes" below if you want to cancel this appointment.
-        </div>
-        <div class="modal-footer">
           <button
             class="btn btn-secondary"
             type="button"
             data-dismiss="modal">
-            No
+            Cancel
           </button>
-          <a class="btn btn-primary" href="#">Yes</a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Reschedule Appointment Modal -->
-  <div
-    class="modal fade"
-    id="RescheduleAppModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">
-            Do You Want to reschedule this appointment?
-          </h5>
-          <button
-            class="close"
-            type="button"
-            data-dismiss="modal"
-            aria-label="Close">
-            <span aria-hidden="true">×</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          Select "Yes" below if you want to reschedule this appointment.
-        </div>
-        <div class="modal-footer">
-          <button
-            class="btn btn-secondary"
-            type="button"
-            data-dismiss="modal">
-            No
-          </button>
-          <a class="btn btn-primary" href="./appointment handler/calendar.php">Yes</a>
+          <a class="btn btn-primary" href="../login page/login page.html">Logout</a>
         </div>
       </div>
     </div>

@@ -418,9 +418,7 @@ $conn->close();
                                             <div class="file-upload">
                                                 <input type="file" name="image" id="image" value="<?php echo htmlspecialchars($imageData); ?>">
                                             </div>
-                                        </form>
 
-                                        <form action="doctor_profile.php" method="post">
                                             <div class="d-flex justify-content-center">
                                                 <div class="mr-2">
                                                     <?php

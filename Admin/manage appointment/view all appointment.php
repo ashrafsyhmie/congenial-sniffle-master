@@ -169,7 +169,7 @@ require_once "../../db conn.php";
       <li class="nav-item ml-1">
         <a
           class="nav-link collapsed"
-          href="settings.html"
+          href="../settings.html"
           data-toggle="collapse"
           data-target="#collapseTwo"
           ria-expanded="true"
@@ -315,6 +315,10 @@ require_once "../../db conn.php";
             <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
               View Appointment Record
             </h1>
+            <!-- Add New patient Button -->
+            <a href="appointment form.php" class="btn btn-primary mb-2">
+              <i class="fa fa-plus mr-1"></i> Add New Appointment
+            </a>
           </div>
 
           <!-- All Appointment table -->

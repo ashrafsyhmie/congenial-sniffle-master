@@ -13,7 +13,7 @@ function getAppointmentData($conn, $appointment_id)
   return $stmt->get_result()->fetch_assoc();
 }
 
-$appointment_id = 107;
+$appointment_id = 1;
 // $appointment_id = $_GET['appointment_id'];
 // if (!isset($_GET['appointment_id'])) {
 //   die("Appointment ID not provided.");
@@ -186,15 +186,15 @@ $patient_dob = $PatientRow['d_o_b'];
               <div class="form-group">
                 <label for="gender">Gender</label>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="gender" id="male" value="male" disabled <?php if ($patient_gender == 'Male') echo 'checked'; ?> />
+                  <input class="form-check-input" type="radio" name="gender" id="male" value="male" <?php if ($patient_gender == 'Male') echo 'checked'; ?> />
                   <label class="form-check-label" for="male">Male</label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="gender" id="female" value="female" disabled <?php if ($patient_gender == 'Female') echo 'checked'; ?> />
+                  <input class="form-check-input" type="radio" name="gender" id="female" value="female" <?php if ($patient_gender == 'Female') echo 'checked'; ?> />
                   <label class="form-check-label" for="female">Female</label>
                 </div>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="gender" id="other" value="other" disabled <?php if ($patient_gender == 'other') echo 'checked'; ?> />
+                  <input class="form-check-input" type="radio" name="gender" id="other" value="other" <?php if ($patient_gender == 'other') echo 'checked'; ?> />
                   <label class="form-check-label" for="other">Other</label>
                 </div>
               </div>
@@ -239,6 +239,7 @@ $patient_dob = $PatientRow['d_o_b'];
           <thead>
             <th>Medication</th>
             <th>Purpose</th>
+            <th>Test 123</th>
             <th>Dosage</th>
             <th>Frequency</th>
           </thead>

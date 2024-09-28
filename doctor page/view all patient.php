@@ -1,3 +1,50 @@
+<?php
+
+require_once "../db conn.php";
+global $conn;
+session_start();
+
+$doctor_id = $_SESSION['doctor_id'];
+
+function fetchAllDoctorInfo($conn)
+{
+  global $doctor_id;
+  $sql = "SELECT * FROM doctor WHERE doctor_id = $doctor_id";
+  $result = mysqli_query($conn, $sql);
+
+  // Initialize an array to store the results
+  $doctorInfo = array();
+
+  // Fetch each row and store it in the array
+  while ($row = mysqli_fetch_assoc($result)) {
+    $doctorInfo[] = $row;
+  }
+
+  // Return the array containing all patient information
+  return $doctorInfo;
+}
+
+
+
+// Fetch all patient information
+$allDoctorInfo = fetchAllDoctorInfo($conn);
+
+
+
+// Output the fetched information
+
+
+foreach ($allDoctorInfo as $doctor) {
+
+
+  $_SESSION['doctor_name'] = $doctor['doctor_name'];
+  $_SESSION['doctor_photo'] = $doctor['doctor_photo'];
+}
+
+
+$doctor_name = $_SESSION['doctor_name'];
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -34,6 +81,31 @@
 </head>
 
 <body id="page-top">
+  <style>
+    .mini-photo {
+      width: 45px;
+      /* set the width */
+      height: 45px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+
+    .photo {
+      width: 90px;
+      /* set the width */
+      height: 90px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+  </style>
   <!-- Page Wrapper -->
   <div id="wrapper">
     <!-- Sidebar -->
@@ -43,7 +115,7 @@
       <!-- Sidebar - Brand -->
       <a
         class="sidebar-brand d-flex align-items-center justify-content-center"
-        href="index.html">
+        href="./homepage.php">
         <div class="sidebar-brand-icon">
           <img src="../img/svg/logo-only.svg" />
         </div>
@@ -52,7 +124,7 @@
 
       <!-- Nav Item - Dashboard -->
       <li class="nav-item  ml-1">
-        <a class="nav-link" href="homepage.html">
+        <a class="nav-link" href="./homepage.php">
           <i class="fa-solid fa-house"></i>
           <span>Home</span></a>
       </li>
@@ -86,8 +158,7 @@
           data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Settings</h6>
-            <a class="collapse-item" href="change info.html">Change Info</a>
-            <a class="collapse-item" href="settings.html"> Delete Account </a>
+            <a class="collapse-item" href="change info.php">Change Info</a>
           </div>
         </div>
       </li>
@@ -163,141 +234,6 @@
               </div>
             </li>
 
-            <!-- Nav Item - Alerts -->
-            <li class="nav-item dropdown no-arrow mx-1">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="alertsDropdown"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false">
-                <i class="fas fa-bell fa-fw"></i>
-                <!-- Counter - Alerts -->
-                <span class="badge badge-danger badge-counter">3+</span>
-              </a>
-              <!-- Dropdown - Alerts -->
-              <div
-                class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                aria-labelledby="alertsDropdown">
-                <h6 class="dropdown-header">Alerts Center</h6>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="mr-3">
-                    <div class="icon-circle bg-primary">
-                      <i class="fas fa-file-alt text-white"></i>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="small text-gray-500">December 12, 2019</div>
-                    <span class="font-weight-bold">A new monthly report is ready to download!</span>
-                  </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="mr-3">
-                    <div class="icon-circle bg-success">
-                      <i class="fas fa-donate text-white"></i>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="small text-gray-500">December 7, 2019</div>
-                    $290.29 has been deposited into your account!
-                  </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="mr-3">
-                    <div class="icon-circle bg-warning">
-                      <i class="fas fa-exclamation-triangle text-white"></i>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="small text-gray-500">December 2, 2019</div>
-                    Spending Alert: We've noticed unusually high spending for
-                    your account.
-                  </div>
-                </a>
-                <a
-                  class="dropdown-item text-center small text-gray-500"
-                  href="#">Show All Alerts</a>
-              </div>
-            </li>
-
-            <!-- Nav Item - Messages -->
-            <li class="nav-item dropdown no-arrow mx-1">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="messagesDropdown"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false">
-                <i class="fas fa-envelope fa-fw"></i>
-                <!-- Counter - Messages -->
-                <span class="badge badge-danger badge-counter">7</span>
-              </a>
-              <!-- Dropdown - Messages -->
-              <div
-                class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                aria-labelledby="messagesDropdown">
-                <h6 class="dropdown-header">Message Center</h6>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="dropdown-list-image mr-3">
-                    <img
-                      class="rounded-circle"
-                      src="../img/undraw_profile_1.svg"
-                      alt="..." />
-                    <div class="status-indicator bg-success"></div>
-                  </div>
-                  <div class="font-weight-bold">
-                    <div class="text-truncate">
-                      Hi there! I am wondering if you can help me with a
-                      problem I've been having.
-                    </div>
-                    <div class="small text-gray-500">Emily Fowler · 58m</div>
-                  </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="dropdown-list-image mr-3">
-                    <img
-                      class="rounded-circle"
-                      src="../img/undraw_profile_2.svg"
-                      alt="..." />
-                    <div class="status-indicator"></div>
-                  </div>
-                  <div>
-                    <div class="text-truncate">
-                      I have the photos that you ordered last month, how would
-                      you like them sent to you?
-                    </div>
-                    <div class="small text-gray-500">Jae Chun · 1d</div>
-                  </div>
-                </a>
-                <a class="dropdown-item d-flex align-items-center" href="#">
-                  <div class="dropdown-list-image mr-3">
-                    <img
-                      class="rounded-circle"
-                      src="../img/undraw_profile_3.svg"
-                      alt="..." />
-                    <div class="status-indicator bg-warning"></div>
-                  </div>
-                  <div>
-                    <div class="text-truncate">
-                      Last month's report looks great, I am very happy with
-                      the progress so far, keep up the good work!
-                    </div>
-                    <div class="small text-gray-500">Morgan Alvarez · 2d</div>
-                  </div>
-                </a>
-
-                <a
-                  class="dropdown-item text-center small text-gray-500"
-                  href="#">Read More Messages</a>
-              </div>
-            </li>
-
-            <div class="topbar-divider d-none d-sm-block"></div>
-
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a
@@ -308,10 +244,10 @@
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-                <span class="mr-3 d-none d-lg-inline text-gray-600 small">User Name</span>
-                <img
-                  class="img-profile rounded-circle"
-                  src="../img/undraw_profile.svg" />
+                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $doctor['doctor_name'] ?></span>
+                <?php
+                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($doctor['doctor_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
+                ?>
               </a>
               <!-- Dropdown - User Information -->
               <div
@@ -362,58 +298,48 @@
                 View All Patient
               </h6>
             </div>
-            <div class="card-body">
+            <?php
+            // Assuming the connection has been made as shown above
+
+            // Query to get doctors
+            $sql = "SELECT patient_id, patient_name, email,gender, patient_photo FROM patient"; // Adjust the column names and table name as needed
+            $result = $conn->query($sql);
+
+
+
+            if ($result->num_rows > 0) {
+              echo '<div class="card-body">
               <div class="table-responsive">
-                <table
-                  class="table table-striped table-border-0"
-                  id="dataTable"
-                  width="100%"
-                  cellspacing="0">
-                  <thead>
-                    <td>Name</td>
-                    <td></td>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        Patient 1
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn btn-primary">
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        Patient 2
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn btn-primary">
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        Patient 3
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn btn-primary">
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
+                <table class="table table-striped table-border-0" id="dataTable" width="100%" cellspacing="0">
+                  <tbody>';
+
+              // Output data of each row
+              while ($row = $result->fetch_assoc()) {
+                $patient_id = $row["patient_id"];
+                echo '<tr>
+                <td><img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class = "photo"></td>
+               
+                <td>' . $row["patient_name"] . '<br />' . $row["email"] . '</td>
+                <td>' . $row["gender"] . '</td>
+                <td>
+                  <a href="./medical history handler/medical history view.php?patient_id=' . $row["patient_id"] . '">
+                    <button type="button" class="btn btn-primary">Select</button>
+                  </a>
+                </td>
+              </tr>';
+              }
+
+              echo '      </tbody>
                 </table>
               </div>
-            </div>
+            </div>';
+            } else {
+              echo "0 results";
+            }
+
+            // Close connection
+            $conn->close();
+            ?>
           </div>
         </div>
         <!-- /.container-fluid -->

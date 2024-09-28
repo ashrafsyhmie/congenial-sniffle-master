@@ -35,12 +35,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $imageData = addslashes(file_get_contents($_FILES['image']['tmp_name']));
 
 
-    $sql = "INSERT INTO doctor (name, address, email, gender, cont_number, d_o_b, specialization, ic_number, image) 
+    $sql = "INSERT INTO doctor (doctor_name, address, email, gender, `phone number`, d_o_b, specialization,`ic number`, doctor_photo) 
         VALUES ('$Pt_name', '$Address', '$Email', '$gender', '$Num_Phone', '$dob', '$specily', '$ic', '$imageData')";
 
     // Execute the query
     if ($conn->query($sql) === TRUE) {
-        echo "Image uploaded successfully.";
+        echo "New Doctor Uploaded.";
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
@@ -352,12 +352,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         if (!empty($successmsg)) {
                                             echo "<script>alert('" . htmlspecialchars($successmsg) . "')</script>";
                                             if (strpos($successmsg, 'created successfully') !== false) {
-                                                echo "<script>window.location.href = 'view all doctors.php'</script>";
+                                                header("Location: http://localhost/congenial-sniffle-master/admin/manage%20doctor/view%20all%20doctors.php");
                                             }
                                         }
                                         ?>
-                                    </form>
-                                    <form action="doctor_profile.php" method="post">
+
                                         <div class="d-flex justify-content-center">
                                             <div class="mr-2">
                                                 <!-- Back Button -->

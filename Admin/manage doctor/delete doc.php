@@ -2,23 +2,27 @@
 
 if (isset($_GET["id"])) {
     $id = $_GET["id"];
-
-    // For debugging (to see if the id is passed correctly)
-    // echo $id;
+    echo $id;
 
     require_once "../../db conn.php";
 
-    // Correcting the SQL to use the correct column name 'doctor_id'
-    $sql = "DELETE FROM doctor WHERE doctor_id=$id";
+    // Use a prepared statement to prevent SQL injection
+    $stmt = $conn->prepare("DELETE FROM doctor WHERE doctor_id = ?");
+    $stmt->bind_param("i", $id);
 
-    if ($conn->query($sql) === TRUE) {
+    if ($stmt->execute()) {
+        // Record deleted successfully, now redirect
         echo "Record deleted successfully";
+        header("Location: http://localhost/congenial-sniffle-master/admin/manage%20doctor/view%20all%20doctors.php");
+        exit;
     } else {
+        // Handle error if the deletion fails
         echo "Error deleting record: " . $conn->error;
     }
 
-    // Redirect to the page that lists all doctors
-    header("Location: /Admin/Admin/view all doctors.php");
-    exit;
+    // Close statement
+    $stmt->close();
 }
-?>
+
+// Close connection
+$conn->close();
