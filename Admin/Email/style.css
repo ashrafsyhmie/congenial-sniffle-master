@@ -1,0 +1,63 @@
+.email-composer {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin: 10px 0 5px;
+  color: #555;
+}
+
+input,
+textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  width: 80%;
+}
+
+input {
+  text-align: center;
+}
+
+textarea {
+  height: 150px;
+  resize: none;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.send-btn {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.discard-btn {
+  background-color: #dc3545;
+  color: #fff;
+}

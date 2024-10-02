@@ -422,7 +422,7 @@ $conn->close();
                                             <div class="d-flex justify-content-center">
                                                 <div class="mr-2">
                                                     <?php
-                                                    echo '<a href="doctor_profile.php?id=' . htmlspecialchars($row['doctor_id']) . '">
+                                                    echo '<a href="view all doctors.php ">
     <button type="button" class="btn btn-primary mb-2">
         <i class="fa-solid fa-chevron-left mr-1"></i> Back
     </button>

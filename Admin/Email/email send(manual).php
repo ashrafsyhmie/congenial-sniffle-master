@@ -22,8 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->Host       = 'smtp.hostinger.com';
         $mail->SMTPAuth   = true;
         $mail->Username   = 'medassist.admin@medassist.icu';  // Your Hostinger email
-        $mail->Password   = '#2!U7Iw7@';              // Your email password
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;  // Encryption type
+        $mail->Password   = '#2!U7Iw7@';                      // Your email password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;      // Encryption type
         $mail->Port       = 465;
 
         // Set email sender
@@ -42,7 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Send the email
         $mail->send();
-        echo 'Emails sent successfully!';
+
+        // Redirect to the form with a success status
+        header('Location: ./email.php?status=sent');
+        exit();
     } catch (Exception $e) {
         echo "Email could not be sent. Error: {$mail->ErrorInfo}";
     }

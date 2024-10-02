@@ -7,6 +7,36 @@ $admin_name = $_SESSION['admin_name'];
 
 require_once "../../db conn.php";
 
+
+function fetchAllAdminInfo($conn)
+{
+
+    global $admin_id;
+    $sql = "SELECT * FROM admin WHERE admin_id = $admin_id";
+    $result = mysqli_query($conn, $sql);
+
+    // Initialize an array to store the results
+    $adminInfo = array();
+
+    // Fetch each row and store it in the array
+    while ($row = mysqli_fetch_assoc($result)) {
+        $adminInfo[] = $row;
+    }
+
+    // Return the array containing all patient information
+    return $adminInfo;
+}
+
+$allAdminInfo = fetchAllAdminInfo($conn);
+
+foreach ($allAdminInfo as $admin) {
+    $_SESSION['admin_name'] = $admin['admin_name'];
+    $_SESSION['admin_photo'] = $admin['admin_photo'];
+}
+
+$admin_name = $_SESSION['admin_name'];
+$admin_photo = $_SESSION['admin_photo'];
+
 $successmsg = "";
 
 $Pt_name = "";
@@ -87,6 +117,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 </head>
 
 <body id="page-top">
+    <style>
+        .mini-photo {
+            width: 45px;
+            /* set the width */
+            height: 45px;
+            /* set the height */
+            object-fit: cover;
+            /* to maintain the aspect ratio and cover the area */
+            border-radius: 50%;
+            /* for a circular shape */
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+        }
+    </style>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -236,9 +279,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 aria-haspopup="true"
                                 aria-expanded="false">
                                 <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
-                                <img
-                                    class="img-profile rounded-circle"
-                                    src="../img/undraw_profile.svg" />
+                                <?php
+                                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($admin['admin_photo']) . '" alt="Admin photo" class="mini-photo"></td>'
+                                ?>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div

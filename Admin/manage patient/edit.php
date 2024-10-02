@@ -1,5 +1,8 @@
 <?php
-require_once './db conn.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+require_once '../../db conn.php';
 
 // Initialize variables
 $id = $Pt_name = $Address = $Email = $gender = $Num_Phone = $emergency = $dob = $ic = $successmsg = $errorMsg = "";
@@ -7,7 +10,7 @@ $id = $Pt_name = $Address = $Email = $gender = $Num_Phone = $emergency = $dob = 
 // Function to fetch patient data
 function getPatientData($conn, $id)
 {
-    $sql = "SELECT * FROM patient WHERE id=?";
+    $sql = "SELECT * FROM patient WHERE patient_id=?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -31,15 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     }
 
     // Populate fields
-    $Pt_name = $row["name"];
+    $Pt_name = $row["patient_name"];
     $Address = $row["address"];
     $Email = $row["email"];
     $gender = $row["gender"];
-    $Num_Phone = $row["cont_number"];
-    $emergency = $row["emerg_number"];
+    $Num_Phone = $row["phone number"];
+    $emergency = $row["emerg_num"];
     $dob = $row["d_o_b"];
-    $ic = $row["ic_number"];
-    $image = $row["image"];
+    $ic = $row["ic number"];
+    $image = $row["patient_photo"];
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $id = $_POST['id'];
@@ -63,24 +66,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // }
 
     // Prepare and execute update query
-    // $sql = "UPDATE patient SET 
-    //         name = ?, 
-    //         ic_number = ?, 
-    //         address = ?, 
-    //         email = ?, 
-    //         cont_number = ?, 
-    //         gender = ?, 
-    //         emerg_number = ?, 
-    //         d_o_b = ?, 
-    //         image = ? 
-    //     WHERE id = ?";
+    $sql = "UPDATE patient SET 
+            patient_name = ?, 
+            `ic number` = ?, 
+            address = ?, 
+            email = ?, 
+            `phone number` = ?, 
+            gender = ?, 
+            emerg_num = ?, 
+            d_o_b = ?, 
+            patient_photo = ? 
+        WHERE patient_id = ?";
 
-    $sql = "UPDATE patient SET image = ? where id = ?";
+    // $sql = "UPDATE patient SET image = ? where patient_id = ?";
 
     $stmt = $conn->prepare($sql);
-    // $stmt->bind_param("sssssssssi", $Pt_name, $ic, $Address, $Email, $Num_Phone, $gender, $emergency, $dob, $imageData, $id);
+    $stmt->bind_param("sssssssssi", $Pt_name, $ic, $Address, $Email, $Num_Phone, $gender, $emergency, $dob, $imageData, $id);
 
-    $stmt->bind_param("si", $imageData, $id);
+    // $stmt->bind_param("si", $imageData, $id);
     // Execute the query
     if ($stmt->execute()) {
         $successmsg = "Patient information updated successfully.";
@@ -118,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         referrerpolicy="no-referrer" />
 
     <link
-        href="vendor/fontawesome-free/css/all.min.css"
+        href="../../vendor/fontawesome-free/css/all.min.css"
         rel="stylesheet"
         type="text/css" />
     <link
@@ -126,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         rel="stylesheet" />
 
     <!-- Custom styles for this template-->
-    <link href="./css/sb-admin-2.min.css" rel="stylesheet" />
+    <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
 </head>
 
 <body id="page-top">
@@ -139,34 +142,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             <!-- Sidebar - Brand -->
             <a
                 class="sidebar-brand d-flex align-items-center justify-content-center"
-                href="index.html">
+                href="../homepage.php">
                 <div class="sidebar-brand-icon">
-                    <img src="./img/svg/logo-only.svg" />
+                    <img src="../img/svg/logo-only.svg" />
                 </div>
                 <div class="sidebar-brand-text mx-2">MedAssist</div>
             </a>
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item ml-1">
-                <a class="nav-link" href="homepage.php">
+                <a class="nav-link" href="../homepage.php">
                     <i class="fa-solid fa-house"></i>
                     <span>Home</span></a>
             </li>
 
             <li class="nav-item  ml-1">
-                <a class="nav-link" href="view all doctors.php">
+                <a class="nav-link" href="../manage doctor/view all doctors.php ">
                     <i class="fa-solid fa-stethoscope"></i>
                     <span>View All Doctors</span></a>
             </li>
 
             <li class="nav-item active ml-1">
-                <a class="nav-link" href="view all patient.php">
+                <a class="nav-link" href="../manage patient/view all patient.php ">
                     <i class="fa-regular fa-user"></i>
                     <span>View All Patients</span></a>
             </li>
 
             <li class="nav-item ml-1">
-                <a class="nav-link" href="view all appointment.php">
+                <a class="nav-link" href="../manage appointment/view all appointment.php">
                     <i class="fa-solid fa-bookmark"></i>
                     <span>View All Appointment</span></a>
             </li>
@@ -174,24 +177,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             <li class="nav-item ml-1">
                 <a
                     class="nav-link collapsed"
-                    href="settings.html"
+                    href="../change info.html"
                     data-toggle="collapse"
                     data-target="#collapseTwo"
                     ria-expanded="true"
                     aria-controls="collapseTwo">
                     <i class="fa-solid fa-gear"></i>
                     <span>Settings</span></a>
-                <div
-                    id="collapseTwo"
-                    class="collapse"
-                    aria-labelledby="headingTwo"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Settings</h6>
-                        <a class="collapse-item" href="change info.html">Change Info</a>
-                        <a class="collapse-item" href="settings.html"> Delete Account </a>
-                    </div>
-                </div>
+
             </li>
 
             <li class="nav-item ml-1">
@@ -492,7 +485,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                             </div>
                                         <?php endif; ?>
 
-                                        <form method="post" action="edit.php">
+                                        <form method="post" action="./edit.php" enctype="multipart/form-data">
                                             <input type="hidden" name="id" value="<?php echo htmlspecialchars($id); ?>">
 
                                             <div class="form-group">
@@ -541,21 +534,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                             <div class="form-group">
                                                 <label for="image">Image</label>
                                                 <br>
-                                                <?php echo '<img src="data:image/jpeg;base64,' . base64_encode($image) . '" alt="Image" class="article-image">'; ?>
+                                                <?php
+                                                if (!empty($imageData)) {
+                                                    echo '<img src="data:image/jpeg;base64,' . base64_encode($imageData) . '" alt="Image" class="article-image">';
+                                                } else {
+                                                    echo '<img src="placeholder-image.jpg" alt="Image" class="article-image">'; // Use a placeholder image if no image is available
+                                                }
+                                                ?>
                                                 <input type="file" name="imageUpload" id="imageUpload">
                                             </div>
 
-                                        </form>
-
-                                        <form action="patient_profile.php" method="post">
                                             <div class="d-flex justify-content-center">
                                                 <div class="mr-2">
                                                     <?php
-                                                    echo '<a href="patient_profile.php?id=' . htmlspecialchars($row['id']) . '">
-    <button type="button" class="btn btn-primary mb-2">
-        <i class="fa-solid fa-chevron-left mr-1"></i> Back
-    </button>
-</a>';
+                                                    //                                                     echo '<a href="patient_profile.php?id=' . htmlspecialchars($row['patient_id']) . '">
+                                                    //     <button type="button" class="btn btn-primary mb-2">
+                                                    //         <i class="fa-solid fa-chevron-left mr-1"></i> Back
+                                                    //     </button>
+                                                    // </a>';
                                                     ?>
                                                 </div>
                                                 <div>

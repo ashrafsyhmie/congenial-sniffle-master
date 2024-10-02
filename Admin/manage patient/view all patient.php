@@ -302,8 +302,13 @@ $admin_name = $_SESSION['admin_name'];
               </div>
             </form>
 
+            <!-- Send Email to Patient Button -->
+            <a href="../Email/email.php" class="btn btn-primary mb-2">
+              <i class="fa fa-plus mr-1"></i> Send Email
+            </a>
+
             <!-- Add New patient Button -->
-            <a href="patient form.php" class="btn btn-primary mb-2">
+            <a href="./patient form.php" class="btn btn-primary mb-2">
               <i class="fa fa-plus mr-1"></i> Add New Patient
             </a>
           </div>

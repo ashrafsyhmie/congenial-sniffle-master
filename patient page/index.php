@@ -95,7 +95,44 @@ $patient_name = $_SESSION['patient_name'];
       /* for a circular shape */
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
     }
+
+    .alert {
+      padding: 20px;
+      background-color: #f44336;
+      /* Red */
+      color: white;
+      margin-bottom: 15px;
+    }
+
+    .closebtn {
+      margin-left: 15px;
+      color: white;
+      font-weight: bold;
+      float: right;
+      font-size: 22px;
+      line-height: 20px;
+      cursor: pointer;
+    }
   </style>
+  <script>
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const message = urlParams.get('message');
+
+      if (message === 'success') {
+        document.getElementById("alert").style.display = "block";
+      }
+    };
+
+    function closeAlert() {
+      document.getElementById("alert").style.display = "none";
+    }
+  </script>
+  <!-- Custom Alert -->
+  <div id="alert" class="alert" style="display:none;">
+    <span class="closebtn" onclick="closeAlert()">&times;</span>
+    Successfully logged in!
+  </div>
   <!-- Page Wrapper -->
   <div id="wrapper">
     <!-- Sidebar -->

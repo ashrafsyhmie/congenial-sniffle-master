@@ -1,0 +1,218 @@
+/* Hide the sign-up section by default */
+#signup-section {
+  display: none;
+}
+
+/* Add styles to switch between forms */
+.show-section {
+  display: block;
+}
+
+.hide-section {
+  display: none;
+}
+
+/* Shared styles */
+.display-flex,
+.display-flex-center,
+.signup-content,
+.signin-content,
+.social-login,
+.socials {
+  display: flex;
+  display: -webkit-flex;
+  margin-top: -150px; /* Adjust this value to move it up */
+}
+
+/* Style for .socials */
+.socials {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Style for the signin-image */
+.signin-image {
+  width: 120%; /* Increase the width */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.signin-image img {
+  width: 100%; /* Make sure the image fills the container */
+  height: auto; /* Maintain aspect ratio */
+}
+
+.form-group {
+  position: relative;
+}
+
+input[type="password"],
+input[type="text"] {
+  padding-right: 40px;
+}
+
+#togglePasswordSignIn, #togglePasswordSignUp {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+}
+
+#togglePassword:hover {
+  color: #333;
+}
+
+.zmdi-eye,
+.zmdi-eye-off {
+  font-size: 18px;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+
+.form-part {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  transition: border-color 0.3s; /* Add transition for border color */
+}
+
+input:focus {
+  border-color: #007bff;
+  outline: none; /* Remove default outline */
+}
+
+button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Transition effects for form parts */
+#part1,
+#part2 {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  display: none; /* Start with display none */
+}
+
+#part1.active,
+#part2.active {
+  opacity: 1;
+  transform: translateY(0);
+  display: block; /* Show when active */
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 600px) {
+  .display-flex {
+    flex-direction: column;
+  }
+}
+
+.form-group.form-button {
+  display: flex; /* Use flexbox to center the content */
+  justify-content: center; /* Center the buttons horizontally */
+  margin-top: 20px; /* Add some margin if necessary */
+  margin-right: 20px;
+  gap: 15px;
+}
+
+input {
+  font-size: 15px;
+}
+
+/* Password strength indicator styles */
+#password-strength {
+  margin-top: 10px;
+}
+
+#strength-bar {
+  display: block;
+  height: 5px;
+  background-color: #ddd;
+  border-radius: 5px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.strength-bar.weak {
+  background-color: #ff4b47;
+  width: 33%;
+}
+
+.strength-bar.medium {
+  background-color: #ffa534;
+  width: 66%;
+}
+
+.strength-bar.strong {
+  background-color: #28a745;
+  width: 100%;
+}
+
+#strength-message {
+  font-size: 12px;
+  color: #888;
+}
+
+#strength-bar {
+  height: 5px;
+  background-color: #ddd; /* Default color */
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 3px;
+  transition: background-color 0.3s ease, width 0.3s ease;
+}
+
+#strength-bar.weak {
+  background-color: #ff8080;
+}
+
+#strength-bar.medium {
+  background-color: #fffda2;
+}
+
+#strength-bar.strong {
+  background-color: #73ec8b;
+}
+
+.medassist_logo {
+  max-width: 200px;
+  max-height: 200px;
+}
+

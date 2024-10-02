@@ -300,7 +300,7 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
                                                         <input type="text" name="txtName" class="form-control" placeholder="Patient Name" required />
                                                     </div>
                                                     <div class="form-group">
-                                                        <input type="text" id="icInput" name="ic_num" class="form-control" placeholder="IC Number" required />
+                                                        <input type="text" id="icInput" name="ic_num" class="form-control" placeholder="IC Number" maxlength="14" required />
                                                     </div>
                                                     <div class="form-group">
                                                         <input type="text" name="add" class="form-control" placeholder="Address" required />

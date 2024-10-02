@@ -4,19 +4,7 @@ $patient_id = $_SESSION['patient_id'];
 $doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
 
 
-// Database connection
-$host = "localhost"; // Your database host (usually "localhost")
-$user = "root"; // Your database username
-$password = ""; // Your database password
-$dbname = "medassist 2"; // Your database name
-
-$mysqli = new mysqli($host, $user, $password, $dbname);
-
-// Check connection
-if ($mysqli->connect_error) {
-    die("Connection failed: " . $mysqli->connect_error);
-}
-
+require_once '../../db conn.php';
 
 require './timeslots-function.php';
 
@@ -27,7 +15,7 @@ $date = "2024-09-3"; // Example date
 
 
 
-function displayAvailableSlots($date, $doctor_id, $mysqli)
+function displayAvailableSlots($date, $doctor_id, $conn)
 {
     // Define slot parameters
 
@@ -36,9 +24,9 @@ function displayAvailableSlots($date, $doctor_id, $mysqli)
     $all_slots = timeslots();
 
     // Prepare the SQL statement to get booked slots
-    $stmt = $mysqli->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND doctor_id = ?");
+    $stmt = $conn->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND doctor_id = ?");
     if (!$stmt) {
-        die('Prepare failed: ' . $mysqli->error);
+        die('Prepare failed: ' . $conn->error);
     }
 
     // Bind parameters and execute
@@ -61,7 +49,7 @@ function displayAvailableSlots($date, $doctor_id, $mysqli)
 }
 
 
-// function isDateFullyBooked($date, $doctor_id, $mysqli)
+// function isDateFullyBooked($date, $doctor_id, $conn)
 // {
 
 //     // Get the total number of time slots for the day
@@ -72,9 +60,9 @@ function displayAvailableSlots($date, $doctor_id, $mysqli)
 //     $all_slots = timeslots($duration, $cleanup, $start, $end);
 //     $total_slots = count($all_slots);
 
-//     $stmt = $mysqli->prepare("SELECT COUNT(DISTINCT timeslot) AS slot_count FROM appointment WHERE DATE = ? AND doctor_id = ?");
+//     $stmt = $conn->prepare("SELECT COUNT(DISTINCT timeslot) AS slot_count FROM appointment WHERE DATE = ? AND doctor_id = ?");
 //     if (!$stmt) {
-//         die('Prepare failed: ' . $mysqli->error);
+//         die('Prepare failed: ' . $conn->error);
 //     }
 //     $stmt->bind_param('si', $date, $doctor_id);
 //     $stmt->execute();
@@ -98,10 +86,10 @@ function displayAvailableSlots($date, $doctor_id, $mysqli)
 //     // return ($row['slot_count'] >= $total_slots);
 // }
 
-function build_calendar($month, $year, $patient_id, $mysqli)
+function build_calendar($month, $year, $patient_id, $conn)
 {
     global $doctor_id;
-    $stmt = $mysqli->prepare("SELECT DATE FROM appointment WHERE MONTH(DATE) = ? AND YEAR(DATE) = ? AND patient_id = ?");
+    $stmt = $conn->prepare("SELECT DATE FROM appointment WHERE MONTH(DATE) = ? AND YEAR(DATE) = ? AND patient_id = ?");
     $stmt->bind_param('iis', $month, $year, $patient_id);
     $bookings = array();
 
@@ -152,8 +140,8 @@ function build_calendar($month, $year, $patient_id, $mysqli)
         $date = "$year-$month-$currentDayRel";
         $today = $date == date('Y-m-d') ? "today" : "";
 
-        // $fullyBooked = isDateFullyBooked($date, $doctor_id, $mysqli);
-        $fullyBooked = displayAvailableSlots($date, $doctor_id, $mysqli);
+        // $fullyBooked = isDateFullyBooked($date, $doctor_id, $conn);
+        $fullyBooked = displayAvailableSlots($date, $doctor_id, $conn);
 
         if ($fullyBooked || $date < date('Y-m-d')) {
             // Date is fully booked or in the past, display as not clickable
@@ -333,7 +321,7 @@ function build_calendar($month, $year, $patient_id, $mysqli)
                     $year = $dateComponents['year'];
                 }
 
-                build_calendar($month, $year, $patient_id, $mysqli);
+                build_calendar($month, $year, $patient_id, $conn);
                 ?>
             </div>
         </div>

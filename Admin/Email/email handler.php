@@ -1,65 +1,77 @@
 <?php
-//Import PHPMailer classes into the global namespace
-//These must be at the top of your script, not inside a function
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-//Load Composer's autoloader
 require '../../vendor/autoload.php';
+require_once '../../db conn.php';
 
-//Create an instance; passing `true` enables exceptions
-$mail = new PHPMailer(true);
+// Desired date
+$preferredDate = '2024-09-27'; // Use your desired date
 
-try {
-    //Server settings
-    $mail->SMTPDebug = 0;                      //Enable verbose debug output
-    $mail->isSMTP();                                            //Send using SMTP
-    $mail->Host       = 'smtp.hostinger.com';                     //Set the SMTP server to send through
-    $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-    $mail->Username   = 'medassist.admin@medassist.icu';                     //SMTP username
-    $mail->Password   = '#2!U7Iw7@';                               //SMTP password
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-    $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+// Query to fetch all appointments on the preferred date
+$query = "SELECT appointment.*, patient.email, patient.patient_name , doctor.doctor_name
+          FROM appointment 
+          JOIN patient ON appointment.patient_id = patient.patient_id 
+          JOIN doctor ON appointment.doctor_id = doctor.doctor_id
+          WHERE date = '$preferredDate'";
 
-    //Recipients
+$result = $conn->query($query);
+
+if ($result->num_rows > 0) {
+    $mail = new PHPMailer(true);
+
+    // Server settings
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.hostinger.com';
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'medassist.admin@medassist.icu';
+    $mail->Password   = '#2!U7Iw7@';
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+    $mail->Port       = 465;
+
+    // Set the email from address
     $mail->setFrom('medassist.admin@medassist.icu', 'MedAssist');
-    $mail->addAddress('icerafsyahmie12@gmail.com', 'Ashraf Syahmie');     //Add a recipient           //Name is optional
-    $mail->addReplyTo('medassist.admin@medassist.icu', 'Customer Center');
 
+    // Prepare the email content
+    while ($appointment = $result->fetch_assoc()) {
+        $patientEmail = $appointment['email'];
+        $patientName = $appointment['patient_name'];
+        $doctorName = $appointment['doctor_name'];
+        $appointmentDate = $appointment['date'];
+        $timeslot = $appointment['timeslot']; // Include this if you want to mention the time in the email
 
+        // Add recipient for each patient
+        $mail->addAddress($patientEmail);
 
-    //Content
-    $mail->isHTML(true);                                  //Set email format to HTML
-    $mail->Subject = "Upcoming Appointment Reminder - [Doctor's Name] on [Appointment Date]";
-    $mail->Body    = 'Dear [Patient Name],<br>
+        // Set email format to HTML
+        $mail->isHTML(true);
+        $mail->Subject = "Upcoming Appointment Reminder with Doctor: $doctorName";
+        $mail->Body = 'Dear ' . $patientName . ',<br>
+                        We hope this message finds you well.<br>
+                        This is a friendly reminder about your upcoming appointment on <b>' . $appointmentDate . '</b> at <b>' . $timeslot . '</b> with <b>' . $doctorName . '</b>.<br>
+                        Please make sure to arrive 10-15 minutes early for any necessary preparations.<br>
+                        If you need to reschedule or have any questions, feel free to reply to this email or call us.<br><br>
+                        We look forward to seeing you!<br><br>
+                        Best regards,<br>
+                        MedAssist';
 
-We hope this message finds you well.<br>
+        try {
+            // Send the email
+            $mail->send();
+            echo 'Message has been sent to ' . $patientEmail . '<br>';
+        } catch (Exception $e) {
+            echo "Message could not be sent to $patientEmail. Mailer Error: {$mail->ErrorInfo}<br>";
+        }
 
-This is a friendly reminder about your upcoming appointment with [Doctor’s Name] on **[Appointment Date]** at **[Appointment Time]**.<br>
-Please make sure to arrive 10-15 minutes early for any necessary preparations.<br>
-
-**Appointment Details:**
-- **Doctor:** [Doctor’s Name]<br>
-- **Date:** [Appointment Date]<br>
-- **Time:** [Appointment Time]<br>
-- **Location:** [Clinic Address]<br>
-
-If you need to reschedule or have any questions, feel free to reply to this email or call us at [Clinic Contact Number].<br><br>
-
-We look forward to seeing you!<br><br>
-
-Best regards,  <br>
-MedAssisst  <br>
-[Clinic Contact Information]<br>
-';
-
-    $mail->send();
-    echo 'Message has been sent';
-} catch (Exception $e) {
-    echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        // Clear all addresses for the next iteration
+        $mail->clearAddresses();
+    }
+} else {
+    echo "No appointments found for $preferredDate.";
 }
 
-?>
-<br>
-<button><a href="http://localhost/congenial-sniffle-master/admin/homepage.php"></a>Back</button>
+// Close the database connection
+$conn->close();

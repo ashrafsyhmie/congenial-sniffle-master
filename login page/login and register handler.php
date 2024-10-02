@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['admin_id'] = $userData['id'];
                     echo "<script>
                     alert('Successfully logged in!');
-                    window.location.href = ' http://localhost/congenial-sniffle-master/admin/homepage.php';
+                    window.location.href = ' ../admin/homepage.php';
                   </script>";
 
                     break;
@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['doctor_id'] = $userData['id'];
                     echo "<script>
                     alert('Successfully logged in!');
-                    window.location.href = 'http://localhost/congenial-sniffle-master/doctor%20page/homepage.php';
+                    window.location.href = '../doctor page/homepage.php';
                   </script>";
 
                     break;
@@ -40,15 +40,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['patient_id'] = $userData['id'];
                     echo "<script>
                     alert('Successfully logged in!');
-                    window.location.href = ' http://localhost/congenial-sniffle-master/patient%20page/index.php';
+                    window.location.href = ' ../patient page/index.php';
                   </script>";
 
                     break;
             }
         } else {
             echo "<script>
-                    alert('Successfully logged in!');
-                    window.location.href = ' http://localhost/congenial-sniffle-master/patient%20page/index.php';
+                    alert('Wrong Password!');
+                    window.location.href = ' ../login page../login page.html';
                   </script>";
         }
     } elseif (isset($_POST["register_submit"])) {

@@ -389,7 +389,9 @@ $doctor_name = $_SESSION['doctor_name'];
             data-dismiss="modal">
             Cancel
           </button>
-          <a class="btn btn-primary" href="../login page/login page.html">Logout</a>
+          <form action="./logout_modal.php" method="post">
+            <button type="submit" class="btn btn-primary">Logout</button>
+          </form>
         </div>
       </div>
     </div>
