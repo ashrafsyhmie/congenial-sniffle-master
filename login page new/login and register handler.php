@@ -47,17 +47,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } elseif (isset($_POST["signup_submit"])) {
         // Handle register section
-        $patient_name = $_POST["name"];
-        $email = $_POST["email"];
-        $password = $_POST["pass"];
-        $phone_number = $_POST["phone_number"];
-        $emergency_number = $_POST["emergency_number"];
-        $dob = $_POST["dob"];
-        $gender = $_POST["gender"];
-        $address = $_POST["address"];
-        $ic_number = $_POST["ic_number"];
+        if (isset($_FILES['photo']) && $_FILES['photo']['error'] == UPLOAD_ERR_OK) {
+            $patient_name = $_POST["name"];
+            $email = $_POST["email"];
+            $password = $_POST["pass"];
+            $phone_number = $_POST["phone_number"];
+            $emergency_number = $_POST["emergency_number"];
+            $dob = $_POST["dob"];
+            $gender = $_POST["gender"];
+            $address = $_POST["address"];
+            $ic_number = $_POST["ic_number"];
+            $patient_photo = file_get_contents($_FILES['photo']['tmp_name']); // Get the binary data
 
-        registerhandler($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number);
+            registerhandler($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo);
+        }
     }
 }
 
@@ -74,22 +77,34 @@ function isDuplicate($email, $username)
     global $conn;
 
     // Check if email or username exists in the 'patient' table
-    $sql = "SELECT * FROM patient WHERE email = '$email' OR patient_name = '$username'";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM patient WHERE email = ? OR patient_name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $email, $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
     if ($result->num_rows > 0) {
         return true;
     }
 
     // Check if email or username exists in the 'admin' table
-    $sql = "SELECT * FROM admin WHERE email = '$email' OR admin_name = '$username'";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM admin WHERE email = ? OR admin_name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $email, $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
     if ($result->num_rows > 0) {
         return true;
     }
 
     // Check if email or username exists in the 'doctor' table
-    $sql = "SELECT * FROM doctor WHERE email = '$email' OR doctor_name = '$username'";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM doctor WHERE email = ? OR doctor_name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $email, $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
     if ($result->num_rows > 0) {
         return true;
     }
@@ -98,8 +113,7 @@ function isDuplicate($email, $username)
 }
 
 // Function to handle registration
-// Function to handle registration
-function registerhandler($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number)
+function registerhandler($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo)
 {
     if (strlen($username) >= 6 && strlen($username) <= 30) {
         if (!specialChars($username)) {
@@ -107,7 +121,7 @@ function registerhandler($username, $email, $password, $phone_number, $emergency
                 if (strlen($password) >= 6 && strlen($password) <= 30) {
                     // Check for duplicate username or email
                     if (!isDuplicate($email, $username)) {
-                        insertUser($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number);
+                        insertUser($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo);
                     } else {
                         // Redirect or stay on the page with error message
                         echo "<script>
@@ -135,33 +149,35 @@ function registerhandler($username, $email, $password, $phone_number, $emergency
         }
     } else {
         echo "<script>
-                alert('Username must be between 6 and 10 characters.');
+                alert('Username must be between 6 and 30 characters.');
                 window.history.back();
               </script>";
     }
 }
 
-
 // Function to insert new user into the database with password hashing
-function insertUser($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number)
+function insertUser($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo)
 {
     global $conn;
 
     // Hash the password
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    // Insert the user into the 'patient' table
-    $sql = "INSERT INTO patient (patient_name, email, password, `phone number`, emerg_num, d_o_b, gender, address, `ic number`)
-            VALUES ('$patient_name', '$email', '$hashedPassword', '$phone_number', '$emergency_number', '$dob', '$gender', '$address', '$ic_number')";
+    // Prepare and bind the SQL statement
+    $stmt = $conn->prepare("INSERT INTO patient (patient_name, email, password, `phone number`, emerg_num, d_o_b, gender, address, `ic number`, patient_photo)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssssssb", $patient_name, $email, $hashedPassword, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo);
 
-    if ($conn->query($sql) === TRUE) {
+    if ($stmt->execute()) {
         echo "<script>
                 alert('Successfully registered!');
                 window.location.href = '../login page new/index.html';
               </script>";
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        echo "Error: " . $stmt->error;
     }
+
+    $stmt->close();
 }
 
 // Function to handle login and password verification
@@ -170,8 +186,12 @@ function loginhandler($username, $password)
     global $conn;
 
     // Check admin table
-    $sql = "SELECT * FROM admin WHERE admin_name = '$username'";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM admin WHERE admin_name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         // Verify the password
@@ -181,8 +201,12 @@ function loginhandler($username, $password)
     }
 
     // Check doctor table
-    $sql = "SELECT * FROM doctor WHERE doctor_name = '$username'";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM doctor WHERE doctor_name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         // Verify the password
@@ -192,8 +216,12 @@ function loginhandler($username, $password)
     }
 
     // Check patient table
-    $sql = "SELECT * FROM patient WHERE patient_name = '$username'";
-    $result = $conn->query($sql);
+    $sql = "SELECT * FROM patient WHERE patient_name = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         // Verify the password

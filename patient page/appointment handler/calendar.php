@@ -15,7 +15,7 @@ $date = "2024-09-3"; // Example date
 
 
 
-function displayAvailableSlots($date, $doctor_id, $conn)
+function displayAvailableSlots($date, $doctor_id, $patient_id, $conn)
 {
     // Define slot parameters
 
@@ -24,13 +24,14 @@ function displayAvailableSlots($date, $doctor_id, $conn)
     $all_slots = timeslots();
 
     // Prepare the SQL statement to get booked slots
-    $stmt = $conn->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND doctor_id = ?");
+    $stmt = $conn->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
+
     if (!$stmt) {
         die('Prepare failed: ' . $conn->error);
     }
 
     // Bind parameters and execute
-    $stmt->bind_param('ss', $date, $doctor_id);
+    $stmt->bind_param('sss', $date, $doctor_id, $patient_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $booked_slots = [];
@@ -120,11 +121,11 @@ function build_calendar($month, $year, $patient_id, $conn)
     }
     $calendar .= "</tr><tr>";
 
-    // if ($dayOfWeek > 0) {
-    //     for ($k = 0; $k < $dayOfWeek; $k++) {
-    //         $calendar .= "<td class='empty'></td>";
-    //     }
-    // }
+    if ($dayOfWeek > 0) {
+        for ($k = 0; $k < $dayOfWeek; $k++) {
+            $calendar .= "<td class='empty'></td>";
+        }
+    }
 
 
     $currentDay = 1;
@@ -141,7 +142,7 @@ function build_calendar($month, $year, $patient_id, $conn)
         $today = $date == date('Y-m-d') ? "today" : "";
 
         // $fullyBooked = isDateFullyBooked($date, $doctor_id, $conn);
-        $fullyBooked = displayAvailableSlots($date, $doctor_id, $conn);
+        $fullyBooked = displayAvailableSlots($date, $doctor_id, $patient_id, $conn);
 
         if ($fullyBooked || $date < date('Y-m-d')) {
             // Date is fully booked or in the past, display as not clickable
