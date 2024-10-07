@@ -353,7 +353,7 @@ $admin_name = $_SESSION['admin_name'];
                         echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class="doctor-photo"></td>';
                         echo "<td>" . htmlspecialchars($row['doctor_name']) . "<br>" . htmlspecialchars($row['ic number']) . "</td>";
                         echo '<td>';
-                        echo '<a href="doctor_profile.php?id=' . htmlspecialchars($row['doctor_id']) . '" class="btn btn-primary btn-sm">View</a> ';
+                        echo '<a href="doctor_profile.php?id=' . htmlspecialchars($row['doctor_id']) . '" class="btn btn-primary btn-sm"><i class="fa-solid fa-eye"></i></a> ';
                         echo '<a href="delete doc.php?id=' . htmlspecialchars($row['doctor_id']) . '" class="btn btn-danger btn-sm " onclick="return confirm(\'Are you sure you want to delete this doctor?\');" ><i class="fa fa-trash"></i></a>';
                         echo '</td>';
                         echo "</tr>";

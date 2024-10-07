@@ -345,11 +345,15 @@ $admin_name = $_SESSION['admin_name'];
 
                                         <!-- Fourth Column: Edit Button -->
                                         <td>
-                                            <div class="btn">
+                                            <div class="form-group">
                                                 <a href="edit.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-success btn-sm">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
+                                                <a href="send email patient.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-primary btn-sm">
+                                                    <i class="fa-regular fa-envelope"></i>
+                                                </a>
                                             </div>
+
                                         </td>
                                     </tr>
                                 </tbody>
@@ -379,6 +383,7 @@ $admin_name = $_SESSION['admin_name'];
                                         <th>Date </th>
                                         <th>Time</th>
                                         <th>Status</th>
+                                        <th>Medical Record</th>
 
 
                                     </tr>
@@ -422,6 +427,8 @@ $admin_name = $_SESSION['admin_name'];
                                         } elseif ($row['status'] == 'upcoming') {
                                             echo "<td><span class='status-upcoming'>Upcoming</span></td>";
                                         }
+
+                                        echo "<td><a href='../medical record/view medical record.php?id=" . $row['appointment_id'] . "' class='btn btn-primary btn-sm '> View</i></a></td>";
                                         echo "</tr>";
                                     }
 
@@ -447,7 +454,7 @@ $admin_name = $_SESSION['admin_name'];
                             <?php
 
                             if (!empty($patient)) {
-                                echo '<a href="view all patient.php?id=' . htmlspecialchars($patient['patient_id']) . '">
+                                echo '<a href="view all patient.php">
             <button type="button" class="btn btn-primary mb-2">
                 <i class="fa-solid fa-chevron-left mr-1"></i> Back
             </button>

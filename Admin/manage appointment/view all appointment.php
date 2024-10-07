@@ -106,7 +106,7 @@ require_once "../../db conn.php";
       display: inline-block;
     }
 
-    .status-canceled {
+    .status-cancelled {
       background-color: red;
       color: white;
       padding: 5px 10px;
@@ -342,9 +342,9 @@ require_once "../../db conn.php";
                     <td>Doctor Name</td>
                     <td></td>
                     <td>Patient Name</td>
-                    <td>Date</td>
-                    <td>Time</td>
+                    <td>Date & Time</td>
                     <td>Status</td>
+                    <td>Action</td>
 
                   </thead>
 
@@ -357,16 +357,19 @@ require_once "../../db conn.php";
 
                     if ($result->num_rows > 0) {
                       while ($row = $result->fetch_assoc()) {
+
+
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['appointment_id']) . "</td>";
                         echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Patient photo" class="patient-photo"></td>';
                         echo  "<td>" . htmlspecialchars($row['doctor_name']) . "</td>";
                         echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class="patient-photo"></td>';
                         echo "<td>" . htmlspecialchars($row['patient_name']) . "<br>" . htmlspecialchars($row['ic number']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['date']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['timeslot']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['date']) . "<br>" . htmlspecialchars($row['timeslot']) . "</td>";
+                        echo '<td><span class="status-' . htmlspecialchars($row['status']) . '">' . ucfirst(htmlspecialchars($row['status'])) . '</span></td>';
+
                         echo '<td>';
-                        echo '<a href="patient_profile.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm">View</a> ';
+                        echo '<a href="../medical record/all medical record.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm"><i class="fa-solid fa-eye"></i></a> ';
                         echo '<a href="delete.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-danger btn-sm btn-delete" onclick="return confirm(\'Are you sure you want to delete this patient?\');">';
                         echo '<i class="fa fa-trash"></i>';
                         echo '</a>';
@@ -461,7 +464,7 @@ require_once "../../db conn.php";
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const rowsPerPage = 5; //number of row per page (kalau nak tukar kat sini tau)
+      const rowsPerPage = 10; //number of row per page (kalau nak tukar kat sini tau)
       const table = document.querySelector('#dataTable');
       const rows = table.querySelectorAll('tbody tr');
       const totalRows = rows.length;

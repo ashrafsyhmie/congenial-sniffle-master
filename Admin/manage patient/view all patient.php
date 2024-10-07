@@ -302,10 +302,7 @@ $admin_name = $_SESSION['admin_name'];
               </div>
             </form>
 
-            <!-- Send Email to Patient Button -->
-            <a href="../Email/email.php" class="btn btn-primary mb-2">
-              <i class="fa fa-plus mr-1"></i> Send Email
-            </a>
+
 
             <!-- Add New patient Button -->
             <a href="./patient form.php" class="btn btn-primary mb-2">
@@ -392,7 +389,7 @@ $admin_name = $_SESSION['admin_name'];
                         echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class="patient-photo"></td>';
                         echo "<td>" . htmlspecialchars($row['patient_name']) . "<br>" . htmlspecialchars($row['ic number']) . "</td>";
                         echo '<td>';
-                        echo '<a href="patient_profile.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm">View</a> ';
+                        echo '<a href="patient_profile.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm"><i class="fa-solid fa-eye"></i></a> ';
                         echo '<a href="delete.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-danger btn-sm btn-delete" onclick="return confirm(\'Are you sure you want to delete this patient?\');">';
                         echo '<i class="fa fa-trash"></i>';
                         echo '</a>';

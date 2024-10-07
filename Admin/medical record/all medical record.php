@@ -4,30 +4,44 @@ session_start();
 $admin_id = $_SESSION['admin_id'];
 $admin_name = $_SESSION['admin_name'];
 
-
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>View All Doctors</title>
+
+    <title>View All Patient</title>
 
     <!-- Custom fonts for this template-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="../../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css" />
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
+
+    <link
+        href="../../vendor/fontawesome-free/css/all.min.css"
+        rel="stylesheet"
+        type="text/css" />
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet" />
+
     <!-- Custom styles for this template-->
     <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
 </head>
-
 <style>
-    .doctor-photo {
+    .patient-photo {
         width: 98px;
         /* set the width */
         height: 98px;
@@ -82,25 +96,25 @@ $admin_name = $_SESSION['admin_name'];
             </a>
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item  ml-1">
+            <li class="nav-item ml-1">
                 <a class="nav-link" href="../homepage.php">
                     <i class="fa-solid fa-house"></i>
                     <span>Home</span></a>
             </li>
 
-            <li class="nav-item active ml-1">
-                <a class="nav-link" href="./view all doctors.php">
+            <li class="nav-item  ml-1">
+                <a class="nav-link" href="../manage doctor/view all doctors.php ">
                     <i class="fa-solid fa-stethoscope"></i>
                     <span>View All Doctors</span></a>
             </li>
 
-            <li class="nav-item ml-1">
-                <a class="nav-link" href="../manage patient/view all patient.php ">
+            <li class="nav-item  ml-1">
+                <a class="nav-link" href="./view all patient.php">
                     <i class="fa-regular fa-user"></i>
                     <span>View All Patients</span></a>
             </li>
 
-            <li class="nav-item ml-1">
+            <li class="nav-item active ml-1">
                 <a class="nav-link" href="../manage appointment/view all appointment.php">
                     <i class="fa-solid fa-bookmark"></i>
                     <span>View All Appointment</span></a>
@@ -153,9 +167,12 @@ $admin_name = $_SESSION['admin_name'];
             <!-- Main Content -->
             <div id="content">
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <nav
+                    class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
                     <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <button
+                        id="sidebarToggleTop"
+                        class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
 
@@ -165,14 +182,28 @@ $admin_name = $_SESSION['admin_name'];
                     <ul class="navbar-nav ml-auto">
                         <!-- Nav Item - Search Dropdown (Visible Only XS) -->
                         <li class="nav-item dropdown no-arrow d-sm-none">
-                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a
+                                class="nav-link dropdown-toggle"
+                                href="#"
+                                id="searchDropdown"
+                                role="button"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
                                 <i class="fas fa-search fa-fw"></i>
                             </a>
                             <!-- Dropdown - Messages -->
-                            <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown">
+                            <div
+                                class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in"
+                                aria-labelledby="searchDropdown">
                                 <form class="form-inline mr-auto w-100 navbar-search">
                                     <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..." aria-label="Search" aria-describedby="basic-addon2" />
+                                        <input
+                                            type="text"
+                                            class="form-control bg-light border-0 small"
+                                            placeholder="Search for..."
+                                            aria-label="Search"
+                                            aria-describedby="basic-addon2" />
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button">
                                                 <i class="fas fa-search fa-sm"></i>
@@ -186,12 +217,23 @@ $admin_name = $_SESSION['admin_name'];
 
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
-                                <img class="img-profile rounded-circle" src="../img/undraw_profile.svg" />
+                            <a
+                                class="nav-link dropdown-toggle"
+                                href="#"
+                                id="userDropdown"
+                                role="button"
+                                data-toggle="dropdown"
+                                aria-haspopup="true"
+                                aria-expanded="false">
+                                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
+                                <img
+                                    class="img-profile rounded-circle"
+                                    src="../img/undraw_profile.svg" />
                             </a>
                             <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            <div
+                                class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="#">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
@@ -205,8 +247,13 @@ $admin_name = $_SESSION['admin_name'];
                                     Activity Log
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                <a
+                                    class="dropdown-item"
+                                    href="#"
+                                    data-toggle="modal"
+                                    data-target="#logoutModal">
+                                    <i
+                                        class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Logout
                                 </a>
                             </div>
@@ -217,16 +264,14 @@ $admin_name = $_SESSION['admin_name'];
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-
                     <?php
                     // Database connection
                     require_once "../../db conn.php";
-
                     // Fetch the patient ID from the URL
                     $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
                     // SQL Query to fetch the specific patient's data using the patient ID
-                    $sql = "SELECT * FROM doctor WHERE doctor_id = $id";
+                    $sql = "SELECT * FROM patient WHERE patient_id = $id";
                     $result = $conn->query($sql);
 
                     // Check if the query was successful
@@ -236,17 +281,17 @@ $admin_name = $_SESSION['admin_name'];
 
                     // Fetch the specific patient data
                     if ($result->num_rows > 0) {
-                        $doctor = $result->fetch_assoc();
+                        $patient = $result->fetch_assoc();
                     } else {
-                        $doctor = null;
+                        $patient = null;
                     }
                     ?>
 
-                    <!-- All Doctor table -->
+                    <!-- Display Patient Profile -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
-                                Doctor Profile
+                                Patient Profile
                             </h6>
                         </div>
 
@@ -254,60 +299,61 @@ $admin_name = $_SESSION['admin_name'];
                             <table class="table table-striped table-border-0" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th style="width: 30%;">Doctor Photo</th>
+                                        <th style="width: 30%;">Patient Photo</th>
                                         <th style="width: 30%;">Information</th>
                                         <th style="width: 30%;">Address & Contact</th>
-                                        <th style="width: 25%;">Action</th>
+                                        <th style="width: 25%;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <!-- First Column: doctor Photo -->
+                                        <!-- First Column: Patient Photo -->
                                         <td>
                                             <div class="form-group">
-                                                <img src="data:image/jpeg;base64,<?php echo base64_encode($doctor['doctor_photo']); ?>" alt="Doctor photo" class="doctor-photo">
-                                            </div>
-                                            <div class="form-group">
-                                                <div><?php echo htmlspecialchars($doctor['specialization']); ?></div>
+                                                <img src="data:image/jpeg;base64,<?php echo base64_encode($patient['patient_photo']); ?>" alt="Patient photo" class="patient-photo" style="max-width: 100%; height: auto;">
                                             </div>
                                         </td>
 
                                         <!-- Second Column: Basic Information -->
                                         <td>
                                             <div class="form-group">
-                                                <div>Name: <?php echo htmlspecialchars($doctor['doctor_name']); ?></div>
+                                                <div>Name: <?php echo htmlspecialchars($patient['patient_name']); ?></div>
                                             </div>
                                             <div class="form-group">
-                                                <div>IC: <?php echo htmlspecialchars($doctor['ic number']); ?></div>
+                                                <div>IC: <?php echo htmlspecialchars($patient['ic number']); ?></div>
                                             </div>
                                             <div class="form-group">
-                                                <div>Gender: <?php echo htmlspecialchars($doctor['gender']); ?></div>
+                                                <div>Gender: <?php echo htmlspecialchars($patient['gender']); ?></div>
                                             </div>
                                             <div class="form-group">
-                                                <div>Date of Birth: <?php echo htmlspecialchars($doctor['d_o_b']); ?></div>
+                                                <div>Date of Birth: <?php echo htmlspecialchars($patient['d_o_b']); ?></div>
                                             </div>
                                         </td>
 
                                         <!-- Third Column: Address and Contact Information -->
                                         <td>
                                             <div class="form-group">
-                                                <div>Address: <?php echo htmlspecialchars($doctor['address']); ?></div>
+                                                <div>Address: <?php echo htmlspecialchars($patient['address']); ?></div>
                                             </div>
                                             <div class="form-group">
-                                                <div>Contact Number: <?php echo htmlspecialchars($doctor['phone number']); ?></div>
+                                                <div>Contact Number: <?php echo htmlspecialchars($patient['phone number']); ?></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div>Emergency Number: <?php echo htmlspecialchars($patient['emerg_num']); ?></div>
                                             </div>
                                         </td>
 
                                         <!-- Fourth Column: Edit Button -->
                                         <td>
                                             <div class="form-group">
-                                                <a href="edit doc.php?id=<?php echo htmlspecialchars($doctor['doctor_id']); ?>" class="btn btn-success btn-sm">
+                                                <a href="edit.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-success btn-sm">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
-                                                <a href="send email doc.php?id=<?php echo htmlspecialchars($doctor['doctor_id']); ?>" class="btn btn-primary btn-sm">
+                                                <a href="send email patient.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-primary btn-sm">
                                                     <i class="fa-regular fa-envelope"></i>
                                                 </a>
                                             </div>
+
                                         </td>
                                     </tr>
                                 </tbody>
@@ -315,7 +361,7 @@ $admin_name = $_SESSION['admin_name'];
                         </div>
                     </div>
 
-                    <!-- Display Patient Profile -->
+                    <!-- Display Patient appointment -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
@@ -344,11 +390,12 @@ $admin_name = $_SESSION['admin_name'];
                                 <tbody>
                                     <?php
 
-                                    $doctor_id = $_GET['id'];
+                                    $patient_id = $_GET['id'];
 
                                     $sql = "SELECT * FROM appointment 
-                                    JOIN doctor ON appointment.doctor_id = doctor.doctor_id 
-                                    WHERE doctor.doctor_id = $doctor_id";
+                                    JOIN patient ON appointment.patient_id = patient.patient_id 
+                                    JOIN doctor ON appointment.doctor_id = doctor.doctor_id
+                                    WHERE patient.patient_id = $patient_id";
 
                                     //  AND status = 'upcoming'
                                     $result = mysqli_query($conn, $sql);
@@ -364,7 +411,7 @@ $admin_name = $_SESSION['admin_name'];
 
                                         echo "<tr>";
                                         echo "<td>" . $row['appointment_id'] . "</td>";
-                                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>';
+                                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "patient-photo"></td>';
 
                                         echo "<td>" . $row['doctor_name'] . "</td>";
                                         echo "<td>" . $row['date'] . "</td>";
@@ -390,17 +437,21 @@ $admin_name = $_SESSION['admin_name'];
 
                         </div>
 
+
                     </div>
+
+                    <!-- Close the connection -->
+                    <?php $conn->close(); ?>
+
                 </div>
-                <!-- End of Doctor Table -->
-                <form action="doctor_profile.php" method="post">
+                <form action="patient_profile.php method=" post">
                     <div class="d-flex justify-content-center">
                         <div class="mr-2">
                             <!-- Back Button -->
                             <?php
 
-                            if (!empty($doctor)) {
-                                echo '<a href="view all doctors.php?id=' . htmlspecialchars($doctor['doctor_id']) . '">
+                            if (!empty($patient)) {
+                                echo '<a href="view all patient.php?id=' . htmlspecialchars($patient['patient_id']) . '">
             <button type="button" class="btn btn-primary mb-2">
                 <i class="fa-solid fa-chevron-left mr-1"></i> Back
             </button>
@@ -410,91 +461,71 @@ $admin_name = $_SESSION['admin_name'];
                         </div>
                     </div>
                 </form>
+                <!-- End of Main Content -->
+
             </div>
-            <!-- End of Main Content -->
+            <!-- End of Content Wrapper -->
         </div>
-        <!-- End of Content Wrapper -->
-    </div>
-    <!-- End of Page Wrapper -->
+        <!-- End of Page Wrapper -->
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+            <i class="fas fa-angle-up"></i>
+        </a>
 
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+        <!-- Logout Modal-->
+        <div
+            class="modal fade"
+            id="logoutModal"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                        <button
+                            class="close"
+                            type="button"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Select "Logout" below if you are ready to end your current session.
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            class="btn btn-secondary"
+                            type="button"
+                            data-dismiss="modal">
+                            Cancel
+                        </button>
+                        <a class="btn btn-primary" href="login.html">Logout</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Delete Account Modal -->
-    <div class="modal fade" id="deleteDocModal" tabindex="-1" role="dialog" aria-labelledby="deleteDocModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteDocModalLabel">Confirm Delete</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Are you sure you want to delete this doctor's account? This action cannot be undone.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a id="deleteConfirmButton" class="btn btn-danger" href="#">Delete</a>
-                </div>
-            </div>
-        </div>
-    </div>
+        <!-- Bootstrap core JavaScript-->
+        <script src="vendor/jquery/jquery.min.js"></script>
+        <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
+        <!-- Core plugin JavaScript-->
+        <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- Custom scripts for all pages-->
+        <script src="js/sb-admin-2.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+        <!-- Page level plugins -->
+        <script src="vendor/chart.js/Chart.min.js"></script>
 
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get the modal element
-            var deleteDocModal = document.getElementById('deleteDocModal');
-            var deleteConfirmButton = document.getElementById('deleteConfirmButton');
-
-            // Set up the event listener for the delete button
-            document.querySelectorAll('.btn-delete').forEach(function(button) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    var deleteUrl = this.getAttribute('href');
-                    deleteConfirmButton.setAttribute('href', deleteUrl);
-                    $(deleteDocModal).modal('show');
-                });
-            });
-        });
-    </script>
-
+        <!-- Page level custom scripts -->
+        <script src="js/demo/chart-area-demo.js"></script>
+        <script src="js/demo/chart-pie-demo.js"></script>
 
 </body>
 
