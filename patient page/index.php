@@ -3,6 +3,7 @@ require_once "../db conn.php";
 global $conn;
 session_start();
 
+
 $patient_id = $_SESSION['patient_id'];
 
 

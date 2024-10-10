@@ -51,7 +51,8 @@ input[type="text"] {
   padding-right: 40px;
 }
 
-#togglePasswordSignIn, #togglePasswordSignUp {
+#togglePasswordSignIn,
+#togglePasswordSignUp {
   position: absolute;
   right: 10px;
   top: 50%;
@@ -215,4 +216,3 @@ input {
   max-width: 200px;
   max-height: 200px;
 }
-
