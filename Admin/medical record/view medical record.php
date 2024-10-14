@@ -5,8 +5,8 @@ session_start();
 $admin_id = $_SESSION['admin_id'];
 $admin_name = $_SESSION['admin_name'];
 
-// $appointment_id = $_GET['appointment_id'];
-$appointment_id = 1;
+$appointment_id = $_GET['appointment_id'];
+// $appointment_id = 1;
 require_once('../../db conn.php');
 
 // Function to fetch all appointment information
@@ -596,7 +596,7 @@ if (mysqli_num_rows($condition_result) > 0) {
         </div>
 
         <div class="container text-center">
-            <a href="../manage patient/patient_profile.php?patient_id=<?php echo $patient_id ?>">
+            <a href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>">
                 <button class="btn btn-primary previous-btn">Back</button>
             </a>
         </div>

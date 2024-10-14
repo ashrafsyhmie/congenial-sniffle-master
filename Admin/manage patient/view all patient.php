@@ -41,6 +41,18 @@ $admin_name = $_SESSION['admin_name'];
   <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
 </head>
 <style>
+  .mini-photo {
+    width: 45px;
+    /* set the width */
+    height: 45px;
+    /* set the height */
+    object-fit: cover;
+    /* to maintain the aspect ratio and cover the area */
+    border-radius: 50%;
+    /* for a circular shape */
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+  }
+
   .pagination-container {
     text-align: center;
     margin-top: 15px;
@@ -245,9 +257,9 @@ $admin_name = $_SESSION['admin_name'];
                 aria-haspopup="true"
                 aria-expanded="false">
                 <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
-                <img
-                  class="img-profile rounded-circle"
-                  src="../img/undraw_profile.svg" />
+                <?php
+                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['admin_photo']) . '" alt="Admin photo" class="mini-photo"></td>'
+                ?>
               </a>
               <!-- Dropdown - User Information -->
               <div

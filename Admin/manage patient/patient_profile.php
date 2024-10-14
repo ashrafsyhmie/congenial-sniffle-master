@@ -41,6 +41,18 @@ $admin_name = $_SESSION['admin_name'];
     <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
 </head>
 <style>
+    .mini-photo {
+        width: 45px;
+        /* set the width */
+        height: 45px;
+        /* set the height */
+        object-fit: cover;
+        /* to maintain the aspect ratio and cover the area */
+        border-radius: 50%;
+        /* for a circular shape */
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+
     .patient-photo {
         width: 98px;
         /* set the width */
@@ -226,9 +238,9 @@ $admin_name = $_SESSION['admin_name'];
                                 aria-haspopup="true"
                                 aria-expanded="false">
                                 <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
-                                <img
-                                    class="img-profile rounded-circle"
-                                    src="../img/undraw_profile.svg" />
+                                <?php
+                                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['admin_photo']) . '" alt="Admin photo" class="mini-photo"></td>'
+                                ?>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div
@@ -381,9 +393,9 @@ $admin_name = $_SESSION['admin_name'];
                                         <th>Photo</th>
                                         <th>Name</th>
                                         <th>Date </th>
-                                        <th>Time</th>
                                         <th>Status</th>
                                         <th>Medical Record</th>
+                                        <th>Medical Record ID</th>
 
 
                                     </tr>
@@ -415,9 +427,7 @@ $admin_name = $_SESSION['admin_name'];
                                         echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "patient-photo"></td>';
 
                                         echo "<td>" . $row['doctor_name'] . "</td>";
-                                        echo "<td>" . $row['date'] . "</td>";
-                                        echo "<td>" . $row['timeslot'] .  "</td>";
-
+                                        echo "<td>" . $row['date'] . '<br>' . $row['timeslot'] . "</td>";
 
 
                                         if ($row['status'] == 'done') {
@@ -427,13 +437,10 @@ $admin_name = $_SESSION['admin_name'];
                                         } elseif ($row['status'] == 'upcoming') {
                                             echo "<td><span class='status-upcoming'>Upcoming</span></td>";
                                         }
-
-                                        echo "<td><a href='../medical record/view medical record.php?id=" . $row['appointment_id'] . "' class='btn btn-primary btn-sm '> View</i></a></td>";
+                                        echo "<td><a href='../medical record/edit medical record.php?id=" . $row['appointment_id'] . "' class='btn btn-success btn-sm mr-3'> <i class='fa fa-edit'></i></a>";
+                                        echo "<a href='../medical record/view medical record.php?appointment_id=" . $row['appointment_id'] . "' class='btn btn-primary btn-sm  '> <i class='fa-solid fa-eye'></i></a></td>";
                                         echo "</tr>";
                                     }
-
-
-
                                     ?>
                                 </tbody>
                             </table>

@@ -109,7 +109,7 @@ $admin_name = $_SESSION['admin_name'];
             </li>
 
             <li class="nav-item  ml-1">
-                <a class="nav-link" href="./view all patient.php">
+                <a class="nav-link" href="../manage patient/view all patient.php">
                     <i class="fa-regular fa-user"></i>
                     <span>View All Patients</span></a>
             </li>
@@ -346,7 +346,7 @@ $admin_name = $_SESSION['admin_name'];
                                         <!-- Fourth Column: Edit Button -->
                                         <td>
                                             <div class="form-group">
-                                                <a href="edit.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-success btn-sm">
+                                                <a href="../manage patient/edit.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-success btn-sm">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
                                                 <a href="send email patient.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-primary btn-sm">

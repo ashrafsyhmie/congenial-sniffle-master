@@ -289,7 +289,8 @@ $doctor_name = $_SESSION['doctor_name'];
             class="welcome-section p-4 ml-1 border-2 rounded-lg justify-content-center"
             style="background-image: url(../img/background.png)">
             <h1 class="h4 text-dark">Welcome!</h1>
-            <p class="">Hi, Doctor Name</p>
+            <?php echo "<p>Hi, " . $doctor['doctor_name'] . " </p>" ?>
+
             <br />
             <br />
             <br />

@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $article_id = $_GET['id'];
 
     // Prepare and execute query
-    $sql = "SELECT * FROM article WHERE id = ?";
+    $sql = "SELECT * FROM article WHERE article_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $article_id);
     $stmt->execute();
@@ -100,6 +100,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
 
 <body id="page-top">
+    <style>
+        .mini-photo {
+            width: 45px;
+            /* set the width */
+            height: 45px;
+            /* set the height */
+            object-fit: cover;
+            /* to maintain the aspect ratio and cover the area */
+            border-radius: 50%;
+            /* for a circular shape */
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+        }
+    </style>
     <!-- Page Wrapper -->
     <div id="wrapper">
         <!-- Sidebar -->
@@ -111,32 +124,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 class="sidebar-brand d-flex align-items-center justify-content-center"
                 href="index.html">
                 <div class="sidebar-brand-icon">
-                    <img src="./img/svg/logo-only.svg" />
+                    <img src="../../img/svg/logo-only.svg" />
                 </div>
                 <div class="sidebar-brand-text mx-2">MedAssist</div>
             </a>
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item active ml-1">
-                <a class="nav-link" href="homepage.php">
+                <a class="nav-link" href="../homepage.php">
                     <i class="fa-solid fa-house"></i>
                     <span>Home</span></a>
             </li>
 
             <li class="nav-item  ml-1">
-                <a class="nav-link" href="view all doctors.php">
+                <a class="nav-link" href="../manage doctor/view all doctors.php">
                     <i class="fa-solid fa-stethoscope"></i>
                     <span>View All Doctors</span></a>
             </li>
 
             <li class="nav-item ml-1">
-                <a class="nav-link" href="view all patient.php">
+                <a class="nav-link" href="../manage patient/view all patient.php">
                     <i class="fa-regular fa-user"></i>
                     <span>View All Patients</span></a>
             </li>
 
             <li class="nav-item ml-1">
-                <a class="nav-link" href="view all appointment.php">
+                <a class="nav-link" href="../manage appointment/view all appointment.php">
                     <i class="fa-solid fa-bookmark"></i>
                     <span>View All Appointment</span></a>
             </li>
@@ -247,10 +260,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 data-toggle="dropdown"
                                 aria-haspopup="true"
                                 aria-expanded="false">
-                                <span class="mr-3 d-none d-lg-inline text-gray-600 small">User Name</span>
-                                <img
-                                    class="img-profile rounded-circle"
-                                    src="img/undraw_profile.svg" />
+                                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $_SESSION['admin_name'] ?></span>
+                                <?php
+                                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['admin_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
+                                ?>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div
@@ -353,7 +366,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                                 <div class="mr-2">
                                                     <!-- Back Button -->
                                                     <?php
-                                                    echo '<a href="manage_article.php?id=' . htmlspecialchars($row['id']) . '">
+                                                    echo '<a href="manage_article.php?id=' . htmlspecialchars($row['article_id']) . '">
             <button type="button" class="btn btn-primary mb-2">
                 <i class="fa-solid fa-chevron-left mr-1"></i> Back
             </button>

@@ -1,6 +1,6 @@
 <?php
 // Include your database connection
-require_once './db conn.php'; // Assuming this contains your MySQL connection setup
+require_once '../../db conn.php'; // Assuming this contains your MySQL connection setup
 
 // Check if the 'id' parameter exists in the URL
 if (isset($_GET['id'])) {
@@ -10,12 +10,13 @@ if (isset($_GET['id'])) {
     $articleId = intval($articleId);
 
     // Create the delete query
-    $deleteQuery = "DELETE FROM article WHERE id = $articleId";
+    $deleteQuery = "DELETE FROM article WHERE article_id = $articleId";
 
     // Execute the query using the mysqli connection
     if (mysqli_query($conn, $deleteQuery)) {
         // If successful, redirect to the articles list page
-    location: header('Location: manage_article.php');
+        location:
+        header('Location: manage_article.php');
         exit;
     } else {
         // Handle errors if the query fails
@@ -28,4 +29,3 @@ if (isset($_GET['id'])) {
 
 // Close the database connection
 mysqli_close($conn);
-?>

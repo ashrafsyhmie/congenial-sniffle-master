@@ -1,78 +1,18 @@
- <ul
-      class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion"
-      id="accordionSidebar">
-      <!-- Sidebar - Brand -->
-      <a
-        class="sidebar-brand d-flex align-items-center justify-content-center"
-        href="./homepage.php">
-        <div class="sidebar-brand-icon">
-          <img src="./img/svg/logo-only.svg" />
-        </div>
-        <div class="sidebar-brand-text mx-2">MedAssist</div>
-      </a>
+<?php
+                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['admin_photo']) . '" alt="Admin photo" class="mini-photo"></td>'
+                ?>
 
-      <!-- Nav Item - Dashboard -->
-      <li class="nav-item ml-1">
-        <a class="nav-link" href="./homepage.php">
-          <i class="fa-solid fa-house"></i>
-          <span>Home</span></a>
-      </li>
 
-      <li class="nav-item ml-1">
-        <a class="nav-link" href="./manage doctor/view all doctors.php">
-          <i class="fa-solid fa-stethoscope"></i>
-          <span>View All Doctors</span></a>
-      </li>
-
-      <li class="nav-item ml-1">
-        <a class="nav-link" href="./manage patient/view all patient.php ">
-          <i class="fa-regular fa-user"></i>
-          <span>View All Patients</span></a>
-      </li>
-
-      <li class="nav-item  ml-1">
-        <a class="nav-link" href="./manage appointment/view all appointment.php ">
-          <i class="fa-solid fa-bookmark"></i>
-          <span>View All Appointment</span></a>
-      </li>
-
-      <li class="nav-item active ml-1">
-        <a
-          class="nav-link collapsed"
-          href="settings.html"
-          data-toggle="collapse"
-          data-target="#collapseTwo"
-          ria-expanded="true"
-          aria-controls="collapseTwo">
-          <i class="fa-solid fa-gear"></i>
-          <span>Settings</span></a>
-        <div
-          id="collapseTwo"
-          class="collapse"
-          aria-labelledby="headingTwo"
-          data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">Settings</h6>
-            <a class="collapse-item" href="change info.html">Change Info</a>
-            <a class="collapse-item" href="settings.html"> Delete Account </a>
-          </div>
-        </div>
-      </li>
-
-      <li class="nav-item ml-1">
-        <a
-          class="nav-link"
-          href="#"
-          data-toggle="modal"
-          data-target="#logoutModal">
-          <i class="fa-solid fa-right-from-bracket"></i>
-          <span>Sign Out</span></a>
-      </li>
-
-      <!-- Sidebar Toggler (Sidebar) -->
-      <div class="text-center d-none d-md-inline">
-        <button
-          class="rounded-circle border-0 mt-5"
-          id="sidebarToggle"></button>
-      </div>
-    </ul>
+<style>
+  .mini-photo {
+      width: 45px;
+      /* set the width */
+      height: 45px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+</style>

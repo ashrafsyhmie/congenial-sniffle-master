@@ -45,6 +45,18 @@ require_once "../../db conn.php";
   <!-- Custom styles for this template-->
   <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
   <style>
+    .mini-photo {
+      width: 45px;
+      /* set the width */
+      height: 45px;
+      /* set the height */
+      object-fit: cover;
+      /* to maintain the aspect ratio and cover the area */
+      border-radius: 50%;
+      /* for a circular shape */
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+
     .patient-photo {
       width: 98px;
       /* set the width */
@@ -272,9 +284,9 @@ require_once "../../db conn.php";
                 aria-haspopup="true"
                 aria-expanded="false">
                 <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
-                <img
-                  class="img-profile rounded-circle"
-                  src="../img/undraw_profile.svg" />
+                <?php
+                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['admin_photo']) . '" alt="Admin photo" class="mini-photo"></td>'
+                ?>
               </a>
               <!-- Dropdown - User Information -->
               <div
@@ -351,7 +363,7 @@ require_once "../../db conn.php";
                   <tbody>
                     <?php
 
-                    $sql = "SELECT * FROM appointment JOIN patient ON appointment.patient_id = patient.patient_id JOIN doctor ON appointment.doctor_id = doctor.doctor_id";
+                    $sql = "SELECT * FROM appointment JOIN patient ON appointment.patient_id = patient.patient_id JOIN doctor ON appointment.doctor_id = doctor.doctor_id ORDER BY appointment.date DESC, appointment.timeslot ASC";
 
                     $result = $conn->query($sql);
 
@@ -369,11 +381,13 @@ require_once "../../db conn.php";
                         echo '<td><span class="status-' . htmlspecialchars($row['status']) . '">' . ucfirst(htmlspecialchars($row['status'])) . '</span></td>';
 
                         echo '<td>';
-                        echo '<a href="../medical record/all medical record.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm"><i class="fa-solid fa-eye"></i></a> ';
+                        echo '<a href="../manage patient/patient_profile.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm"><i class="fa-solid fa-eye"></i></a> ';
                         echo '<a href="delete.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-danger btn-sm btn-delete" onclick="return confirm(\'Are you sure you want to delete this patient?\');">';
                         echo '<i class="fa fa-trash"></i>';
                         echo '</a>';
                         echo '</td>';
+                        echo "<td>";
+                        echo "</td>";
                         echo "</tr>";
                       }
                     } else {

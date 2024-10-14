@@ -86,6 +86,19 @@ $admin_name = $_SESSION['admin_name'];
 </head>
 
 <body id="page-top">
+    <style>
+        .mini-photo {
+            width: 45px;
+            /* set the width */
+            height: 45px;
+            /* set the height */
+            object-fit: cover;
+            /* to maintain the aspect ratio and cover the area */
+            border-radius: 50%;
+            /* for a circular shape */
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+        }
+    </style>
     <!-- Page Wrapper -->
     <div id="wrapper">
         <!-- Sidebar -->
@@ -235,9 +248,9 @@ $admin_name = $_SESSION['admin_name'];
                                 aria-haspopup="true"
                                 aria-expanded="false">
                                 <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
-                                <img
-                                    class="img-profile rounded-circle"
-                                    src="../img/undraw_profile.svg" />
+                                <?php
+                                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['admin_photo']) . '" alt="Admin photo" class="mini-photo"></td>'
+                                ?>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div
@@ -273,6 +286,7 @@ $admin_name = $_SESSION['admin_name'];
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
+
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
@@ -352,7 +366,7 @@ $admin_name = $_SESSION['admin_name'];
                                     <tbody>
                                         <?php foreach ($articles as $article): ?>
                                             <tr>
-                                                <td><?= htmlspecialchars($article['id']); ?></td>
+                                                <td><?= htmlspecialchars($article['article_id']); ?></td>
                                                 <td><?= htmlspecialchars($article['title']); ?></td>
                                                 <td>
                                                     <img src="data:image/jpeg;base64,<?= base64_encode($article['image']); ?>"
@@ -361,8 +375,8 @@ $admin_name = $_SESSION['admin_name'];
                                                 <td><?= htmlspecialchars($article['description']); ?></td>
                                                 <td><?= date('F d, Y', strtotime($article['date'])); ?></td>
                                                 <td>
-                                                    <a href="edit_article.php?id=<?= htmlspecialchars($article['id']); ?>" class="btn btn-primary btn-sm">Edit</a>
-                                                    <a href="delete_article.php?id=<?= htmlspecialchars($article['id']); ?>" class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash"></i></a>
+                                                    <a href="edit_article.php?id=<?= htmlspecialchars($article['article_id']); ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
+                                                    <a href="delete_article.php?id=<?= htmlspecialchars($article['article_id']); ?>" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
                                                     <!-- onclick="return confirm('Are you sure you want to delete this article?');" -->
                                                 </td>
 
