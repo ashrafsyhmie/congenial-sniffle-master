@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Email Inbox</title>
+  </head>
+  <body>
+    <style>
+      /* Styling for the email inbox */
+      .email-inbox {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        width: 500px;
+        margin: 0 auto;
+      }
+
+      h2 {
+        text-align: center;
+        color: #333;
+      }
+
+      .email-list {
+        margin-top: 20px;
+      }
+
+      .email-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      .email-item:last-child {
+        border-bottom: none;
+      }
+
+      .email-sender {
+        color: #007bff;
+        font-weight: bold;
+      }
+
+      .email-subject {
+        flex-grow: 1;
+        margin-left: 20px;
+        color: #555;
+      }
+
+      .email-date {
+        color: #999;
+        font-size: 12px;
+      }
+
+      .email-item:hover {
+        background-color: #f8f9fa;
+        cursor: pointer;
+      }
+    </style>
+    <div class="email-inbox">
+      <h2>Inbox</h2>
+      <div class="email-list">
+        <!-- Example email entries -->
+        <div class="email-item">
+          <div class="email-sender">John Doe</div>
+          <div class="email-subject">Meeting Reminder</div>
+          <div class="email-date">Oct 18, 2024</div>
+        </div>
+
+        <div class="email-item">
+          <div class="email-sender">Jane Smith</div>
+          <div class="email-subject">Project Update</div>
+          <div class="email-date">Oct 17, 2024</div>
+        </div>
+
+        <!-- More email items can be added dynamically -->
+      </div>
+    </div>
+  </body>
+</html>

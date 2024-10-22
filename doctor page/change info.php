@@ -1,49 +1,98 @@
 <?php
 
-require_once "../db conn.php";
-global $conn;
 session_start();
-
 $doctor_id = $_SESSION['doctor_id'];
+$doctor_name = $_SESSION['doctor_name'];
+$errorMsg = "";
+$successMsg = "";
 
-function fetchAllDoctorInfo($conn)
+
+require_once("../db conn.php");
+
+function getDoctorData($conn, $doctor_id)
 {
-  global $doctor_id;
-  $sql = "SELECT * FROM doctor WHERE doctor_id = $doctor_id";
-  $result = mysqli_query($conn, $sql);
+  $sql = "SELECT * FROM doctor WHERE doctor_id=?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $doctor_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc();
+}
 
-  // Initialize an array to store the results
-  $doctorInfo = array();
 
-  // Fetch each row and store it in the array
-  while ($row = mysqli_fetch_assoc($result)) {
-    $doctorInfo[] = $row;
+
+$row = getDoctorData($conn, $doctor_id);
+
+if (!$row) {
+  die("Doctor not found.");
+}
+
+// Populate fields
+$doctor_name = $row["doctor_name"];
+$address = $row["address"];
+$email = $row["email"];
+$gender = $row["gender"];
+$phone_number = $row["phone number"];
+$dob = $row["d_o_b"];
+$ic_number = $row["ic number"];
+$imageData = $row["doctor_photo"];
+
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $doctor_name = $_POST['doctor_name'] ?? '';
+  $address = $_POST['address'] ?? '';
+  $email = $_POST['email'] ?? '';
+  $gender = $_POST['gender'] ?? '';
+  $phone_number = $_POST['phone_number'] ?? '';
+  $dob = $_POST['dob'] ?? '';
+  $ic_number = $_POST['ic_number'] ?? '';
+  $imageData = $_FILES['image']['name'] ?? '';
+
+  // Validate required fields
+  if (!empty($doctor_name) && !empty($email)) {
+    $sql = "UPDATE doctor SET doctor_name=?, `ic number`=?, address=?, email=?, `phone number`=?, gender=?, d_o_b=?, doctor_photo=? WHERE doctor_id=?";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("sssssssssi", $doctor_name, $ic_number, $address, $email, $phone_number, $gender, $dob, $imageData, $doctor_id);
+
+    if ($stmt->execute()) {
+      $successmsg = "Doctor information updated successfully.";
+    } else {
+      $errorMsg = "Error updating doctor information: " . $stmt->error;
+    }
+  } else {
+    $errorMsg = "Please fill out all required fields.";
   }
 
-  // Return the array containing all patient information
-  return $doctorInfo;
+  if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+    $imageType = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+
+    // Validate image type and size
+    if (in_array($imageType, ['jpg', 'jpeg', 'png']) && $_FILES['image']['size'] < 5000000) { // Limit size to 5MB
+      $imageData = file_get_contents($_FILES['image']['tmp_name']);
+
+      // Prepare SQL query to update doctor information
+      $sql = "UPDATE doctor SET doctor_photo = ? WHERE doctor_id = $doctor_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bind_param("s", $imageData);
+
+      // Execute the query
+      if ($stmt->execute()) {
+        $successMsg = "doctor information updated successfully.";
+      } else {
+        $errorMsg = "Error updating doctor information: " . $conn->error;
+      }
+    } else {
+      $errorMsg = "Invalid image file type or size.";
+    }
+  } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+    $errorMsg = "Error uploading image.";
+  }
 }
 
 
-
-// Fetch all patient information
-$allDoctorInfo = fetchAllDoctorInfo($conn);
-
-
-
-// Output the fetched information
-
-
-foreach ($allDoctorInfo as $doctor) {
-
-
-  $_SESSION['doctor_name'] = $doctor['doctor_name'];
-  $_SESSION['doctor_photo'] = $doctor['doctor_photo'];
-}
-
-
-$doctor_name = $_SESSION['doctor_name'];
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -103,7 +152,7 @@ $doctor_name = $_SESSION['doctor_name'];
       <!-- Sidebar - Brand -->
       <a
         class="sidebar-brand d-flex align-items-center justify-content-center"
-        href="homepage.php">
+        href="./homepage.php">
         <div class="sidebar-brand-icon">
           <img src="../img/svg/logo-only.svg" />
         </div>
@@ -111,7 +160,7 @@ $doctor_name = $_SESSION['doctor_name'];
       </a>
 
       <!-- Nav Item - Dashboard -->
-      <li class="nav-item ml-1">
+      <li class="nav-item  ml-1">
         <a class="nav-link" href="homepage.php">
           <i class="fa-solid fa-house"></i>
           <span>Home</span></a>
@@ -146,7 +195,7 @@ $doctor_name = $_SESSION['doctor_name'];
           data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <h6 class="collapse-header">Settings</h6>
-            <a class="collapse-item active" href="change info.html">Change Info</a>
+            <a class="collapse-item active" href="change info.php">Change Info</a>
           </div>
         </div>
       </li>
@@ -222,7 +271,6 @@ $doctor_name = $_SESSION['doctor_name'];
               </div>
             </li>
 
-
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">
               <a
@@ -233,9 +281,9 @@ $doctor_name = $_SESSION['doctor_name'];
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $doctor['doctor_name']  ?></span>
+                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $doctor_name; ?></span>
                 <?php
-                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($doctor['doctor_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
+                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['doctor_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
                 ?>
               </a>
               <!-- Dropdown - User Information -->
@@ -281,46 +329,78 @@ $doctor_name = $_SESSION['doctor_name'];
           </div>
 
           <!-- Content Row -->
-          <form action="#">
-            <div class="row">
-              <div class="col-lg-6 mb-4">
-                <div class="card card-body p-5">
-                  <h5 class="card-title text-dark">Change Information</h5>
-                  <div class="name p-2">
-                    <label for="name">Nameㅤ:ㅤ</label>
-                    <input class="ml-2" type="text" id="name" />
-                  </div>
-                  <div class="email p-2">
-                    <label for="email">Email ㅤ :ㅤ</label>
-                    <input class="ml-1" type="email" id="email" />
-                  </div>
-                  <div class="phone p-2">
-                    <label for="phone">Phoneㅤ:ㅤ</label>
-                    <input class="ml-2" type="tel" id="phone" />
-                  </div>
-                  <br />
-                  <button class="change-info-btn btn btn-primary mt-4">
-                    Change Information
-                  </button>
-                </div>
-              </div>
-              <div class="col-lg-6 mb-4">
-                <div class="card card-body p-5">
-                  <h5 class="card-title text-dark">Change Password</h5>
-                  <div class="name p-2">
-                    <label for="password">Passwordㅤ: </label>
-                    <input class="ml-5" type="password" id="password" />
-                  </div>
-                  <div class="email p-2">
-                    <label for="confirm-password">Confirm Passwordㅤ:</label>
-                    <input type="password" id="confirm-password" />
-                  </div>
+          <form method="post" action="./change info.php" enctype="multipart/form-data">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                  <tbody>
+                    <div class="container-fluid">
+                      <?php if ($successMsg): ?>
+                        <div class="alert alert-success" role="alert">
+                          <?php echo $successMsg; ?>
+                        </div>
+                      <?php endif; ?>
 
-                  <br />
-                  <button class="change-info-btn btn btn-primary mt-4">
-                    Change Password
-                  </button>
-                </div>
+                      <?php if ($errorMsg): ?>
+                        <div class="alert alert-danger" role="alert">
+                          <?php echo $errorMsg; ?>
+                        </div>
+                      <?php endif; ?>
+
+
+                      <input type="hidden" name="doctor_id" value="<?php echo htmlspecialchars($doctor_id); ?>">
+
+                      <div class="form-group">
+                        <label for="doctor_name">Doctor Name</label>
+                        <input type="text" class="form-control" id="doctor_name" name="doctor_name" value="<?php echo htmlspecialchars($doctor_name); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="ic_number">IC Number</label>
+                        <input type="text" class="form-control" id="ic_number" name="ic_number" value="<?php echo htmlspecialchars($ic_number); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="address">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" value="<?php echo htmlspecialchars($address); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($email); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="gender">Gender</label>
+                        <select class="form-control" id="gender" name="gender" required>
+                          <option value="Male" <?php echo $gender == 'Male' ? 'selected' : ''; ?>>Male</option>
+                          <option value="Female" <?php echo $gender == 'Female' ? 'selected' : ''; ?>>Female</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="phone_number">Phone Number</label>
+                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" class="form-control" id="dob" name="dob" value="<?php echo htmlspecialchars($dob); ?>" required>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="image">Profile Image</label>
+                        <input type="file" class="form-control-file" id="image" name="image">
+                      </div>
+
+                      <div class="form-group d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary">Update Info</button>
+                      </div>
+
+
+                    </div>
+                  </tbody>
+                </table>
               </div>
             </div>
           </form>
@@ -343,22 +423,12 @@ $doctor_name = $_SESSION['doctor_name'];
   </a>
 
   <!-- Logout Modal-->
-  <div
-    class="modal fade"
-    id="logoutModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="exampleModalLabel"
-    aria-hidden="true">
+  <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-          <button
-            class="close"
-            type="button"
-            data-dismiss="modal"
-            aria-label="Close">
+          <button class="close" type="button" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
         </div>
@@ -366,12 +436,8 @@ $doctor_name = $_SESSION['doctor_name'];
           Select "Logout" below if you are ready to end your current session.
         </div>
         <div class="modal-footer">
-          <button
-            class="btn btn-secondary"
-            type="button"
-            data-dismiss="modal">
-            Cancel
-          </button>
+          <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+          <!-- Form for logout -->
           <form action="./logout_modal.php" method="post">
             <button type="submit" class="btn btn-primary">Logout</button>
           </form>
@@ -387,15 +453,7 @@ $doctor_name = $_SESSION['doctor_name'];
   <!-- Core plugin JavaScript-->
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-  <!-- Custom scripts for all pages-->
-  <script src="../js/sb-admin-2.min.js"></script>
 
-  <!-- Page level plugins -->
-  <script src="../vendor/chart.js/Chart.min.js"></script>
-
-  <!-- Page level custom scripts -->
-  <script src="../js/demo/chart-area-demo.js"></script>
-  <script src="../js/demo/chart-pie-demo.js"></script>
 </body>
 
 </html>

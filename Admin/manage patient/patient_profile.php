@@ -134,29 +134,6 @@ $admin_name = $_SESSION['admin_name'];
 
             <li class="nav-item ml-1">
                 <a
-                    class="nav-link collapsed"
-                    href="settings.html"
-                    data-toggle="collapse"
-                    data-target="#collapseTwo"
-                    ria-expanded="true"
-                    aria-controls="collapseTwo">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>Settings</span></a>
-                <div
-                    id="collapseTwo"
-                    class="collapse"
-                    aria-labelledby="headingTwo"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Settings</h6>
-                        <a class="collapse-item" href="change info.html">Change Info</a>
-                        <a class="collapse-item" href="settings.html"> Delete Account </a>
-                    </div>
-                </div>
-            </li>
-
-            <li class="nav-item ml-1">
-                <a
                     class="nav-link"
                     href="#"
                     data-toggle="modal"
@@ -276,6 +253,16 @@ $admin_name = $_SESSION['admin_name'];
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
+
+                    <?php
+                    // Display success or error message
+                    if (isset($_GET['message'])) {
+                        $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+                        echo '<div class="alert ' . $messageType . '">';
+                        echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+                        echo '</div>';
+                    }
+                    ?>
                     <?php
                     // Database connection
                     require_once "../../db conn.php";
@@ -382,54 +369,41 @@ $admin_name = $_SESSION['admin_name'];
 
                         <div class="card-body">
 
-                            <table
-                                class="table table-bordered"
-                                id="dataTable"
-                                width="100%"
-                                cellspacing="0">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
-                                        <th>Appointment ID</th>
-                                        <th>Photo</th>
+                                        <th>Dr. Photo</th>
                                         <th>Name</th>
-                                        <th>Date </th>
+                                        <th>Date</th>
                                         <th>Status</th>
-                                        <th>Medical Record</th>
-                                        <th>Medical Record ID</th>
-
-
+                                        <th>Appointment Action</th>
+                                        <th>Medical Record Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-
                                     $patient_id = $_GET['id'];
 
-                                    $sql = "SELECT * FROM appointment 
+                                    $sql = "SELECT appointment.*, patient.patient_name, doctor.doctor_name, doctor.doctor_photo, medical_record.medical_record_id 
+                                    FROM appointment 
                                     JOIN patient ON appointment.patient_id = patient.patient_id 
                                     JOIN doctor ON appointment.doctor_id = doctor.doctor_id
-                                    WHERE patient.patient_id = $patient_id";
+                                    LEFT JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id
+                                    WHERE appointment.patient_id = $patient_id";
 
-                                    //  AND status = 'upcoming'
                                     $result = mysqli_query($conn, $sql);
 
                                     while ($row = mysqli_fetch_assoc($result)) {
+                                        $appointment_id = $row['appointment_id'];
 
-                                        //   $doctor_id = $row['doctor_id'];
-                                        //   $sql2 = "SELECT * FROM `doctor` WHERE `doctor_id` = '$doctor_id'";
-                                        //   $result2 = mysqli_query($connection, $sql2);
-                                        //   $row2 = mysqli_fetch_assoc($result2);
-
-                                        //   $doctor_name = $row2['doctor_name'];
-
+                                        // Display appointment data
                                         echo "<tr>";
-                                        echo "<td>" . $row['appointment_id'] . "</td>";
-                                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "patient-photo"></td>';
 
+                                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class="patient-photo"></td>';
                                         echo "<td>" . $row['doctor_name'] . "</td>";
                                         echo "<td>" . $row['date'] . '<br>' . $row['timeslot'] . "</td>";
 
-
+                                        // Appointment status
                                         if ($row['status'] == 'done') {
                                             echo '<td><span class="status-done">Done</span></td>';
                                         } elseif ($row['status'] == 'cancelled') {
@@ -437,13 +411,87 @@ $admin_name = $_SESSION['admin_name'];
                                         } elseif ($row['status'] == 'upcoming') {
                                             echo "<td><span class='status-upcoming'>Upcoming</span></td>";
                                         }
-                                        echo "<td><a href='../medical record/edit medical record.php?id=" . $row['appointment_id'] . "' class='btn btn-success btn-sm mr-3'> <i class='fa fa-edit'></i></a>";
-                                        echo "<a href='../medical record/view medical record.php?appointment_id=" . $row['appointment_id'] . "' class='btn btn-primary btn-sm  '> <i class='fa-solid fa-eye'></i></a></td>";
+
+                                        // Appointment action buttons
+                                    ?>
+
+                                        <td>
+                                            <a href="#" class="btn btn-info btn-sm" data-toggle="modal" data-target="#rescheduleAppModal<?php echo $appointment_id; ?>">
+                                                <i class="fa-regular fa-calendar"></i> Reschedule
+                                            </a>
+                                            <!-- Each appointment has its own Cancel button and modal -->
+                                            <a href="#" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancelAppModal<?php echo $appointment_id; ?>">
+                                                <i class="fa-solid fa-trash"></i> Cancel
+                                            </a>
+                                            <p>Appointment Record ID: <?php echo $row['appointment_id']; ?> </p>
+                                        </td>
+
+                                        <!-- Cancel Modal for each appointment -->
+                                        <div class="modal fade" id="cancelAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Do You Want to Cancel Appointment?</h5>
+                                                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">×</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Select "Yes" below if you want to cancel this appointment.
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
+                                                        <!-- Form with appointment_id -->
+                                                        <form action="../manage appointment/cancel appointment.php" method="POST">
+                                                            <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
+                                                            <button type="submit" class="btn btn-primary">Yes</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Reschedule modal -->
+                                        <div class="modal fade" id="rescheduleAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Reschedule Appointment</h5>
+                                                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">×</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        Do you want to reschedule this appointment?
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                                                        <!-- Reschedule form -->
+                                                        <form action="../manage appointment/reschedule handler/calendar.php" method="GET">
+                                                            <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
+                                                            <button type="submit" class="btn btn-primary">Yes</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <?php
+                                        // Medical record action buttons
+                                        echo "<td><a href='../medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-success btn-sm mr-3'> 
+                                                  <i class='fa fa-edit'></i> Edit</a>";
+                                        echo "<a href='../medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-primary btn-sm'> 
+                                                     <i class='fa-solid fa-eye'></i> View</a><br> Medical Record ID: " . $row['medical_record_id'] . "</td>";
+                                        ?>
+
+                                    <?php
                                         echo "</tr>";
                                     }
                                     ?>
                                 </tbody>
+
                             </table>
+
 
                         </div>
 
@@ -454,24 +502,20 @@ $admin_name = $_SESSION['admin_name'];
                     <?php $conn->close(); ?>
 
                 </div>
-                <form action="patient_profile.php method=" post">
-                    <div class="d-flex justify-content-center">
-                        <div class="mr-2">
-                            <!-- Back Button -->
-                            <?php
 
-                            if (!empty($patient)) {
-                                echo '<a href="view all patient.php">
-            <button type="button" class="btn btn-primary mb-2">
-                <i class="fa-solid fa-chevron-left mr-1"></i> Back
-            </button>
-            </a>';
-                            }
-                            ?>
-                        </div>
+                <div class="d-flex justify-content-center">
+                    <div class="mr-2">
+                        <a href="view all patient.php">
+                            <button type="button" class="btn btn-primary mb-2">
+                                <i class="fa-solid fa-chevron-left mr-1"></i> Back
+                            </button>
+                        </a>;
+
+
                     </div>
-                </form>
-                <!-- End of Main Content -->
+                </div>
+                <
+                    <!-- End of Main Content -->
 
             </div>
             <!-- End of Content Wrapper -->
@@ -513,29 +557,32 @@ $admin_name = $_SESSION['admin_name'];
                             data-dismiss="modal">
                             Cancel
                         </button>
-                        <a class="btn btn-primary" href="login.html">Logout</a>
+                        <form action="../logout_modal.php" method="post">
+                            <button type="submit" class="btn btn-primary">Logout</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Bootstrap core JavaScript-->
-        <script src="vendor/jquery/jquery.min.js"></script>
-        <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="../../vendor/jquery/jquery.min.js"></script>
+        <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
+
         <!-- Core plugin JavaScript-->
-        <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+        <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
         <!-- Custom scripts for all pages-->
-        <script src="js/sb-admin-2.min.js"></script>
+        <script src="../../js/sb-admin-2.min.js"></script>
 
         <!-- Page level plugins -->
-        <script src="vendor/chart.js/Chart.min.js"></script>
+        <script src="../../vendor/chart.js/Chart.min.js"></script>
 
         <!-- Page level custom scripts -->
-        <script src="js/demo/chart-area-demo.js"></script>
-        <script src="js/demo/chart-pie-demo.js"></script>
+        <script src="../../js/demo/chart-area-demo.js"></script>
+        <script src="../../js/demo/chart-pie-demo.js"></script>
 
 </body>
 

@@ -1,82 +1,23 @@
 <?php
 session_start();
-$patient_id = $_SESSION['patient_id'];
 
-require_once '../../db conn.php';
+require_once '../../../db conn.php';
 require './timeslots-function.php';
 
-$date = isset($_GET['date']) ? $_GET['date'] : '';
-$doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
-
-$appointment_id = $_GET['appointment_id'];
-
-// Fetch the appointment details using the appointment_id
-$appointmentDetails = fetchAppointmentById($conn, $appointment_id);
-
-function fetchAppointmentById($conn, $appointment_id)
-{
-    $sql = "SELECT * FROM appointment WHERE appointment_id = ?";
-    $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $appointment_id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-
-    // Fetch the appointment details
-    if ($row = mysqli_fetch_assoc($result)) {
-        return $row;
-    } else {
-        return null;
-    }
-}
-
-// Process the data (e.g., reschedule, display the details, etc.)
-if ($appointmentDetails) {
-    // Store or display the appointment details
-    $_SESSION['appointment_id'] = $appointmentDetails['appointment_id'];
-    $_SESSION['appointment_date'] = $appointmentDetails['date'];
-    $_SESSION['appointment_timeslot'] = $appointmentDetails['timeslot'];
-    $_SESSION['appointment_doctor'] = $appointmentDetails['doctor_id'];
+if (isset($_GET['patient_id'])) {
+    $patient_id = $_GET['patient_id'];
+    $date = isset($_GET['date']) ? $_GET['date'] : '';
+    $doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
+} elseif (isset($_POST['patient_id'])) {
+    $patient_id = $_POST['patient_id'];
+    $date = isset($_POST['date']) ? $_POST['date'] : '';
+    $doctor_id = isset($_POST['doctor_id']) ? $_POST['doctor_id'] : '';
 } else {
-    echo "Appointment not found!";
-}
-
-// Function to fetch doctor information using doctor_id
-function fetchDoctorById($conn, $doctor_id)
-{
-    // Prepare the SQL query to fetch the doctor info based on doctor_id
-    $sql = "SELECT * FROM doctor WHERE doctor_id = ?";
-
-    // Prepare the statement
-    $stmt = mysqli_prepare($conn, $sql);
-
-    // Bind the doctor_id parameter to the query
-    mysqli_stmt_bind_param($stmt, "i", $doctor_id);
-
-    // Execute the query
-    mysqli_stmt_execute($stmt);
-
-    // Get the result
-    $result = mysqli_stmt_get_result($stmt);
-
-    // Fetch the doctor details if found
-    if ($row = mysqli_fetch_assoc($result)) {
-        return $row; // Return the doctor details
-    } else {
-        return null; // Return null if no doctor is found
-    }
 }
 
 
 
-// Fetch the doctor details using the doctor_id
-$doctorInfo = fetchDoctorById($conn, $appointmentDetails['doctor_id']);
 
-if ($doctorInfo) {
-    // Store doctor info in session or display it as needed
-    $_SESSION['doctor_name'] = $doctorInfo['doctor_name'];
-} else {
-    echo "No doctor found with the provided doctor_id!";
-}
 
 $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
 
@@ -93,7 +34,7 @@ $row = mysqli_fetch_assoc($result);
 $patient_name = $row['patient_name'];
 
 
-$sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
+$sql = "SELECT * FROM doctor WHERE doctor_id = $doctor_id";
 
 // Execute the query
 $result = mysqli_query($conn, $sql);
@@ -105,7 +46,7 @@ if (!$result) {
 
 $row = mysqli_fetch_assoc($result);
 
-$doctor_name = $doctorInfo['doctor_name'];
+$doctor_name = $row['doctor_name'];
 
 
 $booked_timeslot = isset($_GET['booked_timeslot']) ? $_GET['booked_timeslot'] : '';
@@ -145,15 +86,14 @@ if (isset($_POST['submit'])) {
     if ($result->num_rows > 0) {
         $msg = "<div class='alert alert-danger'>Already Booked</div>";
     } else {
-
-        $sql = "UPDATE appointment SET date = ?, timeslot = ? WHERE appointment_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssi", $date, $timeslot, $appointment_id);
-
-
+        // Insert the booking into the database with patient_id
+        $stmt = $conn->prepare("INSERT INTO appointment (DATE, TIMESLOT, patient_id,doctor_id) VALUES (?, ?, ?,?)");
+        $stmt->bind_param('ssss', $date, $timeslot, $patient_id, $doctor_id);
 
         if ($stmt->execute()) {
-            header("Location: ../all appointment.php?message=Appointment Rescheduled Successfully&message_type=success");
+            $msg = "<div class='alert alert-success'>Booking Successful</div>";
+            header("Location: timeslots.php?date=" . $date . "&doctor_id=" . $doctor_id);
+            // date=$date&booked_timeslot=$timeslot
             exit;
         } else {
             $msg = "<div class='alert alert-danger'>Booking Failed: " . $stmt->error . "</div>";
@@ -227,53 +167,22 @@ $timeslots = timeslots();
                 <?php echo $msg; ?>
             </div>
             <?php
-            // foreach ($timeslots as $t) {
-            //     $isBooked = in_array($t, $bookings);
-            //     $buttonClass = $isBooked ? 'btn-danger' : 'btn-success book';
-            //     echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' " . ($isBooked ? "disabled" : "data-timeslot='$t'") . ">$t</button>";
-            // }
-
             foreach ($timeslots as $t) {
                 $isBooked = in_array($t, $bookings);
-                $isPreviousAppointment = ($t == $_SESSION['appointment_timeslot']); // Check if this timeslot is the previous appointment's timeslot
-
-                // Determine the button class
-                if ($isPreviousAppointment) {
-                    $buttonClass = 'btn-warning'; // Highlight the previous appointment
-                } else {
-                    $buttonClass = $isBooked ? 'btn-danger' : 'btn-success book';
-                }
-
+                $buttonClass = $isBooked ? 'btn-danger' : 'btn-success book';
                 echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' " . ($isBooked ? "disabled" : "data-timeslot='$t'") . ">$t</button>";
             }
-
-
             ?>
             <br><br>
             <div class="container" style="text-align: center;">
-                <a href="./calendar.php?appointment_id=<?php echo $appointment_id; ?>"><button class="btn btn-primary">BACK</button></a>
+                <a href="./calendar.php?doctor_id=<?php echo $doctor_id; ?>&patient_id=<?php echo $patient_id ?>"><button class="btn btn-primary">BACK</button></a>
             </div>
         </div>
-
-        <div class="legend">
-            <h4>Legend:</h4>
-            <button class="btn btn-success" style="width:5%; cursor: default;" disabled></button>
-            <span>Available</span>
-            <br>
-            <br>
-            <button class="btn btn-danger" style="width:5%; cursor: default;" disabled></button>
-            <span>Booked</span>
-            <br>
-            <br>
-            <button class="btn btn-warning" style="width:5%; cursor: default;" disabled></button>
-            <span>Current</span>
-        </div>
-
     </div>
 
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
-            <form method="post" action="">
+            <form method="post" action="./timeslots.php">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>

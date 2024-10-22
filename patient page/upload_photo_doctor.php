@@ -13,16 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if (in_array($imageType, ['jpg', 'jpeg', 'png']) && $_FILES['image']['size'] < 5000000) { // Limit size to 5MB
             $imageData = file_get_contents($_FILES['image']['tmp_name']);
 
-            // Prepare SQL query to update doctor information
-            $sql = "UPDATE doctor SET doctor_photo = ? WHERE doctor_id = 3";
+            // Prepare SQL query to update patient information
+            $sql = "UPDATE patient SET patient_photo = ? WHERE patient_id = 18";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("s", $imageData);
 
             // Execute the query
             if ($stmt->execute()) {
-                $successMsg = "Doctor information updated successfully.";
+                $successMsg = "patient information updated successfully.";
             } else {
-                $errorMsg = "Error updating Doctor information: " . $conn->error;
+                $errorMsg = "Error updating patient information: " . $conn->error;
             }
         } else {
             $errorMsg = "Invalid image file type or size.";

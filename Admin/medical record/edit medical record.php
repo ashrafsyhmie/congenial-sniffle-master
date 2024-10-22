@@ -3,6 +3,26 @@
 session_start();
 require_once('../../db conn.php');
 
+// $appointment_id = 107;
+$medical_record_id = $_GET['medical_record_id'];
+if (!isset($_GET['medical_record_id'])) {
+    die("Appointment ID not provided.");
+}
+
+
+function getMedicalRecordData($conn, $medical_record_id)
+{
+    $sql = "SELECT * FROM medical_record WHERE medical_record_id=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $medical_record_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+$MedicalRecordRow = getMedicalRecordData($conn, $medical_record_id);
+
+$appointment_id = $MedicalRecordRow['appointment_id'];
+
 
 function getAppointmentData($conn, $appointment_id)
 {
@@ -13,11 +33,7 @@ function getAppointmentData($conn, $appointment_id)
     return $stmt->get_result()->fetch_assoc();
 }
 
-// $appointment_id = 107;
-$appointment_id = $_GET['id'];
-if (!isset($_GET['id'])) {
-    die("Appointment ID not provided.");
-}
+
 
 
 
@@ -75,6 +91,71 @@ $patient_em_contact = $PatientRow['emerg_num'];
 $patient_dob = $PatientRow['d_o_b'];
 
 
+// Fetch all appointment information
+$sql = "SELECT * FROM appointment WHERE appointment_id = $appointment_id";
+$result = mysqli_query($conn, $sql);
+$appointment = mysqli_fetch_assoc($result);
+
+// Fetch all patient information
+$sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
+$result = mysqli_query($conn, $sql);
+$patient = mysqli_fetch_assoc($result);
+
+
+// Fetch medical record ID using appointment_id
+$sql = "SELECT * FROM medical_record WHERE appointment_id = $appointment_id";
+$result = mysqli_query($conn, $sql);
+$medical_record = mysqli_fetch_assoc($result);
+$medical_record_id = $medical_record['medical_record_id'];
+
+
+// Fetch physical exam data using medical_record_id
+$sql = "SELECT * FROM physical_exam WHERE medical_record_id = $medical_record_id";
+$physical_exam_result = mysqli_query($conn, $sql);
+
+// Fetch medications using medical_record_id
+$sql = "SELECT * FROM medication WHERE medical_record_id = $medical_record_id";
+$medication_result = mysqli_query($conn, $sql);
+
+// Fetch diagnosis using medical_record_id
+$sql = "SELECT * FROM diagnosis WHERE medical_record_id = $medical_record_id";
+$diagnosis_result = mysqli_query($conn, $sql);
+
+//Fetch lifestyle using patient_id
+$sql = "SELECT * FROM patient_lifestyle WHERE patient_id = $patient_id";
+$lifestyle_result = mysqli_query($conn, $sql);
+
+//Fetch current medical condition using patient_id
+
+$conditions = [
+    'Eye Problem' => 'None',
+    'Seizure' => 'None',
+    'Epilepsy' => 'None',
+    'Hearing Problem' => 'None',
+    'Diabetes' => 'None',
+    'Cardiovascular Disease' => 'None',
+    'History of Strokes' => 'None',
+    'Respiratory Problem' => 'None',
+    'Kidney Problem' => 'None',
+    'Stomach and Liver Problem' => 'None',
+    'Pancreatic Problems' => 'None',
+    'Anxiety and Depression' => 'None',
+    'Other Mental Health Issue' => 'None',
+    'Sleep Disorder' => 'None',
+    'Neck or Back Problem' => 'None',
+];
+// Fetch current medical condition using medical_record_id
+$sql = "SELECT * FROM medical_conditions WHERE medical_record_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $medical_record_id);
+$stmt->execute();
+$condition_result = $stmt->get_result();
+
+if ($condition_result && mysqli_num_rows($condition_result) > 0) {
+    while ($row = mysqli_fetch_assoc($condition_result)) {
+        $conditions[$row['condition_name']] = $row['condition_status'];
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -140,10 +221,15 @@ $patient_dob = $PatientRow['d_o_b'];
                         <td>
                             <label for="appointment_id">Appointment ID</label>
                             <input type="text" name="appointment_id" class="form-control" disabled value="<?php echo $appointment_id; ?>">
+
+                            <input type="text" name="patient_id" class="form-control" value="<?php echo $patient_id; ?>" hidden>
                             <label for="patient-name">Patient Name</label>
                             <input type="text" name="patient-name" class="form-control" disabled value="<?php echo $patient_name; ?>" />
                         </td>
                         <td>
+                            <label for="medical-record-id">Medical Record ID</label>
+                            <input type="text" name="medical_record_id" class="form-control" readonly value="<?php echo $medical_record_id; ?>" />
+
                             <label for="patient-age">Age</label>
                             <input type="text" name="patient-age" class="form-control" disabled value="<?php
                                                                                                         // Create DateTime objects for the date of birth and the current date
@@ -209,7 +295,14 @@ $patient_dob = $PatientRow['d_o_b'];
         <section>
             <div class="notes container mt-5">
                 <h4>Notes</h4>
-                <input type="text" name="notes" id="notes" class="form-control">
+
+                <textarea name="notes" id="notes" class="form-control"><?php
+                                                                        if ($medical_record['notes'] == NULL) {
+                                                                            echo "No notes found";
+                                                                        } else {
+                                                                            echo $medical_record['notes'];
+                                                                        }
+                                                                        ?></textarea>
             </div>
         </section>
 
@@ -234,13 +327,31 @@ $patient_dob = $PatientRow['d_o_b'];
                         <th>Frequency</th>
                     </thead>
 
+                    <tbody>
+                        <?php
+                        if ($medication_result->num_rows > 0) {
+                            // Output data of each row
+                            while ($row = $medication_result->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td><input type='text' name='medication_name[]' class='form-control' placeholder='Medication' value='" . htmlspecialchars($row["medication_name"]) . "' /></td>";
+                                echo "<td><input type='text' name='purpose[]' class='form-control' placeholder='Purpose' value='" . htmlspecialchars($row["purpose"]) . "' /></td>";
+                                echo "<td><input type='text' name='dosage[]' class='form-control' placeholder='Dosage' value='" . htmlspecialchars($row["dosage"]) . "' /></td>";
+                                echo "<td><input type='text' name='frequency[]' class='form-control' placeholder='Frequency' value='" . htmlspecialchars($row["frequency"]) . "' /></td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                        ?>
+                            <tr>
+                                <td><input type="text" name="medication_name[]" class="form-control" placeholder="Medication" /></td>
+                                <td><input type="text" name="purpose[]" class="form-control" placeholder="Purpose" /></td>
+                                <td><input type="text" name="dosage[]" class="form-control" placeholder="Dosage" /></td>
+                                <td><input type="text" name="frequency[]" class="form-control" placeholder="Frequency" /></td>
+                            </tr>
+                        <?php
+                        }
+                        ?>
 
-                    <tr>
-                        <td><input type="text" name="medication_name[]" class="form-control" placeholder="Medication" /></td>
-                        <td><input type="text" name="purpose[]" class="form-control" placeholder="Purpose" /></td>
-                        <td><input type="text" name="dosage[]" class="form-control" placeholder="Dosage" /></td>
-                        <td><input type="text" name="frequency[]" class="form-control" placeholder="Frequency" /></td>
-                    </tr>
+                    </tbody>
                 </table>
 
 
@@ -258,90 +369,169 @@ $patient_dob = $PatientRow['d_o_b'];
                 <div class="patient-lifestyle container mt-5">
                     <h4 class="h4">Patient Lifestyle</h4>
                     <table class="table" style="background-color: #fafbfc">
-                        <tr>
-                            <td>
-                                <label for="smoking">Smoking History</label>
-                                <div class="form-group">
-
+                        <?php if (mysqli_num_rows($lifestyle_result) > 0) {
+                            $row = mysqli_fetch_assoc($lifestyle_result);
+                        ?>
+                            <tr>
+                                <td>
+                                    <label for="smoking">Smoking History</label>
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="smoking" value="No"
+                                                <?php if ($row['smoking_history'] == 'No') echo 'checked'; ?> />
+                                            <label class="form-check-label">No</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="smoking" value="Yes"
+                                                <?php if ($row['smoking_history'] === 'Yes') echo 'checked'; ?> />
+                                            <label class="form-check-label">Yes</label>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <label for="alcohol">Alcohol Consumption</label>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="smoking" value="No" />
-                                        <label class="form-check-label" for="no">No</label>
+                                        <input class="form-check-input" type="radio" name="alcohol" value="No"
+                                            <?php if ($row['alcohol_consumption'] == 'No') echo 'checked'; ?> />
+                                        <label class="form-check-label">No</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="smoking" value="Yes" />
+                                        <input class="form-check-input" type="radio" name="alcohol" value="Yes"
+                                            <?php if ($row['alcohol_consumption'] === 'Yes') echo 'checked'; ?> />
                                         <label class="form-check-label">Yes</label>
                                     </div>
+                                </td>
+                            </tr>
 
-                                </div>
-                            </td>
-                            <td>
-                                <label for="alcohol">Alcohol Consumption</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="alcohol" value="No" />
-                                    <label class="form-check-label">No</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="alcohol" value="Yes" />
-                                    <label class="form-check-label">Yes</label>
-                                </div>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <label for="allergies">Allergies History</label>
 
-                        <tr>
-                            <td colspan="2">
-                                <label for="allergies">Allergence History</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="allergies_choice" id="no" value="no"
+                                            <?php if ($row['allergies_history'] == NULL || $row['allergies_history'] === 'No') echo 'checked'; ?>
+                                            onclick="toggleAllergiesInput(false)" />
+                                        <label class="form-check-label" for="no">No</label>
+                                    </div>
 
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="allergies" id="no" value="no" />
-                                    <label class="form-check-label" for="no">No</label>
-                                </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="allergies_choice" id="yes" value="yes"
+                                            <?php if ($row['allergies_history'] !== NULL && $row['allergies_history'] !== 'No') echo 'checked'; ?>
+                                            onclick="toggleAllergiesInput(true)" />
+                                        <label class="form-check-label" for="yes">Yes ; Specify</label>
+                                    </div>
+                                    <br>
 
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="allergies" id="yes" value="yes" />
-                                    <label class="form-check-label" for="yes">Yes; Specify</label>
+                                    <!-- Allergies input field -->
+                                    <input style="width: 20%;" type="text" name="allergies" class="form-control" id="allergies-input" placeholder="Specify allergies"
+                                        value="<?php echo ($row['allergies_history'] !== 'No') ? htmlspecialchars($row['allergies_history']) : ''; ?>"
+                                        style="display: <?php echo ($row['allergies_history'] !== NULL && $row['allergies_history'] !== 'No') ? 'block' : 'none'; ?>;" />
 
-                                    <!-- Specify allergies text input -->
-                                    <input type="text" name="allergies" class="form-control" id="allergies-input" style="display:none;" placeholder="Specify allergies">
-                                </div>
-                            </td>
-                        </tr>
+                                    <script>
+                                        function toggleAllergiesInput(show) {
+                                            const allergiesInput = document.getElementById('allergies-input');
+                                            if (show) {
+                                                allergiesInput.style.display = 'block';
+                                            } else {
+                                                allergiesInput.style.display = 'none';
+                                                allergiesInput.value = ''; // Clear the input when "No" is selected
+                                            }
+                                        }
+                                    </script>
+
+                                </td>
+                            </tr>
+                        <?php } else { ?>
+                            <tr>
+                                <td colspan="2">
+                                    <p>No lifestyle data found for this patient</p>
+                                </td>
+                            </tr>
+                        <?php } ?>
                     </table>
                 </div>
             </section>
         </div>
+
 
         <!-- Physical Exam  -->
         <div class="page-break">
             <section>
                 <div class="physical-exam container mt-5">
-                    <table class="table" id="physicalExamTable" style="background-color: #fafbfc">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h4 class="h4">Physical Exam Date</h4>
-                                <p>January 1, 2000</p>
-                            </div>
-                        </div>
+                    <h3>Physical Exam Date</h3>
 
-                        <thead>
-                            <th>Temperature</th>
-                            <th>Blood Pressure</th>
-                            <th>Heart Rate</th>
-                            <th>Respiratory Rate</th>
-                        </thead>
-                        <tr>
-                            <td><input type='text' name='temperature' class='form-control' placeholder="Temperature" /></td>
-                            <td><input type='text' name='blood pressure' class='form-control' placeholder="Blood Pressure" /></td>
-                            <td><input type='text' name='heart rate' class='form-control' placeholder="Heart Rate" /></td>
-                            <td><input type='text' name='respiratory rate' class='form-control' placeholder="Respiratory Rate" /></td>
-                        </tr>
-                    </table>
+                    <?php
+                    if (mysqli_num_rows($physical_exam_result) > 0) {
+                        // Fetch the data
+                        $row = mysqli_fetch_assoc($physical_exam_result);
+                        $exam_date = $row["exam_date"];
+                        $temperature = $row["temperature"];
+                        $blood_pressure = $row["blood_pressure"];
+                        $heart_rate = $row["heart_rate"];
+                        $respiratory_rate = $row["respiratory_rate"];
+
+                        // Display date
+                        echo "<p>" . $exam_date . "</p>";
+                    ?>
+
+                        <table class="table" style="background-color: #fafbfc">
+                            <tr>
+                                <th>Temperature</th>
+                                <th>Blood Pressure</th>
+                                <th>Heart Rate</th>
+                                <th>Respiratory Rate</th>
+                            </tr>
+                            <tr>
+                                <td><input type='text' name='temperature' class='form-control' placeholder="Temperature" value="<?php echo $temperature; ?>" /></td>
+                                <td><input type='text' name='blood pressure' class='form-control' placeholder="Blood Pressure" value="<?php echo $blood_pressure; ?>" /></td>
+                                <td><input type='text' name='heart rate' class='form-control' placeholder="Heart Rate" value="<?php echo $heart_rate; ?>" /></td>
+                                <td><input type='text' name='respiratory rate' class='form-control' placeholder="Respiratory Rate" value="<?php echo $respiratory_rate; ?>" /></td>
+                            </tr>
+                        </table>
+
+                    <?php
+                    } else {
+                        echo "<p>No physical exam data found</p>";
+                    }
+                    ?>
+
                 </div>
             </section>
+
         </div>
+
+
 
         <!-- Current Medical Condition -->
         <div class="page-break">
             <section>
+                <div class="medical-condition container mt-5">
+                    <h3>Current Medical Condition</h3>
+                    <p>Kindly indicate if you have the following medical condition:</p>
+
+                    <table class="table" style="background-color: #fafbfc">
+                        <tr>
+                            <th>Medical Condition</th>
+                            <th>None</th>
+                            <th>Yes</th>
+                            <th>I'm not sure</th>
+                        </tr>
+
+                        <?php
+                        foreach ($conditions as $condition_name => $condition_status) {
+                            echo "<tr>";
+                            echo "<td>{$condition_name}</td>";
+                            echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='None' " . ($condition_status == 'None' ? 'checked' : '') . " ></td>";
+                            echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='Yes' " . ($condition_status == 'Yes' ? 'checked' : '') . " ></td>";
+                            echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='I\'m not sure' " . ($condition_status == 'I\'m not sure' ? 'checked' : '') . " ></td>";
+                            echo "</tr>";
+                        }
+                        ?>
+                    </table>
+                </div>
+            </section>
+
+            <!-- <section>
                 <div class="medical-condition container mt-5">
                     <h3>Current Medical Condition</h3>
                     <p>Kindly indicate if you have the following medical condition:</p>
@@ -457,7 +647,7 @@ $patient_dob = $PatientRow['d_o_b'];
                         <tr></tr>
                     </table>
                 </div>
-            </section>
+            </section> -->
         </div>
 
         <!-- Diagnosis -->
@@ -484,10 +674,20 @@ $patient_dob = $PatientRow['d_o_b'];
                             <th>Result</th>
                         </thead>
                         <tr>
-                            <td><input type='text' name='procedure_name[]' class='form-control' placeholder="Procedure Name" /></td>
-                            <td><input type='text' name='diagnosis_purpose[]' class='form-control' placeholder="Purpose" /></td>
-                            <td><input type='text' name='diagnosis_result[]' class='form-control' placeholder="Result" /></td>
+                            <?php
+                            if (mysqli_num_rows($diagnosis_result) > 0) {
+                                while ($row = mysqli_fetch_assoc($diagnosis_result)) { ?>
+                                    <td><input type='text' name='procedure_name[]' class='form-control' placeholder="Procedure Name" value="<?php echo  $row["procedure_name"] ?>" /></td>
+                                    <td><input type='text' name='diagnosis_purpose[]' class='form-control' placeholder="Purpose" value="<?php echo  $row["purpose"] ?>" /></td>
+                                    <td><input type='text' name='diagnosis_result[]' class='form-control' placeholder="Result" value="<?php echo  $row["result"] ?>" /></td>
                         </tr>
+                <?php
+
+                                }
+                            } else {
+                                echo "<tr><td colspan='4'>No physical exam data found</td></tr>";
+                            }
+                ?>
                     </table>
                 </div>
             </section>
@@ -620,10 +820,7 @@ $patient_dob = $PatientRow['d_o_b'];
                     name: 'purpose',
                     placeholder: 'Purpose'
                 },
-                {
-                    name: 'abc123',
-                    placeholder: 'abc123'
-                },
+
                 {
                     name: 'dosage',
                     placeholder: 'Dosage'

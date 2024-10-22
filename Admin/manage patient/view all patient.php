@@ -153,29 +153,6 @@ $admin_name = $_SESSION['admin_name'];
 
       <li class="nav-item ml-1">
         <a
-          class="nav-link collapsed"
-          href="settings.html"
-          data-toggle="collapse"
-          data-target="#collapseTwo"
-          ria-expanded="true"
-          aria-controls="collapseTwo">
-          <i class="fa-solid fa-gear"></i>
-          <span>Settings</span></a>
-        <div
-          id="collapseTwo"
-          class="collapse"
-          aria-labelledby="headingTwo"
-          data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">Settings</h6>
-            <a class="collapse-item" href="change info.html">Change Info</a>
-            <a class="collapse-item" href="settings.html"> Delete Account </a>
-          </div>
-        </div>
-      </li>
-
-      <li class="nav-item ml-1">
-        <a
           class="nav-link"
           href="#"
           data-toggle="modal"
@@ -258,7 +235,7 @@ $admin_name = $_SESSION['admin_name'];
                 aria-expanded="false">
                 <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
                 <?php
-                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['admin_photo']) . '" alt="Admin photo" class="mini-photo"></td>'
+                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['admin_photo']) . '" alt="Admin photo" class="mini-photo "></td>'
                 ?>
               </a>
               <!-- Dropdown - User Information -->
@@ -296,6 +273,12 @@ $admin_name = $_SESSION['admin_name'];
         <!-- Begin Page Content -->
         <div class="container-fluid">
           <!-- Page Heading -->
+          <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
+              View All Patients
+            </h1>
+
+          </div>
           <div class="d-flex justify-content-between mb-3 ml-1">
             <!-- Search Bar -->
             <form action="" method="GET" class="d-flex">
@@ -398,7 +381,7 @@ $admin_name = $_SESSION['admin_name'];
                     if ($result->num_rows > 0) {
                       while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
-                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class="patient-photo"></td>';
+                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class="patient-photo img-thumbnail"></td>';
                         echo "<td>" . htmlspecialchars($row['patient_name']) . "<br>" . htmlspecialchars($row['ic number']) . "</td>";
                         echo '<td>';
                         echo '<a href="patient_profile.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm"><i class="fa-solid fa-eye"></i></a> ';
@@ -475,29 +458,32 @@ $admin_name = $_SESSION['admin_name'];
             data-dismiss="modal">
             Cancel
           </button>
-          <a class="btn btn-primary" href="login.html">Logout</a>
+          <form action="../logout_modal.php" method="post">
+            <button type="submit" class="btn btn-primary">Logout</button>
+          </form>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Bootstrap core JavaScript-->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../../vendor/jquery/jquery.min.js"></script>
+  <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
+
   <!-- Core plugin JavaScript-->
-  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+  <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
   <!-- Custom scripts for all pages-->
-  <script src="js/sb-admin-2.min.js"></script>
+  <script src="../../js/sb-admin-2.min.js"></script>
 
   <!-- Page level plugins -->
-  <script src="vendor/chart.js/Chart.min.js"></script>
+  <script src="../../vendor/chart.js/Chart.min.js"></script>
 
   <!-- Page level custom scripts -->
-  <script src="js/demo/chart-area-demo.js"></script>
-  <script src="js/demo/chart-pie-demo.js"></script>
+  <script src="../../js/demo/chart-area-demo.js"></script>
+  <script src="../../js/demo/chart-pie-demo.js"></script>
 
 </body>
 

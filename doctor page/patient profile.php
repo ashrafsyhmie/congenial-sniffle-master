@@ -1,8 +1,8 @@
 <?php
 
 session_start();
-$admin_id = $_SESSION['admin_id'];
-$admin_name = $_SESSION['admin_name'];
+$doctor_id = $_SESSION['doctor_id'];
+$doctor_name = $_SESSION['doctor_name'];
 
 ?>
 
@@ -30,7 +30,7 @@ $admin_name = $_SESSION['admin_name'];
         referrerpolicy="no-referrer" />
 
     <link
-        href="../../vendor/fontawesome-free/css/all.min.css"
+        href="../vendor/fontawesome-free/css/all.min.css"
         rel="stylesheet"
         type="text/css" />
     <link
@@ -38,9 +38,21 @@ $admin_name = $_SESSION['admin_name'];
         rel="stylesheet" />
 
     <!-- Custom styles for this template-->
-    <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
+    <link href="../css/sb-admin-2.min.css" rel="stylesheet" />
 </head>
 <style>
+    .mini-photo {
+        width: 45px;
+        /* set the width */
+        height: 45px;
+        /* set the height */
+        object-fit: cover;
+        /* to maintain the aspect ratio and cover the area */
+        border-radius: 50%;
+        /* for a circular shape */
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+    }
+
     .patient-photo {
         width: 98px;
         /* set the width */
@@ -88,7 +100,7 @@ $admin_name = $_SESSION['admin_name'];
             <!-- Sidebar - Brand -->
             <a
                 class="sidebar-brand d-flex align-items-center justify-content-center"
-                href="../homepage.php">
+                href="./homepage.php">
                 <div class="sidebar-brand-icon">
                     <img src="../img/svg/logo-only.svg" />
                 </div>
@@ -96,28 +108,22 @@ $admin_name = $_SESSION['admin_name'];
             </a>
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item ml-1">
-                <a class="nav-link" href="../homepage.php">
+            <li class="nav-item  ml-1">
+                <a class="nav-link" href="./homepage.php">
                     <i class="fa-solid fa-house"></i>
                     <span>Home</span></a>
             </li>
 
-            <li class="nav-item  ml-1">
-                <a class="nav-link" href="../manage doctor/view all doctors.php ">
-                    <i class="fa-solid fa-stethoscope"></i>
-                    <span>View All Doctors</span></a>
-            </li>
-
-            <li class="nav-item  ml-1">
-                <a class="nav-link" href="../manage patient/view all patient.php">
-                    <i class="fa-regular fa-user"></i>
-                    <span>View All Patients</span></a>
+            <li class="nav-item ml-1">
+                <a class="nav-link" href="appointment record.php">
+                    <i class="fa-solid fa-calendar"></i>
+                    <span>View Appointment</span></a>
             </li>
 
             <li class="nav-item active ml-1">
-                <a class="nav-link" href="../manage appointment/view all appointment.php">
+                <a class="nav-link" href="view all patient.php">
                     <i class="fa-solid fa-bookmark"></i>
-                    <span>View All Appointment</span></a>
+                    <span>View All Patient</span></a>
             </li>
 
             <li class="nav-item ml-1">
@@ -137,8 +143,7 @@ $admin_name = $_SESSION['admin_name'];
                     data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Settings</h6>
-                        <a class="collapse-item" href="change info.html">Change Info</a>
-                        <a class="collapse-item" href="settings.html"> Delete Account </a>
+                        <a class="collapse-item" href="change info.php">Change Info</a>
                     </div>
                 </div>
             </li>
@@ -225,10 +230,10 @@ $admin_name = $_SESSION['admin_name'];
                                 data-toggle="dropdown"
                                 aria-haspopup="true"
                                 aria-expanded="false">
-                                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
-                                <img
-                                    class="img-profile rounded-circle"
-                                    src="../img/undraw_profile.svg" />
+                                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $doctor_name  ?></span>
+                                <?php
+                                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['doctor_photo']) . '" alt="Doctor photo" class="mini-photo"></td>'
+                                ?>
                             </a>
                             <!-- Dropdown - User Information -->
                             <div
@@ -266,7 +271,7 @@ $admin_name = $_SESSION['admin_name'];
                 <div class="container-fluid">
                     <?php
                     // Database connection
-                    require_once "../../db conn.php";
+                    require_once "../db conn.php";
                     // Fetch the patient ID from the URL
                     $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -346,7 +351,7 @@ $admin_name = $_SESSION['admin_name'];
                                         <!-- Fourth Column: Edit Button -->
                                         <td>
                                             <div class="form-group">
-                                                <a href="../manage patient/edit.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-success btn-sm">
+                                                <a href="edit.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-success btn-sm">
                                                     <i class="fa fa-edit"></i>
                                                 </a>
                                                 <a href="send email patient.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-primary btn-sm">
@@ -381,8 +386,9 @@ $admin_name = $_SESSION['admin_name'];
                                         <th>Photo</th>
                                         <th>Name</th>
                                         <th>Date </th>
-                                        <th>Time</th>
                                         <th>Status</th>
+                                        <th>Medical Record</th>
+                                        <th>Medical Record ID</th>
 
 
                                     </tr>
@@ -395,6 +401,7 @@ $admin_name = $_SESSION['admin_name'];
                                     $sql = "SELECT * FROM appointment 
                                     JOIN patient ON appointment.patient_id = patient.patient_id 
                                     JOIN doctor ON appointment.doctor_id = doctor.doctor_id
+                                    JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id
                                     WHERE patient.patient_id = $patient_id";
 
                                     //  AND status = 'upcoming'
@@ -402,21 +409,13 @@ $admin_name = $_SESSION['admin_name'];
 
                                     while ($row = mysqli_fetch_assoc($result)) {
 
-                                        //   $doctor_id = $row['doctor_id'];
-                                        //   $sql2 = "SELECT * FROM `doctor` WHERE `doctor_id` = '$doctor_id'";
-                                        //   $result2 = mysqli_query($connection, $sql2);
-                                        //   $row2 = mysqli_fetch_assoc($result2);
-
-                                        //   $doctor_name = $row2['doctor_name'];
 
                                         echo "<tr>";
                                         echo "<td>" . $row['appointment_id'] . "</td>";
                                         echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "patient-photo"></td>';
 
                                         echo "<td>" . $row['doctor_name'] . "</td>";
-                                        echo "<td>" . $row['date'] . "</td>";
-                                        echo "<td>" . $row['timeslot'] .  "</td>";
-
+                                        echo "<td>" . $row['date'] . '<br>' . $row['timeslot'] . "</td>";
 
 
                                         if ($row['status'] == 'done') {
@@ -426,11 +425,11 @@ $admin_name = $_SESSION['admin_name'];
                                         } elseif ($row['status'] == 'upcoming') {
                                             echo "<td><span class='status-upcoming'>Upcoming</span></td>";
                                         }
+                                        echo "<td><a href='../medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-success btn-sm mr-3'> <i class='fa fa-edit'></i></a>";
+                                        echo "<a href='../medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-primary btn-sm  '> <i class='fa-solid fa-eye'></i></a></td>";
+                                        echo "<td>" . $row['medical_record_id'] . "</td>";
                                         echo "</tr>";
                                     }
-
-
-
                                     ?>
                                 </tbody>
                             </table>
@@ -451,7 +450,7 @@ $admin_name = $_SESSION['admin_name'];
                             <?php
 
                             if (!empty($patient)) {
-                                echo '<a href="view all patient.php?id=' . htmlspecialchars($patient['patient_id']) . '">
+                                echo '<a href="view all patient.php">
             <button type="button" class="btn btn-primary mb-2">
                 <i class="fa-solid fa-chevron-left mr-1"></i> Back
             </button>
@@ -503,29 +502,32 @@ $admin_name = $_SESSION['admin_name'];
                             data-dismiss="modal">
                             Cancel
                         </button>
-                        <a class="btn btn-primary" href="login.html">Logout</a>
+                        <form action="./logout_modal.php" method="post">
+                            <button type="submit" class="btn btn-primary">Logout</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Bootstrap core JavaScript-->
-        <script src="vendor/jquery/jquery.min.js"></script>
-        <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+        <!-- Bootstrap core JavaScript-->
+        <script src="../vendor/jquery/jquery.min.js"></script>
+        <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
         <!-- Core plugin JavaScript-->
-        <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+        <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
         <!-- Custom scripts for all pages-->
-        <script src="js/sb-admin-2.min.js"></script>
+        <script src="../js/sb-admin-2.min.js"></script>
 
         <!-- Page level plugins -->
-        <script src="vendor/chart.js/Chart.min.js"></script>
+        <script src="../vendor/chart.js/Chart.min.js"></script>
 
         <!-- Page level custom scripts -->
-        <script src="js/demo/chart-area-demo.js"></script>
-        <script src="js/demo/chart-pie-demo.js"></script>
+        <script src="../js/demo/chart-area-demo.js"></script>
+        <script src="../js/demo/chart-pie-demo.js"></script>
 
 </body>
 

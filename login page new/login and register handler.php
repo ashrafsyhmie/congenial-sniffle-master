@@ -35,31 +35,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 case 'patient':
                     $_SESSION['patient_id'] = $userData['id'];
                     echo "<script>
-                            window.location.href = '../patient page/index.php?message=success';
+                            window.location.href = '../patient page/index.php?message=success&message_type=success';
                           </script>";
                     break;
             }
         } else {
             echo "<script>
                     alert('Invalid Username or Password!');
-                    window.location.href = '../login page new/index.html';
+                    window.location.href = './index.php';
                   </script>";
         }
     } elseif (isset($_POST["signup_submit"])) {
         // Handle register section
-        if (isset($_FILES['photo']) && $_FILES['photo']['error'] == UPLOAD_ERR_OK) {
-            $patient_name = $_POST["name"];
-            $email = $_POST["email"];
-            $password = $_POST["pass"];
-            $phone_number = $_POST["phone_number"];
-            $emergency_number = $_POST["emergency_number"];
-            $dob = $_POST["dob"];
-            $gender = $_POST["gender"];
-            $address = $_POST["address"];
-            $ic_number = $_POST["ic_number"];
-            $patient_photo = file_get_contents($_FILES['photo']['tmp_name']); // Get the binary data
+        if (isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK) {
+            $imageType = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
 
-            registerhandler($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo);
+            if (in_array($imageType, ['jpg', 'jpeg', 'png']) && $_FILES['image']['size'] < 5000000) { // Limit size to 5MB
+                $imageData = file_get_contents($_FILES['image']['tmp_name']);
+
+
+                $patient_name = $_POST["name"];
+                $email = $_POST["email"];
+                $password = $_POST["pass"];
+                $phone_number = $_POST["phone_number"];
+                $emergency_number = $_POST["emergency_number"];
+                $dob = $_POST["dob"];
+                $gender = $_POST["gender"];
+                $address = $_POST["address"];
+                $ic_number = $_POST["ic_number"];
+                // Get the binary data
+
+                registerhandler($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData);
+            }
+        } else {
+            // Handle logout section
+            session_destroy();
+            echo "<script>
+                alert('Successfully logged out!');
+                window.location.href = '../index.php';
+              </script>";
         }
     }
 }
@@ -113,7 +127,7 @@ function isDuplicate($email, $username)
 }
 
 // Function to handle registration
-function registerhandler($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo)
+function registerhandler($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData)
 {
     if (strlen($username) >= 6 && strlen($username) <= 30) {
         if (!specialChars($username)) {
@@ -121,7 +135,7 @@ function registerhandler($username, $email, $password, $phone_number, $emergency
                 if (strlen($password) >= 6 && strlen($password) <= 30) {
                     // Check for duplicate username or email
                     if (!isDuplicate($email, $username)) {
-                        insertUser($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo);
+                        insertUser($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData);
                     } else {
                         // Redirect or stay on the page with error message
                         echo "<script>
@@ -156,22 +170,28 @@ function registerhandler($username, $email, $password, $phone_number, $emergency
 }
 
 // Function to insert new user into the database with password hashing
-function insertUser($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo)
+function insertUser($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData)
 {
     global $conn;
 
     // Hash the password
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    // Prepare and bind the SQL statement
+    // Prepare the SQL query
     $stmt = $conn->prepare("INSERT INTO patient (patient_name, email, password, `phone number`, emerg_num, d_o_b, gender, address, `ic number`, patient_photo)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssssssb", $patient_name, $email, $hashedPassword, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo);
 
+    // Bind the initial parameters
+    $stmt->bind_param("sssssssssb", $patient_name, $email, $hashedPassword, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $null);
+
+    // Send binary data separately for the image
+    $stmt->send_long_data(9, $imageData);
+
+    // Execute the query
     if ($stmt->execute()) {
         echo "<script>
                 alert('Successfully registered!');
-                window.location.href = '../login page new/index.html';
+                window.location.href = './index.php';
               </script>";
     } else {
         echo "Error: " . $stmt->error;
@@ -179,6 +199,7 @@ function insertUser($patient_name, $email, $password, $phone_number, $emergency_
 
     $stmt->close();
 }
+
 
 // Function to handle login and password verification
 function loginhandler($username, $password)

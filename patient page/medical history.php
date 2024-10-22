@@ -289,6 +289,7 @@ require_once('../db conn.php');
                   cellspacing="0">
                   <thead>
                     <td>Appointment ID</td>
+                    <td>Medical Record ID</td>
                     <td>Doctor Photo</td>
                     <td>Doctor Name</td>
                     <td>Date</td>
@@ -299,7 +300,12 @@ require_once('../db conn.php');
                   <tbody>
                     <?php
 
-                    $sql = "SELECT * FROM appointment JOIN doctor on appointment.doctor_id=doctor.doctor_id  WHERE patient_id = $patient_id AND status = 'done'";
+                    $sql = "SELECT * FROM appointment 
+                    JOIN doctor on appointment.doctor_id=doctor.doctor_id  
+                    JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id
+                    WHERE appointment.patient_id = $patient_id
+                     AND status = 'done'
+                     ";
                     //  AND status = 'upcoming'
                     $result = mysqli_query($conn, $sql);
 
@@ -308,13 +314,14 @@ require_once('../db conn.php');
 
                       echo "<tr>";
                       echo "<td>" . $row['appointment_id'] . "</td>";
+                      echo "<td>" . $row['medical_record_id'] . "</td>";
                       echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>';
 
                       echo "<td>" . $row['doctor_name'] . "</td>";
                       echo "<td>" . $row['date'] . "</td>";
                       echo "<td>" . $row['timeslot'] .  "</td>";
                       // echo '<td><a href="./appointment handler/calendar.php?appointment_id=' . $row["appointment_id"] . '"><button type="button" class="btn btn-primary">Select</button></a></td>';
-                      echo '<td><a href="./medical history handler/medical history view.php?appointment_id=' . $row["appointment_id"] . '"><button type="button" class="btn btn-primary">Select</button></a></td>';
+                      echo '<td><a href="./medical history handler/medical history view.php?medical_record_id=' . $row["medical_record_id"] . '"><button type="button" class="btn btn-primary">Select</button></a></td>';
 
                       echo "</tr>";
                     }

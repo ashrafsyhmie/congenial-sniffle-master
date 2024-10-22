@@ -311,18 +311,27 @@ $doctor_name = $_SESSION['doctor_name'];
               echo '<div class="card-body">
               <div class="table-responsive">
                 <table class="table table-striped table-border-0" id="dataTable" width="100%" cellspacing="0">
-                  <tbody>';
+                  <tbody>
+                  <thead>
+                <tr>
+                  <th>Patient Photo</th>
+                  <th>Patient Name</th>
+                  <th>Gender</th>
+                  <th>Action</th>
+                </tr>
+              </thead>';
 
               // Output data of each row
               while ($row = $result->fetch_assoc()) {
                 $patient_id = $row["patient_id"];
-                echo '<tr>
+                echo '
+                                <tr>
                 <td><img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class = "photo"></td>
                
                 <td>' . $row["patient_name"] . '<br />' . $row["email"] . '</td>
                 <td>' . $row["gender"] . '</td>
                 <td>
-                  <a href="./medical history handler/medical history view.php?patient_id=' . $row["patient_id"] . '">
+                  <a href="./patient profile.php?id=' . $row["patient_id"] . '">
                     <button type="button" class="btn btn-primary">Select</button>
                   </a>
                 </td>

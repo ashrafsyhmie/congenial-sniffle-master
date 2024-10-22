@@ -2,8 +2,9 @@
 
 
 session_start();
+$_SESSION['admin_id'] = 1;
+
 $admin_id = $_SESSION['admin_id'];
-$admin_name = $_SESSION['admin_name'];
 
 require_once "../../db conn.php";
 
@@ -114,9 +115,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <!-- Custom styles for this template-->
     <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
-</head>
-
-<body id="page-top">
     <style>
         .form-group {
             margin-bottom: 15px;
@@ -152,14 +150,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             color: #FFF;
         }
 
-        input[type="text"],
-        input[type="email"],
-        input[type="date"],
-        input[type="number"],
-        #specialization {
-            width: 90%;
-        }
-
         .gender-buttons {
             background-color: #D2E0FB;
             border-radius: 8px;
@@ -182,8 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             color: #161D6F;
             margin-left: 20px;
         }
-
-
 
         .upload-icon {
             width: 40px;
@@ -233,8 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(44, 87, 221, 0.2);
-            width: 1000px;
-            margin-bottom: 30px;
+            width: 6000px;
         }
 
         .row {
@@ -261,6 +248,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
         }
     </style>
+</head>
+
+<body id="page-top">
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -301,6 +291,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <a class="nav-link" href="../manage appointment/view all appointment.php">
                     <i class="fa-solid fa-bookmark"></i>
                     <span>View All Appointment</span></a>
+            </li>
+
+            <li class="nav-item ml-1">
+                <a
+                    class="nav-link collapsed"
+                    href="settings.html"
+                    data-toggle="collapse"
+                    data-target="#collapseTwo"
+                    ria-expanded="true"
+                    aria-controls="collapseTwo">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span></a>
+                <div
+                    id="collapseTwo"
+                    class="collapse"
+                    aria-labelledby="headingTwo"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Settings</h6>
+                        <a class="collapse-item" href="change info.html">Change Info</a>
+                        <a class="collapse-item" href="settings.html"> Delete Account </a>
+                    </div>
+                </div>
             </li>
 
             <li class="nav-item ml-1">
@@ -489,7 +502,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="">Specialization</label>
-                                                        <select name="specialization" id="specialization" class="custom-select" required>
+                                                        <select name="specialization" class="custom-select" required>
                                                             <option value="">--Select Specialization--</option>
                                                             <option value="Pediatrician" <?php echo isset($specialization) && $specialization == 'Pediatrician' ? 'selected' : ''; ?>>Pediatrician</option>
                                                             <option value="Dermatologist" <?php echo isset($specialization) && $specialization == 'Dermatologist' ? 'selected' : ''; ?>>Dermatologist</option>
@@ -587,34 +600,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                         data-dismiss="modal">
                         Cancel
                     </button>
-                    <form action="../logout_modal.php" method="post">
-                        <button type="submit" class="btn btn-primary">Logout</button>
-                    </form>
+                    <a class="btn btn-primary" href="login.html">Logout</a>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Bootstrap core JavaScript-->
-
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="../../vendor/jquery/jquery.min.js"></script>
-    <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <!-- Core plugin JavaScript-->
-    <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <!-- Custom scripts for all pages-->
-    <script src="../../js/sb-admin-2.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
 
     <!-- Page level plugins -->
-    <script src="../../vendor/chart.js/Chart.min.js"></script>
+    <script src="vendor/chart.js/Chart.min.js"></script>
 
     <!-- Page level custom scripts -->
-    <script src="../../js/demo/chart-area-demo.js"></script>
-    <script src="../../js/demo/chart-pie-demo.js"></script>
+    <script src="js/demo/chart-area-demo.js"></script>
+    <script src="js/demo/chart-pie-demo.js"></script>
+
     <script>
         document.querySelectorAll('.gender-buttons label').forEach(function(label) {
             label.addEventListener('click', function() {
@@ -669,8 +678,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             e.target.value = value;
         });
     </script>
-
-
 </body>
 
 </html>

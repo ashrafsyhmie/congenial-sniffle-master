@@ -156,28 +156,7 @@ $admin_photo = $_SESSION['admin_photo'];
           <span>View All Appointment</span></a>
       </li>
 
-      <li class="nav-item ml-1">
-        <a
-          class="nav-link collapsed"
-          href="settings.html"
-          data-toggle="collapse"
-          data-target="#collapseTwo"
-          ria-expanded="true"
-          aria-controls="collapseTwo">
-          <i class="fa-solid fa-gear"></i>
-          <span>Settings</span></a>
-        <div
-          id="collapseTwo"
-          class="collapse"
-          aria-labelledby="headingTwo"
-          data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <h6 class="collapse-header">Settings</h6>
-            <a class="collapse-item" href="change info.html">Change Info</a>
-            <a class="collapse-item" href="settings.html"> Delete Account </a>
-          </div>
-        </div>
-      </li>
+
 
       <li class="nav-item ml-1">
         <a
@@ -302,6 +281,15 @@ $admin_photo = $_SESSION['admin_photo'];
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+          <?php
+          // Display success or error message
+          if (isset($_GET['message'])) {
+            $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+            echo '<div class="alert ' . $messageType . '">';
+            echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+            echo '</div>';
+          }
+          ?>
           <!-- Page Heading and Button in the same row -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">Home Page</h1>
@@ -314,28 +302,14 @@ $admin_photo = $_SESSION['admin_photo'];
           <div
             class="welcome-section p-4 ml-1 mb-5 border-2 rounded-lg justify-content-center"
             style="background-image: url(./img/background.png)">
-            <h1 class="h4 text-dark">Welcome!</h1>
-            <p class="">Hi, <?php echo $admin['admin_name']  ?></p>
             <br />
             <br />
             <br />
             <br />
-            <form
-              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control bg-light border-0 small"
-                  placeholder="Search for..."
-                  aria-label="Search"
-                  aria-describedby="basic-addon2" />
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="button">
-                    <i class="fas fa-search fa-sm"></i>
-                  </button>
-                </div>
-              </div>
-            </form>
+            <br />
+            <br />
+            <h1 class="h4 text-gray-900 font-weight-bolder">Welcome!</h1>
+            <?php echo "<p class='text-gray-900 font-weight-normal'>Hi, " . $admin['admin_name'] . " </p>" ?>
           </div>
         </div>
 

@@ -276,6 +276,16 @@ $doctor_name = $_SESSION['doctor_name'];
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+
+          <?php
+          // Display success or error message
+          if (isset($_GET['message'])) {
+            $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+            echo '<div class="alert ' . $messageType . '">';
+            echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+            echo '</div>';
+          }
+          ?>
           <!-- Page Heading -->
           <div
             class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -288,29 +298,14 @@ $doctor_name = $_SESSION['doctor_name'];
           <div
             class="welcome-section p-4 ml-1 border-2 rounded-lg justify-content-center"
             style="background-image: url(../img/background.png)">
-            <h1 class="h4 text-dark">Welcome!</h1>
-            <?php echo "<p>Hi, " . $doctor['doctor_name'] . " </p>" ?>
-
             <br />
             <br />
             <br />
             <br />
-            <form
-              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control bg-light border-0 small"
-                  placeholder="Search for..."
-                  aria-label="Search"
-                  aria-describedby="basic-addon2" />
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="button">
-                    <i class="fas fa-search fa-sm"></i>
-                  </button>
-                </div>
-              </div>
-            </form>
+            <br />
+            <br />
+            <h1 class="h4 text-gray-900 font-weight-bolder">Welcome!</h1>
+            <?php echo "<p class='text-gray-900 font-weight-normal'>Hi, " . $doctor['doctor_name'] . " </p>" ?>
           </div>
 
           <!-- Appointment table -->

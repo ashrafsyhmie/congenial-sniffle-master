@@ -11,6 +11,7 @@ session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data
     $id = $_POST['id'];
+    $article_id = $id;
     $title = $_POST['title'];
     $date = $_POST['date'];
     $description = $_POST['description'];
@@ -23,17 +24,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $imageData = file_get_contents($_FILES['image']['tmp_name']);
         $imageType = $_FILES['image']['type'];
     } else {
+
+        $sql = "SELECT image FROM article WHERE article_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+
         // If no new image uploaded, retain the old image
         $imageData = $row['image'];
     }
 
     // Update article in the database
-    $sql = "UPDATE article SET title = ?, date = ?, image = ?, description = ?, visibility = ?, link = ? WHERE id = ?";
+    $sql = "UPDATE article SET title = ?, date = ?, image = ?, description = ?, visibility = ?, link = ? WHERE article_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssssssi", $title, $date, $imageData, $description, $visibility, $link, $id);
 
     if ($stmt->execute()) {
-        echo "Article updated successfully!";
+        header("Location: manage_article.php?message=Article updated successfully&message_type=success");
     } else {
         echo "Error updating article: " . $stmt->error;
     }
@@ -154,28 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <span>View All Appointment</span></a>
             </li>
 
-            <li class="nav-item ml-1">
-                <a
-                    class="nav-link collapsed"
-                    href="settings.html"
-                    data-toggle="collapse"
-                    data-target="#collapseTwo"
-                    ria-expanded="true"
-                    aria-controls="collapseTwo">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>Settings</span></a>
-                <div
-                    id="collapseTwo"
-                    class="collapse"
-                    aria-labelledby="headingTwo"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Settings</h6>
-                        <a class="collapse-item" href="change info.html">Change Info</a>
-                        <a class="collapse-item" href="settings.html"> Delete Account </a>
-                    </div>
-                </div>
-            </li>
+
 
             <li class="nav-item ml-1">
                 <a
@@ -325,7 +313,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <tbody>
                                     <div class="container-fluid">
                                         <form method="post" action="edit_article.php" enctype="multipart/form-data">
-                                            <input type="hidden" name="id" value="<?php echo htmlspecialchars($article_id); ?>">
+                                            <input type="hidden" name="id" value="<?php global $article_id;
+                                                                                    echo htmlspecialchars($article_id); ?>">
 
                                             <div class="form-group">
                                                 <label for="title">Title</label>
@@ -423,30 +412,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 data-dismiss="modal">
                                 Cancel
                             </button>
-                            <a class="btn btn-primary" href="logout.php">Logout</a>
+                            <form action="../logout_modal.php" method="post">
+                                <button type="submit" class="btn btn-primary">Logout</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Bootstrap core JavaScript-->
-            <script src="vendor/jquery/jquery.min.js"></script>
-            <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
+            <!-- Bootstrap core JavaScript-->
+            <script src="../../vendor/jquery/jquery.min.js"></script>
+            <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
             <!-- Core plugin JavaScript-->
-            <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+            <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
             <!-- Custom scripts for all pages-->
-            <script src="js/sb-admin-2.min.js"></script>
+            <script src="../../js/sb-admin-2.min.js"></script>
 
             <!-- Page level plugins -->
-            <script src="vendor/chart.js/Chart.min.js"></script>
+            <script src="../../vendor/chart.js/Chart.min.js"></script>
 
             <!-- Page level custom scripts -->
-            <script src="js/demo/chart-area-demo.js"></script>
-            <script src="js/demo/chart-pie-demo.js"></script>
-
+            <script src="../../js/demo/chart-area-demo.js"></script>
+            <script src="../../js/demo/chart-pie-demo.js"></script>
 </body>
 
 </html>

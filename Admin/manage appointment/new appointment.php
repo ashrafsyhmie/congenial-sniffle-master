@@ -5,6 +5,8 @@ session_start();
 $admin_id = $_SESSION['admin_id'];
 $admin_name = $_SESSION['admin_name'];
 
+require_once "../../db conn.php";
+
 
 ?>
 
@@ -21,7 +23,7 @@ $admin_name = $_SESSION['admin_name'];
     <meta name="description" content="" />
     <meta name="author" content="" />
 
-    <title>View All Article</title>
+    <title>View All Patient</title>
 
     <!-- Custom fonts for this template-->
 
@@ -43,17 +45,42 @@ $admin_name = $_SESSION['admin_name'];
     <!-- Custom styles for this template-->
     <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
     <style>
-        .mini-article {
-            width: 100px;
+        .mini-photo {
+            width: 45px;
             /* set the width */
-            height: 100%;
+            height: 45px;
             /* set the height */
             object-fit: cover;
             /* to maintain the aspect ratio and cover the area */
-            border-radius: 0%;
+            border-radius: 50%;
             /* for a circular shape */
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
         }
+
+        .patient-photo {
+            width: 98px;
+            /* set the width */
+            height: 98px;
+            /* set the height */
+            object-fit: cover;
+            /* to maintain the aspect ratio and cover the area */
+            border-radius: 50%;
+            /* for a circular shape */
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+        }
+
+        .doctor-photo {
+            width: 98px;
+            /* set the width */
+            height: 98px;
+            /* set the height */
+            object-fit: cover;
+            /* to maintain the aspect ratio and cover the area */
+            border-radius: 50%;
+            /* for a circular shape */
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+        }
+
 
         .pagination-container {
             text-align: center;
@@ -82,23 +109,34 @@ $admin_name = $_SESSION['admin_name'];
             border: 1px solid #007bff;
             margin: 0 5px;
         }
+
+        .status-done {
+            background-color: green;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .status-cancelled {
+            background-color: red;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .status-upcoming {
+            background-color: orange;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: inline-block;
+        }
     </style>
 </head>
 
 <body id="page-top">
-    <style>
-        .mini-photo {
-            width: 45px;
-            /* set the width */
-            height: 45px;
-            /* set the height */
-            object-fit: cover;
-            /* to maintain the aspect ratio and cover the area */
-            border-radius: 50%;
-            /* for a circular shape */
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
-        }
-    </style>
     <!-- Page Wrapper -->
     <div id="wrapper">
         <!-- Sidebar -->
@@ -116,7 +154,7 @@ $admin_name = $_SESSION['admin_name'];
             </a>
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item active ml-1">
+            <li class="nav-item ml-1">
                 <a class="nav-link" href="../homepage.php">
                     <i class="fa-solid fa-house"></i>
                     <span>Home</span></a>
@@ -134,10 +172,8 @@ $admin_name = $_SESSION['admin_name'];
                     <span>View All Patients</span></a>
             </li>
 
-            <li class="nav-item ml-1">
-                <a
-                    class="nav-link"
-                    href="../manage appointment/view all appointment.php ">
+            <li class="nav-item active ml-1">
+                <a class="nav-link" href="./view all appointment.php">
                     <i class="fa-solid fa-bookmark"></i>
                     <span>View All Appointment</span></a>
             </li>
@@ -263,156 +299,119 @@ $admin_name = $_SESSION['admin_name'];
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-
-                    <?php
-                    // Display success or error message for add article
-                    if (isset($_SESSION['successmsg'])) {
-                        echo '
-                        <div class="alert alert-success">
-                            <strong>Success!</strong> ' . htmlspecialchars($_SESSION['successmsg']) . '
-                        </div>';
-                    }
-
-                    if (isset($_SESSION['errormsg'])) {
-                        echo '
-                        <div class="alert alert-danger">
-                            <strong>Danger!</strong> ' . htmlspecialchars($_SESSION['errormsg']) . '
-                        </div>';
-                    }
-
-                    // Display success or error message for edit article
-                    if (isset($_GET['success_message'])) {
-                        echo '<div class="alert alert-success" role="alert">';
-                        echo htmlspecialchars($_GET['success_message']);
-                        echo '</div>';
-                    }
-
-                    if (isset($_GET['error_message'])) {
-                        echo '
-                        <div class="alert alert-danger">
-                            <strong>Danger!</strong> ' . htmlspecialchars($_GET['error_message']) . '
-                        </div>';
-                    }
-
-                    // Display success or error message for delete article
-                    if (isset($_GET['message'])) {
-                        $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
-                        echo '<div class="alert ' . $messageType . '">';
-                        echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
-                        echo '</div>';
-                    }
-                    ?>
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
-                            Manage Article
+                            Add New Appointment
                         </h1>
 
-                        <a href="add_article.php" class="btn btn-primary mb-2">
-                            <i class="fas fa-plus"></i> Add Article
-                        </a>
                     </div>
 
-                    <?php
-                    // Database connection
-                    require_once '../../db conn.php';
-
-                    // Define the number of results per page
-                    $results_per_page = 4;
-
-                    // Get the current page number from the URL, if not present, default to 1
-                    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-                    if ($page < 1) {
-                        $page = 1;
-                    }
-
-                    // Calculate the starting limit
-                    $start_limit = ($page - 1) * $results_per_page;
-
-                    // Prepare the SQL query to fetch articles with LIMIT for pagination
-                    $query = "SELECT * FROM article LIMIT ?, ?";
-
-                    // Prepare the statement using MySQLi
-                    $stmt = $conn->prepare($query);
-                    $stmt->bind_param('ii', $start_limit, $results_per_page);
-
-                    // Execute the statement
-                    $stmt->execute();
-
-                    // Fetch the result
-                    $result = $stmt->get_result();
-
-                    // Initialize an array to hold the articles
-                    $articles = array();
-
-                    // Fetch all rows using fetch_assoc()
-                    while ($row = $result->fetch_assoc()) {
-                        $articles[] = $row;
-                    }
-
-                    // Fetch total number of records to calculate total pages
-                    $total_sql = "SELECT COUNT(*) FROM article";
-                    $total_result = $conn->query($total_sql);
-                    $total_rows = $total_result->fetch_row()[0];
-                    $total_pages = ceil($total_rows / $results_per_page);
-                    ?>
-
-                    <!-- All Doctor table -->
+                    <!-- All Appointment table -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
-                                All Articles
+                                Select Doctor and Patient
                             </h6>
                         </div>
 
                         <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped table-border-0" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Title</th>
-                                            <th>Image</th>
-                                            <th>Description</th>
-                                            <th>Date Created</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($articles as $article): ?>
-                                            <tr>
-                                                <td><?= htmlspecialchars($article['article_id']); ?></td>
-                                                <td><?= htmlspecialchars($article['title']); ?></td>
-                                                <td>
-                                                    <img src="data:image/jpeg;base64,<?= base64_encode($article['image']); ?>"
-                                                        alt="Article image" class="mini-article">
-                                                </td>
-                                                <td><?= htmlspecialchars($article['description']); ?></td>
-                                                <td><?= date('F d, Y', strtotime($article['date'])); ?></td>
-                                                <td>
-                                                    <a href="edit_article.php?id=<?= htmlspecialchars($article['article_id']); ?>" class="btn btn-success btn-sm"><i class="fa fa-edit"></i></a>
-                                                    <a href="delete_article.php?id=<?= htmlspecialchars($article['article_id']); ?>" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></a>
-                                                    <!-- onclick="return confirm('Are you sure you want to delete this article?');" -->
-                                                </td>
+                            <div class="form-container">
+                                <form action="./appointment handler/calendar.php" method="POST">
 
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
+                                    <!-- Step 1: Patient Selection -->
+                                    <div id="patient-step" class="step">
+                                        <h3 class="mb-3">Select a Patient</h3>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-border-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Patient Name</th>
+                                                        <th>IC Number</th>
+                                                        <th>Photo</th>
+                                                        <th>Select</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    $sqlPatients = "SELECT * FROM patient ORDER BY patient_name ASC";
+                                                    $resultPatients = $conn->query($sqlPatients);
+
+                                                    if ($resultPatients->num_rows > 0) {
+                                                        while ($rowPatient = $resultPatients->fetch_assoc()) {
+                                                            echo "<tr>";
+                                                            echo "<td>" . htmlspecialchars($rowPatient['patient_name']) . "</td>";
+                                                            echo "<td>" . htmlspecialchars($rowPatient['ic number']) . "</td>";
+                                                            echo '<td><img src="data:image/jpeg;base64,' . base64_encode($rowPatient['patient_photo']) . '" alt="Patient photo" class="img-thumbnail " style="width: 90px; height: 90px;"></td>';
+                                                            echo '<td><input type="radio" name="patient_id" class="form-check-input" value="' . htmlspecialchars($rowPatient['patient_id']) . '" required></td>';
+                                                            echo "</tr>";
+                                                        }
+                                                    } else {
+                                                        echo "<tr><td colspan='4'>No patients found.</td></tr>";
+                                                    }
+                                                    ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div class="container text-center">
+                                            <button type="button" class="btn btn-primary mt-3 " id="next-to-doctor" onclick="goToNextStep()">Next</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Step 2: Doctor Selection (Initially Hidden) -->
+                                    <div id="doctor-step" class="step" style="display: none;">
+                                        <h3 class="mb-3">Select a Doctor</h3>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-border-0">
+                                                <thead class="table-primary">
+                                                    <tr>
+                                                        <th>Doctor Name</th>
+                                                        <th>IC Number</th>
+                                                        <th>Photo</th>
+                                                        <th>Select</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    $sqlDoctors = "SELECT * FROM doctor ORDER BY doctor_name ASC";
+                                                    $resultDoctors = $conn->query($sqlDoctors);
+
+                                                    if ($resultDoctors->num_rows > 0) {
+                                                        while ($rowDoctor = $resultDoctors->fetch_assoc()) {
+                                                            echo "<tr>";
+                                                            echo "<td>" . htmlspecialchars($rowDoctor['doctor_name']) . "</td>";
+                                                            echo "<td>" . htmlspecialchars($rowDoctor['ic number']) . "</td>";
+                                                            echo '<td><img src="data:image/jpeg;base64,' . base64_encode($rowDoctor['doctor_photo']) . '" alt="Doctor photo" class="img-thumbnail" style="width: 50px; height: 50px;"></td>';
+                                                            echo '<td><input type="radio" name="doctor_id" class="form-check-input" value="' . htmlspecialchars($rowDoctor['doctor_id']) . '" required></td>';
+                                                            echo "</tr>";
+                                                        }
+                                                    } else {
+                                                        echo "<tr><td colspan='4'>No doctors found.</td></tr>";
+                                                    }
+                                                    ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between mt-3">
+                                            <button type="button" class="btn btn-secondary" onclick="goBack()">Back</button>
+                                            <button type="submit" class="btn btn-success">Create Appointment</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Pagination -->
+                <!-- Pagination Controls -->
                 <div class="pagination-container">
-                    <a href="?page=<?php echo max(1, $page - 1); ?>">&#8249; Previous</a>
-
-                    <!-- Display the current page and total pages -->
-                    <span class="page-info">Page <?php echo $page; ?> of <?php echo $total_pages; ?></span>
-
-                    <a href="?page=<?php echo min($total_pages, $page + 1); ?>">Next &#8250;</a>
+                    <a href="#" class="previous round">&#8249;</a>
+                    <span class="page-number">1</span>
+                    <a href="#" class="next round">&#8250;</a>
                 </div>
+
+                <!-- /.container-fluid -->
             </div>
             <!-- End of Main Content -->
 
@@ -464,32 +463,11 @@ $admin_name = $_SESSION['admin_name'];
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteDocModal" class="modal fade" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Delete Article</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete this article?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <a href="./delete_article.php" id="deleteConfirmButton" class="btn btn-danger">Confirm Delete</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
     <!-- Bootstrap core JavaScript-->
     <script src="../../vendor/jquery/jquery.min.js"></script>
     <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+
 
     <!-- Core plugin JavaScript-->
     <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
@@ -506,7 +484,7 @@ $admin_name = $_SESSION['admin_name'];
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const rowsPerPage = 5; //number of row per page (kalau nak tukar kat sini tau)
+            const rowsPerPage = 10; //number of row per page (kalau nak tukar kat sini tau)
             const table = document.querySelector('#dataTable');
             const rows = table.querySelectorAll('tbody tr');
             const totalRows = rows.length;
@@ -544,27 +522,24 @@ $admin_name = $_SESSION['admin_name'];
             setupPagination();
         });
     </script>
-
-    <!-- Listener for delete button -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get the modal element
-            document.querySelector('#deleteConfirmButton').addEventListener('click', function(event) {
-                // Trigger the final deletion by redirecting to the PHP script
-                var deleteUrl = this.getAttribute('href');
-                window.location.href = deleteUrl; // Perform the deletion action by redirecting
-            });
+        function goToNextStep() {
+            // Ensure a patient is selected before proceeding
+            const patientSelected = document.querySelector('input[name="patient_id"]:checked');
+            if (!patientSelected) {
+                alert('Please select a patient before proceeding.');
+                return;
+            }
+            // Hide patient step and show doctor step
+            document.getElementById('patient-step').style.display = 'none';
+            document.getElementById('doctor-step').style.display = 'block';
+        }
 
-            // Set up the event listener for the delete button
-            document.querySelectorAll('.btn-delete').forEach(function(button) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    var deleteUrl = this.getAttribute('href');
-                    deleteConfirmButton.setAttribute('href', deleteUrl);
-                    $(deleteDocModal).modal('show');
-                });
-            });
-        });
+        function goBack() {
+            // Show patient step and hide doctor step
+            document.getElementById('patient-step').style.display = 'block';
+            document.getElementById('doctor-step').style.display = 'none';
+        }
     </script>
 </body>
 

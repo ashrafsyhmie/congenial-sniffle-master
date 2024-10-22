@@ -1,6 +1,8 @@
 <?php
 
+
 session_start();
+require_once './db conn.php';
 
 ?>
 
@@ -11,25 +13,31 @@ session_start();
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Sign Up Form by Colorlib</title>
+    <title>Login Page</title>
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- jQuery (needed by Bootstrap and other plugins) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Font Icon -->
-    <link
-        rel="stylesheet"
-        href="./login page new/fonts/material-icon/css/material-design-iconic-font.min.css" />
-    <link rel="stylesheet" href="./login page new/style.css" />
-    <!-- Main css -->
-    <link rel="stylesheet" href="./login page new/css/style.css  " />
 
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js" />
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" />
+    <!-- Font Icon (Material Design) -->
+    <link rel="stylesheet" href="./login page new/fonts/material-icon/css/material-design-iconic-font.min.css" />
+
+    <!-- Local CSS (Your custom styles) -->
+    <link rel="stylesheet" href="./login page new/style.css" />
+    <link rel="stylesheet" href="./login page new/css/style.css" />
+
+    <!-- Bootstrap 4.5.2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
+
+    <!-- Font Awesome for icons -->
+
+    <!-- Latest Font Awesome 6 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+
     <style>
         /* Transition effects for form parts */
         #part1,
@@ -48,183 +56,23 @@ session_start();
             display: block;
             /* Show when active */
         }
-
-        :root {
-            --dark: #34495e;
-            --light: #ffffff;
-            --success: #0abf30;
-            --error: #e24d4c;
-            --warning: #e9bd0c;
-            --info: #3498db;
-        }
-
-        .notifications {
-            position: fixed;
-            top: 30px;
-            right: 20px;
-        }
-
-        .notifications :where(.toast, .column) {
-            display: flex;
-            align-items: center;
-        }
-
-        .notifications .toast {
-            width: 400px;
-            position: relative;
-            overflow: hidden;
-            list-style: none;
-            border-radius: 4px;
-            padding: 16px 17px;
-            margin-bottom: 10px;
-            background: var(--light);
-            justify-content: space-between;
-            animation: show_toast 0.3s ease forwards;
-        }
-
-        @keyframes show_toast {
-            0% {
-                transform: translateX(100%);
-            }
-
-            40% {
-                transform: translateX(-5%);
-            }
-
-            80% {
-                transform: translateX(0%);
-            }
-
-            100% {
-                transform: translateX(-10px);
-            }
-        }
-
-        .notifications .toast.hide {
-            animation: hide_toast 0.3s ease forwards;
-        }
-
-        @keyframes hide_toast {
-            0% {
-                transform: translateX(-10px);
-            }
-
-            40% {
-                transform: translateX(0%);
-            }
-
-            80% {
-                transform: translateX(-5%);
-            }
-
-            100% {
-                transform: translateX(calc(100% + 20px));
-            }
-        }
-
-        .toast::before {
-            position: absolute;
-            content: "";
-            height: 3px;
-            width: 100%;
-            bottom: 0px;
-            left: 0px;
-            animation: progress 5s linear forwards;
-        }
-
-        @keyframes progress {
-            100% {
-                width: 0%;
-            }
-        }
-
-        .toast.success::before,
-        .btn#success {
-            background: var(--success);
-        }
-
-        .toast.error::before,
-        .btn#error {
-            background: var(--error);
-        }
-
-        .toast.warning::before,
-        .btn#warning {
-            background: var(--warning);
-        }
-
-        .toast.info::before,
-        .btn#info {
-            background: var(--info);
-        }
-
-        .toast .column i {
-            font-size: 1.75rem;
-        }
-
-        .toast.success .column i {
-            color: var(--success);
-        }
-
-        .toast.error .column i {
-            color: var(--error);
-        }
-
-        .toast.warning .column i {
-            color: var(--warning);
-        }
-
-        .toast.info .column i {
-            color: var(--info);
-        }
-
-        .toast .column span {
-            font-size: 1.07rem;
-            margin-left: 12px;
-        }
-
-        .toast i:last-child {
-            color: #aeb0d7;
-            cursor: pointer;
-        }
-
-        .toast i:last-child:hover {
-            color: var(--dark);
-        }
-
-        .buttons .btn {
-            border: none;
-            outline: none;
-            cursor: pointer;
-            margin: 0 5px;
-            color: var(--light);
-            font-size: 1.2rem;
-            padding: 10px 20px;
-            border-radius: 4px;
-        }
-
-        @media screen and (max-width: 530px) {
-            .notifications {
-                width: 95%;
-            }
-
-            .notifications .toast {
-                width: 100%;
-                font-size: 1rem;
-                margin-left: 20px;
-            }
-
-            .buttons .btn {
-                margin: 0 1px;
-                font-size: 1.1rem;
-                padding: 8px 15px;
-            }
-        }
     </style>
 </head>
 
 <body>
+    <?php
+    // Display success or error message
+    if (isset($_GET['message'])) {
+        $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+        echo '<div class="alert ' . $messageType . ' mt-3" role="alert">'; // Added 'mt-3' for spacing
+        echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+        echo '</div>';
+    }
+    ?>
     <div class="main">
+
+
+
         <!-- Sign up form -->
         <section class="signup" id="signup-section">
             <div class="container">
@@ -257,16 +105,6 @@ session_start();
                                         placeholder="Your Email"
                                         required />
                                 </div>
-                                <!-- <div class="form-group">
-                    <label for="pass"><i class="zmdi zmdi-lock"></i></label>
-                    <input
-                      type="password"
-                      name="pass"
-                      id="pass"
-                      placeholder="Password"
-                      required
-                    />
-                  </div> -->
                                 <div class="form-group">
                                     <label for="pass"><i class="zmdi zmdi-lock"></i></label>
                                     <input
@@ -292,19 +130,6 @@ session_start();
                                         placeholder="Repeat your password"
                                         required />
                                 </div>
-                                <!-- <div class="form-group">
-                    <input
-                      type="checkbox"
-                      name="agree-term"
-                      id="agree-term"
-                      class="agree-term"
-                      required
-                    />
-                    <label for="agree-term" class="label-agree-term">
-                      <span><span></span></span>I agree all statements in
-                      <a href="#" class="term-service">Terms of service</a>
-                    </label>
-                  </div> -->
                                 <div class="form-group form-button">
                                     <button
                                         type="button"
@@ -367,11 +192,11 @@ session_start();
                                         required />
                                 </div>
                                 <div class="form-group">
-                                    <label for="photo"><i class="zmdi zmdi-image"></i></label>
+                                    <label for="image"><i class="zmdi zmdi-image"></i></label>
                                     <input
                                         type="file"
-                                        name="photo"
-                                        id="photo"
+                                        name="image"
+                                        id="image"
                                         accept="image/*"
                                         required />
                                 </div>
@@ -405,10 +230,14 @@ session_start();
             </div>
         </section>
 
+
         <!-- Sign in Form -->
         <section class="sign-in" id="signin-section">
+
             <div class="container">
+
                 <div class="signin-content">
+
                     <div class="signin-image">
                         <figure>
                             <img
@@ -424,6 +253,9 @@ session_start();
 
                     <div class="signin-form">
                         <h2 class="form-title">Sign In</h2>
+
+
+
                         <form
                             method="POST"
                             class="register-form"
@@ -474,6 +306,8 @@ session_start();
                 </div>
             </div>
         </section>
+
+
 
         <!-- <ul class="notifications"></ul>
         <div class="buttons">
@@ -696,18 +530,14 @@ session_start();
             btn.addEventListener("click", () => createToast(btn.id));
         });
     </script>
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"
-        integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ=="
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"></script>
+
 </body>
 
 </html>
 
 <?php
 
-require_once './db conn.php';
+
 
 global $conn;
 
@@ -727,7 +557,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['admin_id'] = $userData['id'];
                     echo "<script>
                             alert('Successfully logged in!');
-                            window.location.href = './admin/homepage.php';
+                            window.location.href = './admin/homepage.php?message=Login Success&message_type=success';
                           </script>";
                     break;
 
@@ -735,44 +565,52 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['doctor_id'] = $userData['id'];
                     echo "<script>
                             alert('Successfully logged in!');
-                            window.location.href = './doctor page/homepage.php';
+                            window.location.href = './doctor page/homepage.php?message=Login Success&message_type=success';
                           </script>";
                     break;
 
                 case 'patient':
                     $_SESSION['patient_id'] = $userData['id'];
                     echo "<script>
-                            alert('Successfully logged in!');
-                            window.location.href = './patient page/index.php';
+                            window.location.href = './patient page/index.php?message=Login Success&message_type=success';
                           </script>";
                     break;
             }
-        } else if ($username == "" || $password == "") {
-            echo "<script>
-                            alert('Username or Password cannot be empty!');
-                            window.location.href = './index.php';
-                          </script>";
         } else {
             echo "<script>
-                            alert('Invalid Username or Password!');
-                            window.location.href = './index.php';
-                          </script>";
+                    alert('Invalid Username or Password!');
+                    window.location.href = './index.php';
+                  </script>";
         }
     } elseif (isset($_POST["signup_submit"])) {
         // Handle register section
-        if (isset($_FILES['photo']) && $_FILES['photo']['error'] == UPLOAD_ERR_OK) {
-            $patient_name = $_POST["name"];
-            $email = $_POST["email"];
-            $password = $_POST["pass"];
-            $phone_number = $_POST["phone_number"];
-            $emergency_number = $_POST["emergency_number"];
-            $dob = $_POST["dob"];
-            $gender = $_POST["gender"];
-            $address = $_POST["address"];
-            $ic_number = $_POST["ic_number"];
-            $patient_photo = file_get_contents($_FILES['photo']['tmp_name']); // Get the binary data
+        if (isset($_FILES['image']) && $_FILES['image']['error'] == UPLOAD_ERR_OK) {
+            $imageType = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
 
-            registerhandler($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo);
+            if (in_array($imageType, ['jpg', 'jpeg', 'png']) && $_FILES['image']['size'] < 5000000) { // Limit size to 5MB
+                $imageData = file_get_contents($_FILES['image']['tmp_name']);
+
+
+                $patient_name = $_POST["name"];
+                $email = $_POST["email"];
+                $password = $_POST["pass"];
+                $phone_number = $_POST["phone_number"];
+                $emergency_number = $_POST["emergency_number"];
+                $dob = $_POST["dob"];
+                $gender = $_POST["gender"];
+                $address = $_POST["address"];
+                $ic_number = $_POST["ic_number"];
+                // Get the binary data
+
+                registerhandler($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData);
+            }
+        } else {
+            // Handle logout section
+            session_destroy();
+            echo "<script>
+                alert('Successfully logged out!');
+                window.location.href = '../index.php';
+              </script>";
         }
     }
 }
@@ -826,7 +664,7 @@ function isDuplicate($email, $username)
 }
 
 // Function to handle registration
-function registerhandler($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo)
+function registerhandler($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData)
 {
     if (strlen($username) >= 6 && strlen($username) <= 30) {
         if (!specialChars($username)) {
@@ -834,7 +672,7 @@ function registerhandler($username, $email, $password, $phone_number, $emergency
                 if (strlen($password) >= 6 && strlen($password) <= 30) {
                     // Check for duplicate username or email
                     if (!isDuplicate($email, $username)) {
-                        insertUser($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo);
+                        insertUser($username, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData);
                     } else {
                         // Redirect or stay on the page with error message
                         echo "<script>
@@ -869,22 +707,28 @@ function registerhandler($username, $email, $password, $phone_number, $emergency
 }
 
 // Function to insert new user into the database with password hashing
-function insertUser($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo)
+function insertUser($patient_name, $email, $password, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData)
 {
     global $conn;
 
     // Hash the password
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    // Prepare and bind the SQL statement
+    // Prepare the SQL query
     $stmt = $conn->prepare("INSERT INTO patient (patient_name, email, password, `phone number`, emerg_num, d_o_b, gender, address, `ic number`, patient_photo)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssssssssb", $patient_name, $email, $hashedPassword, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $patient_photo);
 
+    // Bind the initial parameters
+    $stmt->bind_param("sssssssssb", $patient_name, $email, $hashedPassword, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $null);
+
+    // Send binary data separately for the image
+    $stmt->send_long_data(9, $imageData);
+
+    // Execute the query
     if ($stmt->execute()) {
         echo "<script>
                 alert('Successfully registered!');
-                window.location.href = '../login page new/index.html';
+                window.location.href = './index.php';
               </script>";
     } else {
         echo "Error: " . $stmt->error;
@@ -892,6 +736,7 @@ function insertUser($patient_name, $email, $password, $phone_number, $emergency_
 
     $stmt->close();
 }
+
 
 // Function to handle login and password verification
 function loginhandler($username, $password)

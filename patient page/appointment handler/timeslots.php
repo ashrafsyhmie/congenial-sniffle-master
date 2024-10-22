@@ -82,7 +82,7 @@ if (isset($_POST['submit'])) {
 
         if ($stmt->execute()) {
             $msg = "<div class='alert alert-success'>Booking Successful</div>";
-            header("Location: timeslots.php?date=" . $date . "&doctor_id=" . $doctor_id);
+            header("Location: timeslots.php?date=" . $date . "&doctor_id=" . $doctor_id . "&message=Booked successfully&message_type=success");
             // date=$date&booked_timeslot=$timeslot
             exit;
         } else {
@@ -152,6 +152,15 @@ $timeslots = timeslots();
     <div class="container">
         <h1 class="text-center">Book for Date: <?php echo date('F d, Y', strtotime($date)); ?></h1>
         <hr>
+        <?php
+        // Display success or error message
+        if (isset($_GET['message'])) {
+            $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+            echo '<div class="alert ' . $messageType . '">';
+            echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+            echo '</div>';
+        }
+        ?>
         <div class="row">
             <div class="col-md-12">
                 <?php echo $msg; ?>
@@ -167,6 +176,17 @@ $timeslots = timeslots();
             <div class="container" style="text-align: center;">
                 <a href="./calendar.php?doctor_id=<?php echo $doctor_id; ?>"><button class="btn btn-primary">BACK</button></a>
             </div>
+        </div>
+
+        <div class="legend">
+            <h4>Legend:</h4>
+            <button class="btn btn-success" style="width:5%; cursor: default;" disabled></button>
+            <span>Available</span>
+            <br>
+            <br>
+            <button class="btn btn-danger" style="width:5%; cursor: default;" disabled></button>
+            <span>Booked</span>
+
         </div>
     </div>
 

@@ -7,11 +7,11 @@ global $appointment_id;
 
 
 
-require_once '../../db conn.php';
+require_once '../../../db conn.php';
 
 require './timeslots-function.php';
 
-$patient_id = $_SESSION['patient_id'];
+$admin_id = $_SESSION['admin_id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['appointment_id'])) {

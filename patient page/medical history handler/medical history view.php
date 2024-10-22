@@ -9,7 +9,20 @@ require_once('../../db conn.php');
 
 
 
-$appointment_id = $_GET['appointment_id']; // Or dynamically set this with $_GET['appointment_id']
+$medical_record_id = $_GET['medical_record_id'];
+
+function getMedicalRecordData($conn, $medical_record_id)
+{
+  $sql = "SELECT * FROM medical_record WHERE medical_record_id=?";
+  $stmt = $conn->prepare($sql);
+  $stmt->bind_param("i", $medical_record_id);
+  $stmt->execute();
+  return $stmt->get_result()->fetch_assoc();
+}
+
+$MedicalRecordRow = getMedicalRecordData($conn, $medical_record_id);
+
+$appointment_id = $MedicalRecordRow['appointment_id'];
 
 // Fetch all patient information
 $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
@@ -45,7 +58,7 @@ $sql = "SELECT * FROM patient_lifestyle WHERE patient_id = $patient_id";
 $lifestyle_result = mysqli_query($conn, $sql);
 
 //Fetch current medical condition using patient_id
-$sql = "SELECT * FROM medical_conditions WHERE patient_id = $patient_id";
+$sql = "SELECT * FROM medical_conditions WHERE medical_record_id = $medical_record_id";
 $condition_result = mysqli_query($conn, $sql);
 $conditions = [
   'Eye Problem' => 'None',

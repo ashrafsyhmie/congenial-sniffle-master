@@ -1,13 +1,32 @@
 <?php
 
 
+require_once('../../db conn.php');
 session_start();
+
+
 $admin_id = $_SESSION['admin_id'];
 $admin_name = $_SESSION['admin_name'];
 
-$appointment_id = $_GET['appointment_id'];
+$medical_record_id = $_GET['medical_record_id'];
+
+
+
+function getMedicalRecordData($conn, $medical_record_id)
+{
+    $sql = "SELECT * FROM medical_record WHERE medical_record_id=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $medical_record_id);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_assoc();
+}
+
+$MedicalRecordRow = getMedicalRecordData($conn, $medical_record_id);
+
+$appointment_id = $MedicalRecordRow['appointment_id'];
+
+// $appointment_id = $_GET['appointment_id'];
 // $appointment_id = 1;
-require_once('../../db conn.php');
 
 // Function to fetch all appointment information
 function fetchAllAppointmentInfo($conn, $appointment_id)
@@ -56,13 +75,6 @@ foreach ($allPatientInfo as $patient) {
 }
 
 $patient_name = $_SESSION['patient_name'];
-
-
-
-
-
-
-
 
 $doctor_id = $appointment['doctor_id'];
 
@@ -127,7 +139,7 @@ $sql = "SELECT * FROM patient_lifestyle WHERE patient_id = $patient_id";
 $lifestyle_result = mysqli_query($conn, $sql);
 
 //Fetch current medical condition using patient_id
-$sql = "SELECT * FROM medical_conditions WHERE patient_id = $patient_id";
+$sql = "SELECT * FROM medical_conditions WHERE medical_record_id = $medical_record_id";
 $condition_result = mysqli_query($conn, $sql);
 $conditions = [
     'Eye Problem' => 'None',
@@ -232,58 +244,70 @@ if (mysqli_num_rows($condition_result) > 0) {
                 <table class="table" style="background-color: #fafbfc">
                     <tr>
                         <td>
-                            <p>Patient Name:</p>
-                            <p><?php echo $patient['patient_name']  ?></p>
+                            <label for="appointment_id">Appointment ID</label>
+                            <input type="text" name="appointment_id" class="form-control" disabled value="<?php echo $appointment_id; ?>">
+                            <label for="patient-name">Patient Name</label>
+                            <input type="text" name="patient-name" class="form-control" disabled value="<?php echo $patient_name; ?>" />
                         </td>
                         <td>
-                            <p>Age:</p>
-                            <p><?php
+                            <label for="medical-record-id">Medical Record ID</label>
+                            <input type="text" name="medical-record-id" class="form-control" disabled value="<?php echo $medical_record_id; ?>" />
 
-                                $dateOfBirth = $patient['d_o_b'];
+                            <label for="patient-age">Age</label>
+                            <input type="text" name="patient-age" class="form-control" disabled value="<?php
+                                                                                                        // Create DateTime objects for the date of birth and the current date
+                                                                                                        $dob = new DateTime($patient['d_o_b']);
+                                                                                                        $now = new DateTime();
 
-                                // Create DateTime objects for the date of birth and the current date
-                                $dob = new DateTime($dateOfBirth);
-                                $now = new DateTime();
+                                                                                                        // Calculate the difference between the two dates
+                                                                                                        $age = $now->diff($dob)->y;
 
-                                // Calculate the difference between the two dates
-                                $age = $now->diff($dob)->y;
-
-                                // Output the age
-                                echo "Age: " . $age;
-                                ?>
-                            </p>
+                                                                                                        // Output the age
+                                                                                                        echo $age; ?>" />
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <p>Phone Number:</p>
-                            <p><?php echo $patient['phone number']  ?></p>
+                            <label for="phone-number">Phone Number</label>
+                            <input type="text" name="phone-number" class="form-control" disabled value="<?php echo $patient['phone number']; ?>" />
                         </td>
                         <td>
-                            <p>Date of Birth:</p>
-                            <p><?php echo $patient['d_o_b']  ?></p>
+                            <label for="dob">Date of Birth</label>
+                            <input type="date" name="dob" class="form-control" disabled value="<?php echo $patient['d_o_b'] ?>" />
+
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <p>Email:</p>
-                            <p><?php echo $patient['email']  ?></p>
+                            <label for="email">Email</label>
+                            <input type="email" name="email" class="form-control" disabled value="<?php echo $patient['email'] ?>" />
                         </td>
                         <td>
-                            <p>Gender:</p>
-                            <p><?php echo $patient['gender']  ?></p>
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="male" value="male" disabled <?php if ($patient['gender'] == 'Male') echo 'checked'; ?> />
+                                    <label class="form-check-label" for="male">Male</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="female" value="female" disabled <?php if ($patient['gender'] == 'Female') echo 'checked'; ?> />
+                                    <label class="form-check-label" for="female">Female</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="gender" id="other" value="other" disabled <?php if ($patient['gender'] == 'other') echo 'checked'; ?> />
+                                    <label class="form-check-label" for="other">Other</label>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="2">
-                            <p>Address:</p>
-                            <p><?php echo $patient['address']  ?></p>
+                        <td>
+                            <label for="patient-address">Address</label>
+                            <input type="text" name="patient-address" class="form-control" disabled value="<?php echo $patient['address'] ?>" />
                         </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <p>Emergency Contact Number:</p>
-                            <p><?php echo $patient['emerg_num']  ?></p>
+                        <td>
+                            <label for="patient-em-contact">Emergency Contact Number</label>
+                            <input type="text" name="patient-em-contact" class="form-control" disabled value="<?php echo $patient['emerg_num'] ?>" />
                         </td>
                     </tr>
                 </table>
@@ -300,7 +324,13 @@ if (mysqli_num_rows($condition_result) > 0) {
                     </tr>
                     <tr>
                         <td>
-                            <?php echo $medical_record['notes']  ?>
+                            <?php
+                            if ($medical_record['notes'] == NULL) {
+                                echo "No notes found";
+                            } else {
+                                echo $medical_record['notes'];
+                            }
+                            ?>
                         </td>
                     </tr>
                 </table>
@@ -354,18 +384,46 @@ if (mysqli_num_rows($condition_result) > 0) {
                         ?>
                             <tr>
                                 <td>
-                                    <p>Smoking History</p>
-                                    <p><?php echo $row['smoking_history']; ?></p>
+                                    <b>Smoking History</b>
+                                    <p></p>
+
+                                    <p><?php
+                                        if ($row['smoking_history'] == NULL) {
+                                            echo "No smoking history found";
+                                        } else {
+                                            echo $row['smoking_history'];
+                                        }
+                                        ?></p>
                                 </td>
                                 <td>
-                                    <p>Alcohol Consumption</p>
-                                    <p><?php echo $row['alcohol_consumption']; ?></p>
+                                    <b>Alcohol Consumption</b>
+                                    <p></p>
+                                    <p>
+                                        <?php
+                                        if ($row['alcohol_consumption'] == NULL) {
+                                            echo "No alcohol consumption found";
+                                        } else {
+                                            echo $row['alcohol_consumption'];
+                                        }
+                                        ?>
+
+                                    </p>
                                 </td>
                             </tr>
                             <tr>
                                 <td colspan="2">
-                                    <p>Allergies History</p>
-                                    <p><?php echo $row['allergies_history']; ?></p>
+                                    <b>Allergies History</b>
+                                    <p></p>
+                                    <p>
+                                        <?php
+                                        if ($row['allergies_history'] == NULL) {
+                                            echo "No allergies history found";
+                                        } else {
+                                            echo $row['allergies_history'];
+                                        }
+                                        ?>
+
+                                    </p>
                                 </td>
                             </tr>
                         <?php } else { ?>

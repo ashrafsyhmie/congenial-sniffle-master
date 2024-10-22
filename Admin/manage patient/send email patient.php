@@ -334,29 +334,6 @@ foreach ($allpatientInfo as $patient) {
 
             <li class="nav-item ml-1">
                 <a
-                    class="nav-link collapsed"
-                    href="../settings.html"
-                    data-toggle="collapse"
-                    data-target="#collapseTwo"
-                    ria-expanded="true"
-                    aria-controls="collapseTwo">
-                    <i class="fa-solid fa-gear"></i>
-                    <span>Settings</span></a>
-                <div
-                    id="collapseTwo"
-                    class="collapse"
-                    aria-labelledby="headingTwo"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Settings</h6>
-                        <a class="collapse-item" href="change info.html">Change Info</a>
-                        <a class="collapse-item" href="settings.html"> Delete Account </a>
-                    </div>
-                </div>
-            </li>
-
-            <li class="nav-item ml-1">
-                <a
                     class="nav-link"
                     href="#"
                     data-toggle="modal"
@@ -570,7 +547,9 @@ foreach ($allpatientInfo as $patient) {
                         data-dismiss="modal">
                         Cancel
                     </button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <form action="../logout_modal.php" method="post">
+                        <button type="submit" class="btn btn-primary">Logout</button>
+                    </form>
                 </div>
             </div>
         </div>

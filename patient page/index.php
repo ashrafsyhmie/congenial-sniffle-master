@@ -63,23 +63,15 @@ $patient_name = $_SESSION['patient_name'];
   <title>Home Page</title>
 
   <!-- Custom fonts for this template-->
+  <!-- Latest Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-W0wT0AIJvYlw5WFS3LfpyawPt7cxFpWAcjh64cT3eM5B42t72hrGeugJfczC3Vsu" crossorigin="anonymous">
 
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer" />
+  <!-- Latest Font Awesome 6 CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-  <link
-    href="../vendor/fontawesome-free/css/all.min.css"
-    rel="stylesheet"
-    type="text/css" />
-  <link
-    href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
 
-  <!-- Custom styles for this template-->
+  <!-- Custom styles for this template -->
   <link href="../css/sb-admin-2.min.css" rel="stylesheet" />
 </head>
 
@@ -97,13 +89,7 @@ $patient_name = $_SESSION['patient_name'];
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
     }
 
-    .alert {
-      padding: 20px;
-      background-color: #f44336;
-      /* Red */
-      color: white;
-      margin-bottom: 15px;
-    }
+
 
     .closebtn {
       margin-left: 15px;
@@ -115,25 +101,6 @@ $patient_name = $_SESSION['patient_name'];
       cursor: pointer;
     }
   </style>
-  <script>
-    window.onload = function() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const message = urlParams.get('message');
-
-      if (message === 'success') {
-        document.getElementById("alert").style.display = "block";
-      }
-    };
-
-    function closeAlert() {
-      document.getElementById("alert").style.display = "none";
-    }
-  </script>
-  <!-- Custom Alert -->
-  <div id="alert" class="alert" style="display:none;">
-    <span class="closebtn" onclick="closeAlert()">&times;</span>
-    Successfully logged in!
-  </div>
   <!-- Page Wrapper -->
   <div id="wrapper">
     <!-- Sidebar -->
@@ -319,6 +286,9 @@ $patient_name = $_SESSION['patient_name'];
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+
+
+
           <!-- Page Heading -->
           <div
             class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -327,32 +297,29 @@ $patient_name = $_SESSION['patient_name'];
             </h1>
           </div>
 
+
+          <?php
+          // Display success or error message
+          if (isset($_GET['message'])) {
+            $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+            echo '<div class="alert ' . $messageType . '">';
+            echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+            echo '</div>';
+          }
+          ?>
+
           <!-- Welcome Section -->
           <div
             class="welcome-section p-4 ml-1 border-2 rounded-lg justify-content-center"
             style="background-image: url(../img/background.png)">
-            <h1 class="h4 text-dark">Welcome!</h1>
-            <?php echo "<p>Hi, " . $patient['patient_name'] . " </p>" ?>
             <br />
             <br />
             <br />
             <br />
-            <form
-              class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control bg-light border-0 small"
-                  placeholder="Search for..."
-                  aria-label="Search"
-                  aria-describedby="basic-addon2" />
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="button">
-                    <i class="fas fa-search fa-sm"></i>
-                  </button>
-                </div>
-              </div>
-            </form>
+            <br />
+            <br />
+            <h1 class="h4 text-gray-900 font-weight-bolder">Welcome!</h1>
+            <?php echo "<p class='text-gray-900 font-weight-normal'>Hi, " . $patient['patient_name'] . " </p>" ?>
           </div>
 
           <!-- Content Row -->
