@@ -405,17 +405,17 @@ $admin_name = $_SESSION['admin_name'];
 
                                         // Appointment status
                                         if ($row['status'] == 'done') {
-                                            echo '<td><span class="status-done">Done</span></td>';
+                                            echo '<td class="text-center"><span class="status-done">Done</span></td>';
                                         } elseif ($row['status'] == 'cancelled') {
-                                            echo "<td><span class='status-canceled'>Cancelled</span></td>";
+                                            echo "<td class='text-center'><span class='status-canceled'>Cancelled</span></td>";
                                         } elseif ($row['status'] == 'upcoming') {
-                                            echo "<td><span class='status-upcoming'>Upcoming</span></td>";
+                                            echo "<td class='text-center'><span class='status-upcoming'>Upcoming</span></td>";
                                         }
 
                                         // Appointment action buttons
                                     ?>
 
-                                        <td>
+                                        <td class='text-center'>
                                             <a href="#" class="btn btn-info btn-sm" data-toggle="modal" data-target="#rescheduleAppModal<?php echo $appointment_id; ?>">
                                                 <i class="fa-regular fa-calendar"></i> Reschedule
                                             </a>
@@ -423,6 +423,7 @@ $admin_name = $_SESSION['admin_name'];
                                             <a href="#" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#cancelAppModal<?php echo $appointment_id; ?>">
                                                 <i class="fa-solid fa-trash"></i> Cancel
                                             </a>
+                                            <p></p>
                                             <p>Appointment Record ID: <?php echo $row['appointment_id']; ?> </p>
                                         </td>
 
@@ -476,15 +477,20 @@ $admin_name = $_SESSION['admin_name'];
                                             </div>
                                         </div>
 
-                                        <?php
-                                        // Medical record action buttons
-                                        echo "<td><a href='../medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-success btn-sm mr-3'> 
-                                                  <i class='fa fa-edit'></i> Edit</a>";
-                                        echo "<a href='../medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-primary btn-sm'> 
-                                                     <i class='fa-solid fa-eye'></i> View</a><br> Medical Record ID: " . $row['medical_record_id'] . "</td>";
-                                        ?>
-
                                     <?php
+
+                                        if (isset($row['medical_record_id'])) {
+                                            // Medical record action buttons
+                                            echo "<td class='text-center'><a href='../medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-success btn-sm mr-3'> 
+                                                  <i class='fa fa-edit'></i> Edit</a>";
+                                            echo "<a href='../medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-primary btn-sm'> 
+                                                     <i class='fa-solid fa-eye'></i> View</a><p></p> Medical Record ID: " . $row['medical_record_id'] . "</td>";
+                                        } elseif ($row['status'] == 'done') {
+                                            echo "<td class='text-center'><a href='../medical record/medical history form.php?appointment_id=" . $row['appointment_id'] . "' class='btn btn-primary btn-sm mr-3'> 
+                                            <i class='fa fa-plus mr-1'></i>Add</a></td>";
+                                        } else {
+                                            echo "<td class='text-center' width=20%>No medical record</td>";
+                                        }
                                         echo "</tr>";
                                     }
                                     ?>

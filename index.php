@@ -719,10 +719,10 @@ function insertUser($patient_name, $email, $password, $phone_number, $emergency_
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     // Bind the initial parameters
-    $stmt->bind_param("sssssssssb", $patient_name, $email, $hashedPassword, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $null);
+    $stmt->bind_param("sssssssssb", $patient_name, $email, $hashedPassword, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData);
 
     // Send binary data separately for the image
-    $stmt->send_long_data(9, $imageData);
+    // $stmt->send_long_data(9, $imageData);
 
     // Execute the query
     if ($stmt->execute()) {

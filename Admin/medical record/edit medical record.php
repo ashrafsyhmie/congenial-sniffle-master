@@ -523,7 +523,9 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
                             echo "<td>{$condition_name}</td>";
                             echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='None' " . ($condition_status == 'None' ? 'checked' : '') . " ></td>";
                             echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='Yes' " . ($condition_status == 'Yes' ? 'checked' : '') . " ></td>";
-                            echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='I\'m not sure' " . ($condition_status == 'I\'m not sure' ? 'checked' : '') . " ></td>";
+                            // echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='I\'m not sure' " . ($condition_status == "I'm not sure" ? 'checked' : '') . " ></td>";
+                            echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value=\"I'm not sure\" " . ($condition_status == "I'm not sure" ? 'checked' : '') . " ></td>";
+
                             echo "</tr>";
                         }
                         ?>
@@ -721,14 +723,16 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
             </section>
         </div>
 
-        <div class="container text-center">
+        <div class="container text-center" style="display: flex; justify-content: space-evenly; gap: 1px;">
 
             <input type="reset" value="Reset" class="btn btn-primary">
-            <a href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>">
-                <button class="btn btn-primary ">Back</button>
-            </a>
+            <a href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>" class="btn btn-primary">Back</a>
             <input type="submit" value="Submit" class="btn btn-primary">
+
         </div>
+
+
+
 
         <br><br>
     </form>

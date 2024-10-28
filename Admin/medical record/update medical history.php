@@ -4,29 +4,16 @@ require_once('../../db conn.php');
 session_start();
 $admin_id = $_SESSION['admin_id'];
 
+$messages = []; // Array to hold messages
+
 
 
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $patient_id = $_POST['patient_id'];
     $medical_record_id = $_POST['medical_record_id'];
-    // SQL query to get max medical_record_id
-    // $sql = "SELECT MAX(medical_record_id) AS max_id FROM medical_record";
-    // $MedicalIDResult = $conn->query($sql);
 
-    // // Check if result is not empty and fetch the max value
-    // if ($MedicalIDResult->num_rows > 0) {
-    //     $row = $MedicalIDResult->fetch_assoc();
-    //     $max_id = $row['max_id'];
-    // } else {
-    //     echo "No records found";
-    //     exit();
-    // }
 
-    // Debugging: Output the POST data (remove in production)
-    echo "<pre>";
-    var_dump($_POST);
-    echo "</pre>";
 
     // Flag to track overall success
     $all_success = true;
@@ -61,8 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if ($update_stmt->execute()) {
                     echo "Updated medication: $medication_name<br>";
+                    $messages[] = "Updated medication: $medication_name";
                 } else {
                     echo "Failed to update medication: $medication_name. Error: " . $update_stmt->error . "<br>";
+                    $messages[] = "Failed to update medication: $medication_name. Error: " . $update_stmt->error;
                     $all_success = false;
                 }
                 $update_stmt->close();
@@ -74,8 +63,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 if ($insert_stmt->execute()) {
                     echo "Inserted new medication: $medication_name<br>";
+                    $messages[] = "Insert New medication: $medication_name";
                 } else {
                     echo "Failed to insert medication: $medication_name. Error: " . $insert_stmt->error . "<br>";
+                    $messages[] = "Failed to insert medication: $medication_name. Error: " . $update_stmt->error;
                     $all_success = false;
                 }
                 $insert_stmt->close();
@@ -112,8 +103,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($stmt->execute()) {
             echo "Patient lifestyle updated successfully!<br>"; // Echo success message
+            $messages[] = "Patient lifestyle updated successfully!";
         } else {
             echo "Failed to update patient lifestyle: $patient_id. Error: " . $stmt->error . "<br>";
+            $messages[] = "Failed to update patient lifestyle: $patient_id. Error: " . $stmt->error;
             $all_success = false;
         }
         $stmt->close();
@@ -138,8 +131,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if ($stmt->execute()) {
             echo "Physical exam updated successfully!<br>"; // Echo success message
+            $messages[] = "Physical exam updated successfully!";
         } else {
             echo "Failed to update physical exam. Error: " . $stmt->error . "<br>";
+            $messages[] = "Failed to update physical exam. Error: " . $stmt->error;
             $all_success = false;
         }
         $stmt->close();
@@ -176,8 +171,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt->bind_param("ssis", $diagnosis_purpose, $diagnosis_result, $medical_record_id, $procedure_name);
                     if ($stmt->execute()) {
                         echo "Diagnosis updated successfully for procedure: $procedure_name!<br>";
+                        $messages[] = "Diagnosis updated successfully for procedure: $procedure_name!";
                     } else {
                         echo "Failed to update diagnosis: $procedure_name. Error: " . $stmt->error . "<br>";
+                        $messages[] = "Failed to update diagnosis: $procedure_name. Error: " . $stmt->error;
+                        $all_success = false;
                     }
                     $stmt->close();
                 } else {
@@ -191,8 +189,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $stmt->bind_param("isss", $medical_record_id, $procedure_name, $diagnosis_purpose, $diagnosis_result);
                     if ($stmt->execute()) {
                         echo "New diagnosis inserted successfully for procedure: $procedure_name!<br>";
+                        $messages[] = "New diagnosis inserted successfully for procedure: $procedure_name!";
                     } else {
                         echo "Failed to insert diagnosis: $procedure_name. Error: " . $stmt->error . "<br>";
+                        $messages[] = "Failed to insert diagnosis: $procedure_name. Error: " . $stmt->error;
+                        $all_success = false;
                     }
                     $stmt->close();
                 } else {
@@ -203,35 +204,80 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Loop through the conditions to update
-    if (isset($_POST['condition'])) {
+
+
+    $conditions = [
+        'Eye Problem' => 'None',
+        'Seizure' => 'None',
+        'Epilepsy' => 'None',
+        'Hearing Problem' => 'None',
+        'Diabetes' => 'None',
+        'Cardiovascular Disease' => 'None',
+        'History of Strokes' => 'None',
+        'Respiratory Problem' => 'None',
+        'Kidney Problem' => 'None',
+        'Stomach and Liver Problem' => 'None',
+        'Pancreatic Problems' => 'None',
+        'Anxiety and Depression' => 'None',
+        'Other Mental Health Issue' => 'None',
+        'Sleep Disorder' => 'None',
+        'Neck or Back Problem' => 'None',
+    ];
+
+    if (isset($_POST)) {
         foreach ($conditions as $condition_name => $condition_status) {
-            // Get the current condition value from the POST data
-            $condition_value = $_POST[strtolower(str_replace(' ', '_', $condition_name))] ?? 'None';
+            // Get the current condition value from the POST data, default to 'None' if not set
+            $condition_key = strtolower(str_replace(' ', '_', $condition_name));
+            $condition_value = $_POST[$condition_key] ?? 'None';
 
             // Check if the condition already exists in the database
-            $sql = "SELECT * FROM medical_conditions WHERE medical_record_id = ? AND condition_name = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("is", $medical_record_id, $condition_name);
-            $stmt->execute();
-            $result = $stmt->get_result();
+            $sql_check = "SELECT * FROM medical_conditions WHERE medical_record_id = ? AND condition_name = ?";
+            $stmt_check = $conn->prepare($sql_check);
+            $stmt_check->bind_param("is", $medical_record_id, $condition_name);
+            $stmt_check->execute();
+            $result = $stmt_check->get_result();
 
             if ($result && mysqli_num_rows($result) > 0) {
-                // Update existing record
-                $sql = "UPDATE medical_conditions SET condition_status = ? WHERE medical_record_id = ? AND condition_name = ?";
-                $stmt_update = $conn->prepare($sql);
+                // Condition exists, so update it regardless of its value (None, Yes, I'm not sure)
+                $sql_update = "UPDATE medical_conditions SET condition_status = ? WHERE medical_record_id = ? AND condition_name = ?";
+                $stmt_update = $conn->prepare($sql_update);
                 $stmt_update->bind_param("sis", $condition_value, $medical_record_id, $condition_name);
+
+                // Execute the update and check for errors
                 if (!$stmt_update->execute()) {
                     echo "Failed to update condition: $condition_name. Error: " . $stmt_update->error . "<br>";
+                    $messages[] = "Failed to update condition: $condition_name. Error: " . $stmt_update->error;
+                    $all_success = false;
+                } else {
+                    echo "Condition updated successfully: $condition_name!<br>";
+                    $messages[] = "Condition updated successfully: $condition_name!";
                 }
+
                 $stmt_update->close();
             } else {
+                // Condition does not exist, only insert if the value is "Yes" or "I'm not sure"
+                if ($condition_value == "Yes" || $condition_value == "I'm not sure") {
+                    $sql_insert = "INSERT INTO medical_conditions (medical_record_id, condition_name, condition_status) 
+                                   VALUES (?, ?, ?)";
+                    $stmt_insert = $conn->prepare($sql_insert);
+                    $stmt_insert->bind_param("iss", $medical_record_id, $condition_name, $condition_value);
 
-                echo 'There are a few problem with your medical history';
+                    // Execute the insert and check for errors
+                    if (!$stmt_insert->execute()) {
+                        echo "Failed to insert condition: $condition_name. Error: " . $stmt_insert->error . "<br>";
+                    }
+                    $stmt_insert->close();
+                }
             }
-            $stmt->close();
+            $stmt_check->close();
         }
-        echo 'All conditions updated successfully!';
+
+        echo 'Conditions updated successfully!';
+        $success_message = 'Medical history has been updated successfully!';
     }
+
+
+
 
 
 
@@ -255,13 +301,39 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical Record Update</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
     <br>
+    <?php
+    // Display success or error message
+    // if (isset($_GET['message'])) {
+    //     $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+    //     echo '<div class="alert ' . $messageType . '">';
+    //     echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+    //     echo '</div>';
+    // }
+    ?>
+    <div class="container">
+        <!-- Display Bootstrap Alerts for each message -->
+        <?php foreach ($messages as $msg): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?php echo $msg; ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endforeach; ?>
+
+        <!-- Your form goes here -->
+        <form method="POST" action="">
+            <!-- Form fields... -->
+        </form>
+    </div>
+
     <a href="http://localhost/congenial-sniffle-master/patient%20page/medical%20history%20handler/medical%20history%20view.php">
         <button>Back</button>
     </a>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

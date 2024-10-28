@@ -468,6 +468,9 @@ foreach ($allpatientInfo as $patient) {
                             <input type="email" hidden name="recipients_email" value="<?php echo $patient['email'] ?>">
                             <input type="text" hidden name="patient_id" value="<?php echo $patient_id ?>">
 
+                            <label for="subject">Enter Account Password (For Security Reasons)</label>
+                            <input type="text" id="password" name="password" placeholder="Email password" required />
+
                             <label for="subject">Subject</label>
                             <input type="text" id="subject" name="subject" placeholder="Email subject" required />
 
@@ -556,22 +559,22 @@ foreach ($allpatientInfo as $patient) {
     </div>
 
     <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../../vendor/jquery/jquery.min.js"></script>
+    <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
     <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
+    <script src="../../js/sb-admin-2.min.js"></script>
 
     <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
+    <script src="../../vendor/chart.js/Chart.min.js"></script>
 
     <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
+    <script src="../../js/demo/chart-area-demo.js"></script>
+    <script src="../../js/demo/chart-pie-demo.js"></script>
 
 
     <script>

@@ -13,7 +13,7 @@ function getAppointmentData($conn, $appointment_id)
   return $stmt->get_result()->fetch_assoc();
 }
 
-$appointment_id = 107;
+$appointment_id = 140;
 // $appointment_id = $_GET['appointment_id'];
 // if (!isset($_GET['appointment_id'])) {
 //   die("Appointment ID not provided.");
@@ -145,7 +145,7 @@ $patient_dob = $PatientRow['d_o_b'];
           <tr>
             <td>
               <label for="appointment_id">Appointment ID</label>
-              <input type="text" name="appointment_id" class="form-control">
+              <input type="text" name="appointment_id" class="form-control" disabled value="<?php echo $appointment_id; ?>">
               <label for="patient-name">Patient Name</label>
               <input type="text" name="patient-name" class="form-control" disabled value="
               <?php echo $patient_name; ?>" />
@@ -547,72 +547,6 @@ $patient_dob = $PatientRow['d_o_b'];
 
 
 
-  <!-- <script>
-    $(document).ready(function() {
-      // Add and remove event listeners for all table types
-      addEventListeners('#addRowBtnMed', '#removeRowBtnMed', '#medicationTable', [{
-          name: 'medication',
-          placeholder: 'Medication'
-        },
-        {
-          name: 'purpose',
-          placeholder: 'Purpose'
-        },
-        {
-          name: 'dosage',
-          placeholder: 'Dosage'
-        },
-        {
-          name: 'frequency',
-          placeholder: 'Frequency'
-        }
-      ]);
-
-
-
-      addEventListeners('#addRowBtnDiagnosis', '#removeRowBtnDiagnosis', '#diagnosisTable', [{
-          name: 'procedure_name',
-          placeholder: 'Procedure Name'
-        },
-        {
-          name: 'purpose',
-          placeholder: 'Purpose'
-        },
-        {
-          name: 'result',
-          placeholder: 'Result'
-        }
-      ]);
-    });
-
-    function addEventListeners(addBtnSelector, removeBtnSelector, tableSelector, columns) {
-      $(addBtnSelector).click(function(event) {
-        event.preventDefault();
-        addRow(tableSelector, columns);
-      });
-
-      $(removeBtnSelector).click(function(event) {
-        event.preventDefault();
-        removeRow(tableSelector);
-      });
-    }
-
-    function addRow(tableSelector, columns) {
-      let markup = "<tr>";
-      columns.forEach(column => {
-        markup += `<td><input type='text' name='${column.name}' class='form-control' placeholder='${column.placeholder}' /></td>`;
-      });
-      markup += "</tr>";
-      $(tableSelector + ' tbody').append(markup);
-    }
-
-    function removeRow(tableSelector) {
-      var $tableBody = $(tableSelector + ' tbody');
-      if ($tableBody.find('tr').length > 1) {
-        $tableBody.find('tr:last').remove();
-      }
-    }
-  </script> -->
 
   <script>
     $(document).ready(function() {

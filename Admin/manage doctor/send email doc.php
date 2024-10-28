@@ -469,6 +469,9 @@ foreach ($allDoctorInfo as $doctor) {
                             <input type="text" id="recipients" name="recipients" placeholder="Recipient email" value="<?php echo $doctor['doctor_name'] ?>" readonly class="form-control" />
                             <input type="email" hidden name="recipients_email" value="<?php echo $doctor['email'] ?>">
                             <input type="text" hidden name="doctor_id" value="<?php echo $doctor_id ?>">
+                            
+                            <label for="subject">Enter Account Password (For Security Reasons)</label>
+                            <input type="text" id="password" name="password" placeholder="Email password" required />
 
                             <label for="subject">Subject</label>
                             <input type="text" id="subject" name="subject" placeholder="Email subject" required />
@@ -557,11 +560,10 @@ foreach ($allDoctorInfo as $doctor) {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
-
     <!-- Bootstrap core JavaScript-->
     <script src="../../vendor/jquery/jquery.min.js"></script>
     <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
     <!-- Core plugin JavaScript-->
     <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>

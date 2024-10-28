@@ -115,11 +115,9 @@ $result = mysqli_query($conn, $sql);
 $patient = mysqli_fetch_assoc($result);
 
 
-// Fetch medical record ID using appointment_id
-$sql = "SELECT * FROM medical_record WHERE appointment_id = $appointment_id";
-$result = mysqli_query($conn, $sql);
-$medical_record = mysqli_fetch_assoc($result);
-$medical_record_id = $medical_record['medical_record_id'];
+// Fetch Medical Record data using medical_record_id
+$sql = "SELECT * FROM medical_record WHERE medical_record_id = $medical_record_id";
+$medical_record_result = mysqli_query($conn, $sql);
 
 
 // Fetch physical exam data using medical_record_id
@@ -321,16 +319,22 @@ if (mysqli_num_rows($condition_result) > 0) {
                     <h4 class="h4">Notes</h4>
                     <tr>
                         <th>Appointment Notes</th>
+                        <?php if ($medical_record_result && mysqli_num_rows($medical_record_result) > 0) {
+                            $medical_record = mysqli_fetch_assoc($medical_record_result); ?>
                     </tr>
                     <tr>
                         <td>
-                            <?php
+                        <?php
+                            // Display the notes
                             if ($medical_record['notes'] == NULL) {
                                 echo "No notes found";
                             } else {
-                                echo $medical_record['notes'];
+                                echo htmlspecialchars($medical_record['notes']); // Use htmlspecialchars to prevent XSS
                             }
-                            ?>
+                        } else {
+                            echo "Medical record not found";
+                        }
+                        ?>
                         </td>
                     </tr>
                 </table>
@@ -339,39 +343,58 @@ if (mysqli_num_rows($condition_result) > 0) {
         </section>
 
         <!-- Medication -->
-
-
         <section>
             <div class="medication container mt-5">
-                <table class="table" style="background-color: #fafbfc">
-                    <h4 class="h4">Medication</h4>
-                    <tr>
+                <table id="medicationTable" class="table" style="background-color: #fafbfc">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h4 class="h4">Medication</h4>
+                        </div>
+
+                    </div>
+                    <br>
+                    <thead>
                         <th>Medication</th>
                         <th>Purpose</th>
                         <th>Dosage</th>
                         <th>Frequency</th>
-                    </tr>
-                    <?php
-                    if ($medication_result->num_rows > 0) {
-                        // Output data of each row
-                        while ($row = $medication_result->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . $row["medication_name"] . "</td>";
-                            echo "<td>" . $row["purpose"] . "</td>";
-                            echo "<td>" . $row["dosage"] . "</td>";
-                            echo "<td>" . $row["frequency"] . "</td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='4'>No medication found</td></tr>";
-                    }
-                    ?>
-                </table>
-                <?php
+                    </thead>
 
-                ?>
+                    <tbody>
+                        <?php
+                        if ($medication_result->num_rows > 0) {
+                            // Output data of each row
+                            while ($row = $medication_result->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td><p>" . htmlspecialchars($row["medication_name"]) . "</p></td>";
+                                echo "<td><p>" . htmlspecialchars($row["purpose"]) . "</p></td>";
+                                echo "<td><p>" . htmlspecialchars($row["dosage"]) . "</p></td>";
+                                echo "<td><p>" . htmlspecialchars($row["frequency"]) . "</p></td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                        ?>
+                            <tr>
+                                <td colspan="4">
+                                    <p>No medication data found</p>
+                                </td>
+                            </tr>
+                        <?php
+                        }
+                        ?>
+
+
+                    </tbody>
+                </table>
+
+
+
+
+
             </div>
         </section>
+
+
 
         <!-- Patient Lifestyle -->
         <div class="page-break">
