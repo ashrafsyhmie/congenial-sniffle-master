@@ -361,19 +361,25 @@ $patient_name = $_SESSION['patient_name'];
                     ?>
 
                       <td>
-                        <!-- <a href="./reschedule handler/calendar.php?appointment_id=<?php
-                                                                                        // echo $appointment_id; 
-                                                                                        ?>" class="btn btn-info">
-                          <i class="fa-regular fa-calendar"></i> Reschedule
-                        </a> -->
 
-                        <a href="#" class="btn btn-info" data-toggle="modal" data-target="#rescheduleAppModal<?php echo $appointment_id; ?>">
-                          <i class="fa-regular fa-calendar"></i> Reschedule
-                        </a>
-                        <!-- Each appointment has its own Cancel button and modal -->
-                        <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#cancelAppModal<?php echo $appointment_id; ?>">
-                          <i class="fa-solid fa-trash"></i> Cancel
-                        </a>
+
+                        <?php if ($row['status']  == 'cancelled') : ?>
+                          <p>Your appointment is cancelled.</p>
+                        <?php elseif ($row['status']  == 'done') : ?>
+                          <p>Your appointment is done.</p>
+                        <?php else : ?>
+                          <!-- Reschedule Button -->
+                          <a href="#" class="btn btn-info" data-toggle="modal" data-target="#rescheduleAppModal<?php echo $appointment_id; ?>">
+                            <i class="fa-regular fa-calendar"></i> Reschedule
+                          </a>
+
+                          <!-- Cancel Button -->
+                          <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#cancelAppModal<?php echo $appointment_id; ?>">
+                            <i class="fa-solid fa-trash"></i> Cancel
+                          </a>
+                        <?php endif; ?>
+
+
 
                         <!-- Modal for each appointment -->
                         <div class="modal fade" id="cancelAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

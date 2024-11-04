@@ -46,15 +46,15 @@ if ($booked_timeslot) {
     $bookings[] = $booked_timeslot;
 }
 
-// Retrieve existing bookings for the selected date and doctor_id (including all patients)
+// Retrieve existing bookings for the selected date and doctor_id (including all patients) and their statuses
 if (!empty($date)) {
-    $stmt = $conn->prepare("SELECT timeslot FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
+    $stmt = $conn->prepare("SELECT timeslot, status FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
     $stmt->bind_param('sss', $date, $doctor_id, $patient_id);
 
     if ($stmt->execute()) {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
-            $bookings[] = $row['timeslot'];
+            $bookings[$row['timeslot']] = $row['status']; // Store timeslot and status
         }
         $stmt->close();
     } else {
@@ -68,7 +68,7 @@ if (isset($_POST['submit'])) {
     $timeslot = $_POST['timeslot'];
 
     // Check if the timeslot is already booked for the patient_id
-    $stmt = $conn->prepare("SELECT * FROM appointment WHERE DATE = ? AND TIMESLOT = ? AND patient_id = ? AND doctor_id = ?");
+    $stmt = $conn->prepare("SELECT * FROM appointment WHERE DATE = ? AND TIMESLOT = ? AND patient_id = ? AND doctor_id = ? ");
     $stmt->bind_param('ssss', $date, $timeslot, $patient_id, $doctor_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -166,8 +166,9 @@ $timeslots = timeslots();
                 <?php echo $msg; ?>
             </div>
             <?php
+            // Generate buttons with 'upcoming' status check
             foreach ($timeslots as $t) {
-                $isBooked = in_array($t, $bookings);
+                $isBooked = isset($bookings[$t]) && $bookings[$t] != 'cancelled'; // Check if status is 'upcoming'
                 $buttonClass = $isBooked ? 'btn-danger' : 'btn-success book';
                 echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' " . ($isBooked ? "disabled" : "data-timeslot='$t'") . ">$t</button>";
             }

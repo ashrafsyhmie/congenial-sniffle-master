@@ -77,6 +77,104 @@ $patient_name = $_SESSION['patient_name'];
 
 <body id="page-top">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@300;400&display=swap');
+
+    .article-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+
+    .article-container .square {
+      width: 300px;
+      /* Reduced width for better landscape fit */
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .article-container .square:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Image container for A4 portrait and landscape images */
+    .article-container .mask {
+      width: 280px;
+      height: 160px;
+      /* Reduced height */
+      object-fit: cover;
+      /* Changed to 'contain' to ensure full visibility */
+      border-radius: 10px;
+      background-color: #f0f0f0;
+      /* Adding a background to fill space if image doesn't fit exactly */
+    }
+
+    .article-container .h1 {
+      font-family: 'Merriweather', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      margin-top: 15px;
+      padding: 0 20px;
+    }
+
+    .article-container p {
+      padding: 15px 20px;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 14px;
+      color: #777;
+      line-height: 1.6;
+    }
+
+    .article-container .button-container {
+      display: flex;
+      justify-content: center;
+      /* Centers the button horizontally */
+      margin: 15px 0;
+    }
+
+    .article-container .button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .article-container .button:hover {
+      background-color: #0056b3;
+    }
+
+
+    @media (max-width: 768px) {
+      .article-container {
+        padding: 20px;
+      }
+
+      .article-container .square {
+        width: 100%;
+      }
+
+      .article-container .mask {
+        height: 150px;
+      }
+
+      .article-container .h1 {
+        font-size: 18px;
+      }
+
+      .article-container p {
+        font-size: 13px;
+      }
+    }
+
     .mini-photo {
       width: 45px;
       /* set the width */
@@ -450,10 +548,54 @@ $patient_name = $_SESSION['patient_name'];
               </div>
             </div>
           </div>
-          <div class="row">
-            <!-- Content Column -->
 
-            <div class="col-lg-6 mb-4"></div>
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-primary">
+                Articles Section
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="container article-container">
+                <?php
+                // Assuming connection to the database is established in $conn
+
+                // Fetch only visible articles
+                $query = "SELECT * FROM article WHERE visibility = 'show'";
+                $result = $conn->query($query);
+
+                if ($result && $result->num_rows > 0) {
+                  while ($article = $result->fetch_assoc()) {
+                    // Base64 encode the image from the database
+                    $imageSrc = 'data:image/jpeg;base64,' . base64_encode($article['image']);
+                ?>
+                    <div class="square">
+                      <!-- Dynamic image from the database -->
+                      <img src="<?= htmlspecialchars($imageSrc); ?>" class="mask m-3">
+                      <!-- Dynamic title from the database -->
+                      <div class="h1"><?= htmlspecialchars($article['title']); ?></div>
+                      <!-- Dynamic description from the database -->
+                      <p><?= htmlspecialchars($article['description']); ?></p>
+                      <!-- Dynamic link from the database -->
+                      <div>
+                        <div class="button-container">
+                          <a href="<?= htmlspecialchars($article['link']); ?>" target="_blank" class="button">Read More</a>
+                        </div>
+
+                      </div>
+
+                    </div>
+                <?php
+                  }
+                } else {
+                  echo '<p>No articles found.</p>';
+                }
+
+                $result->free();
+                $conn->close();
+                ?>
+              </div>
+            </div>
           </div>
         </div>
         <!-- /.container-fluid -->

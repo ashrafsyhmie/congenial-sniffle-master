@@ -270,6 +270,15 @@ $doctor_name = $_SESSION['doctor_name'];
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
                     <?php
+                    // Display success or error message
+                    if (isset($_GET['message'])) {
+                        $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+                        echo '<div class="alert ' . $messageType . '">';
+                        echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+                        echo '</div>';
+                    }
+                    ?>
+                    <?php
                     // Database connection
                     require_once "../db conn.php";
                     // Fetch the patient ID from the URL
@@ -370,64 +379,66 @@ $doctor_name = $_SESSION['doctor_name'];
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
-                                All Appointments </h6>
+                                All Appointments For <?php echo htmlspecialchars($patient['patient_name']); ?> </h6>
                         </div>
 
                         <div class="card-body">
 
-                            <table
-                                class="table table-bordered"
-                                id="dataTable"
-                                width="100%"
-                                cellspacing="0">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <thead>
                                     <tr>
                                         <th>Appointment ID</th>
-                                        <th>Photo</th>
+                                        <th>Dr. Photo</th>
                                         <th>Name</th>
-                                        <th>Date </th>
+                                        <th>Date</th>
                                         <th>Status</th>
-                                        <th>Medical Record</th>
-                                        <th>Medical Record ID</th>
-
-
+                                        <th>Medical Record Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-
                                     $patient_id = $_GET['id'];
 
-                                    $sql = "SELECT * FROM appointment 
+                                    $sql = "SELECT appointment.*, patient.patient_name, doctor.doctor_name, doctor.doctor_photo, medical_record.medical_record_id 
+                                    FROM appointment 
                                     JOIN patient ON appointment.patient_id = patient.patient_id 
                                     JOIN doctor ON appointment.doctor_id = doctor.doctor_id
-                                    JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id
-                                    WHERE patient.patient_id = $patient_id";
+                                    LEFT JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id
+                                    WHERE appointment.patient_id = $patient_id";
 
-                                    //  AND status = 'upcoming'
                                     $result = mysqli_query($conn, $sql);
 
                                     while ($row = mysqli_fetch_assoc($result)) {
+                                        $appointment_id = $row['appointment_id'];
 
-
+                                        // Display appointment data
                                         echo "<tr>";
-                                        echo "<td>" . $row['appointment_id'] . "</td>";
-                                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "patient-photo"></td>';
+                                        echo "<td class='text-center'>" . $row['appointment_id'] . "</td>";
+                                        echo '<td class="text-center"><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class="patient-photo"></td>';
+                                        echo "<td class='text-center'>" . $row['doctor_name'] . "</td>";
+                                        echo "<td class='text-center'>" . $row['date'] . '<br>' . $row['timeslot'] . "</td>";
 
-                                        echo "<td>" . $row['doctor_name'] . "</td>";
-                                        echo "<td>" . $row['date'] . '<br>' . $row['timeslot'] . "</td>";
-
-
+                                        // Appointment status
                                         if ($row['status'] == 'done') {
-                                            echo '<td><span class="status-done">Done</span></td>';
+                                            echo '<td class="text-center"><span class="status-done">Done</span></td>';
                                         } elseif ($row['status'] == 'cancelled') {
-                                            echo "<td><span class='status-canceled'>Cancelled</span></td>";
+                                            echo "<td class='text-center'><span class='status-canceled'>Cancelled</span></td>";
                                         } elseif ($row['status'] == 'upcoming') {
-                                            echo "<td><span class='status-upcoming'>Upcoming</span></td>";
+                                            echo "<td class='text-center'><span class='status-upcoming'>Upcoming</span></td>";
                                         }
-                                        echo "<td><a href='../medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-success btn-sm mr-3'> <i class='fa fa-edit'></i></a>";
-                                        echo "<a href='../medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-primary btn-sm  '> <i class='fa-solid fa-eye'></i></a></td>";
-                                        echo "<td>" . $row['medical_record_id'] . "</td>";
+
+                                        if (isset($row['medical_record_id'])) {
+                                            // Medical record action buttons
+                                            echo "<td class='text-center'><a href='./medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-success btn-sm mr-3'> 
+          <i class='fa fa-edit'></i> Edit</a>";
+                                            echo "<a href='./medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-primary btn-sm'> 
+             <i class='fa-solid fa-eye'></i> View</a><p></p> Medical Record ID: " . $row['medical_record_id'] . "</td>";
+                                        } elseif ($row['status'] == 'done') {
+                                            echo "<td class='text-center'><a href='./medical record/medical history form.php?appointment_id=" . $row['appointment_id'] . "' class='btn btn-primary btn-sm mr-3'> 
+    <i class='fa fa-plus mr-1'></i>Add</a></td>";
+                                        } else {
+                                            echo "<td class='text-center' width=20%>No medical record</td>";
+                                        }
                                         echo "</tr>";
                                     }
                                     ?>

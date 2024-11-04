@@ -26,9 +26,7 @@ require_once './db conn.php';
     <link rel="stylesheet" href="./login page new/css/style.css" />
 
     <!-- Bootstrap 4.5.2 CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
 
     <!-- Font Awesome for icons -->
@@ -280,26 +278,15 @@ require_once './db conn.php';
                                     <i class="zmdi zmdi-eye" id="eyeIconSignIn"></i>
                                 </button>
                             </div>
-                            <div class="form-group">
-                                <input
-                                    type="checkbox"
-                                    name="remember-me"
-                                    id="remember-me"
-                                    class="agree-term" />
-                                <label for="remember-me" class="label-agree-term">
-                                    <span><span></span></span>Remember me
-                                </label>
-                            </div>
+
                             <div class="form-group form-button">
-                                <!-- <button
-                    type="submit"
-                    name="login_submit"
-                    id="signin"
-                    class="btn btn-primary btn-small"
-                  >
-                    Log In
-                  </button> -->
-                                <input type="submit" name="login_submit" id="signin" />
+                                <button
+                                    type="submit"
+                                    name="login_submit"
+                                    id="signin"
+                                    class="btn btn-primary btn-small">
+                                    Log In
+                                </button>
                             </div>
                         </form>
                     </div>

@@ -495,9 +495,7 @@ $admin_name = $_SESSION['admin_name'];
                                     }
                                     ?>
                                 </tbody>
-
                             </table>
-
 
                         </div>
 
