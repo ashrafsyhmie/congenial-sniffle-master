@@ -31,14 +31,14 @@ $allAdminInfo = fetchAllAdminInfo($conn);
 foreach ($allAdminInfo as $admin) {
     $_SESSION['admin_name'] = $admin['admin_name'];
 }
-
-
 // Establish your MySQLi connection (assuming you have a separate file for this)
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
 
     $title = $_POST['title'];
     $description = $_POST['description'];
+    $link = $_POST['link'];
+    $visibility = $_POST['visibility'];
 
     // Handle file upload
     $image = null;
@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
     }
 
     // Prepare SQL query with placeholders
-    $query = "INSERT INTO article (title, description, image) VALUES (?, ?, ?)";
+    $query = "INSERT INTO article (title, description, image, link, visibility) VALUES (?, ?, ?, ?, ?)";
 
     // Prepare the statement
     $stmt = $conn->prepare($query);
@@ -58,11 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
     }
 
     // Bind parameters
-    $stmt->bind_param('sss', $title, $description, $image);
+    $stmt->bind_param('sssss', $title, $description, $image, $link, $visibility);
 
     // Execute the statement
     if ($stmt->execute()) {
-        echo "Article inserted successfully.";
+        header("Location: ./manage_article.php?message= New Article added successfully!&message_type=success");
     } else {
         echo "Error executing statement: " . htmlspecialchars($stmt->error);
     }
@@ -113,6 +113,137 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
 
 <body id="page-top">
     <style>
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .custom-btn {
+            border-radius: 10px;
+            color: #161D6F;
+            padding: 6px 15px;
+            background-color: #D2E0FB;
+            font-size: 16px;
+            outline: none;
+            cursor: pointer;
+            margin: 0px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .custom-btn:hover,
+        .custom-btn:focus {
+            background-color: #2C57DD;
+            /* Darker blue for hover/focus */
+            color: #FFF;
+        }
+
+        input[type="radio"] {
+            display: none;
+            /* Hide the radio button itself */
+        }
+
+        input[type="radio"]:checked+label {
+            background-color: #0056b3;
+            /* Darker blue to indicate selection */
+            color: #FFF;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        #specialization {
+            width: 90%;
+        }
+
+        .gender-buttons {
+            background-color: #D2E0FB;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            margin-top: 10px;
+            margin-right: 20px;
+        }
+
+        .upload-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #161D6F;
+            margin-left: 20px;
+        }
+
+
+
+        .upload-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+        }
+
+        .upload-icon i {
+            font-size: 17px;
+            color: #2C57DD;
+        }
+
+        /* Hover effect */
+        .upload-label:hover {
+            color: #2C57DD;
+        }
+
+        .upload-label:hover .upload-icon {
+            background-color: #D2E0FB;
+        }
+
+        .upload-label span {
+            font-size: 15px;
+        }
+
+        .rounded-circle {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        #selectedImage {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .container {
+            background-color: #EEF7FF;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(44, 87, 221, 0.2);
+            width: 1000px;
+            margin-bottom: 30px;
+        }
+
+        .row {
+            color: #2C57DD;
+        }
+
+        .form-control {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-select {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
         .mini-photo {
             width: 45px;
             /* set the width */
@@ -125,6 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
         }
     </style>
+
     <!-- Page Wrapper -->
     <div id="wrapper">
         <!-- Sidebar -->
@@ -290,13 +422,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
 
                 <!-- Begin Page Content -->
 
-                <div class="d-sm-flex align-items-center justify-content-center mb-4">
-                    <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
-                        Add New Article
-                    </h1>
-                </div>
+
 
                 <div class="container-fluid">
+                    <div class="d-sm-flex align-items-center justify-content-center mb-4">
+                        <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
+                            Add New Article
+                        </h1>
+                    </div>
+
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -308,22 +442,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
                                                     <form action="add_article.php" method="POST" d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                                                         <div class="form-group">
                                                             <label for="title">Title</label>
-                                                            <input type="text" name="title" id="title" class="form-control" required>
+                                                            <input type="text" name="title" id="title" class="form-control" placeholder="Title" required>
                                                         </div>
                                                         .
                                                         <div class="form-group">
                                                             <label for="content">Description</label>
-                                                            <textarea name="description" id="description" class="form-control" rows="5" required></textarea>
+                                                            <textarea name="description" id="description" class="form-control" rows="5" placeholder="Description" required></textarea>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label for="imageUpload">Profile Images</label>
-                                                            <div class="file-upload">
-                                                                <input type="file" name="image" id="image">
+                                                            <label>Visibility:</label><br>
+                                                            <div class="gender-buttons">
+                                                                <input type="radio" id="show" name="visibility" value="show" hidden />
+                                                                <label for="show" class="btn custom-btn">Show</label>
+
+                                                                <input type="radio" id="hidden" name="visibility" value="hidden" hidden />
+                                                                <label for="hidden" class="btn custom-btn">Hidden</label>
                                                             </div>
                                                         </div>
-
                                                 </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label for="title">Link</label>
+                                                        <input type="text" name="link" id="link" class="form-control" placeholder="www.example.com" required>
+                                                    </div>
+                                                    <div class="upload-photo">
+                                                        <div class="mb-4 d-flex justify-content-center" ;>
+                                                            <img id="selectedImage" src="https://mdbootstrap.com/img/Photos/Others/placeholder.jpg"
+                                                                alt="example placeholder" class="rounded-circle" />
 
+                                                            <input type="file" name="image" id="image" onchange="displaySelectedImage(event, 'selectedImage')" hidden>
+                                                            <label for="image" class="upload-label">
+                                                                <div class="upload-icon">
+                                                                    <i class="fa fa-camera"></i> <!-- Camera icon -->
+                                                                </div><br>
+                                                                <span style="color: #2C57DD;">Upload a photo</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                     </div>
                         </div>
@@ -425,6 +581,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnSubmit'])) {
     <!-- Page level custom scripts -->
     <script src="../../js/demo/chart-area-demo.js"></script>
     <script src="../../js/demo/chart-pie-demo.js"></script>
+
+    <script>
+        function displaySelectedImage(event, elementId) {
+            const selectedImage = document.getElementById(elementId);
+            const fileInput = event.target;
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    selectedImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+    </script>
 </body>
 
 </html>

@@ -1,38 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
+// Prepare the SQL statement for inserting conditions
+    $sql = "INSERT INTO medical_conditions (medical_record_id, condition_name, condition_status) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
 
-<head>
-  <title>Bootstrap Example</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-</head>
+    // Check for statement preparation success
+    if ($stmt) {
+        foreach ($conditions as $condition_name => $condition_status) {
+            // Skip if the condition status is 'None'
+            if ($condition_status === 'None') {
+                continue;
+            }
 
-<body>
+            $stmt->bind_param("iss", $medical_record_id, $condition_name, $condition_status);
 
-  <div class="container">
-    <h2>Animated Alerts</h2>
-    <p>The .fade and .in classes adds a fading effect when closing the alert message.</p>
-    <div class="alert alert-success alert-dismissible fade in">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-      <strong>Success!</strong> This alert box could indicate a successful or positive action.
-    </div>
-    <div class="alert alert-info alert-dismissible fade in">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-      <strong>Info!</strong> This alert box could indicate a neutral informative change or action.
-    </div>
-    <div class="alert alert-warning alert-dismissible fade in">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-      <strong>Warning!</strong> This alert box could indicate a warning that might need attention.
-    </div>
-    <div class="alert alert-danger alert-dismissible fade in">
-      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-      <strong>Danger!</strong> This alert box could indicate a dangerous or potentially negative action.
-    </div>
-  </div>
-
-</body>
-
-</html>
+            if (!$stmt->execute()) {
+                echo "Failed to insert condition: $condition_name. Error: " . $stmt->error . "<br>";
+            } else {
+                echo "Inserted condition: $condition_name with status: $condition_status<br>";
+            }
+        }
+        $stmt->close();
+    } else {
+        echo "Failed to prepare statement for medical conditions. Error: " . $conn->error . "<br>";
+    }

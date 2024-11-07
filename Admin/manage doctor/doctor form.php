@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Execute the query
     if ($conn->query($sql) === TRUE) {
-        echo "New Doctor Uploaded.";
+        header("Location: ./view all doctors.php?message=New Doctor added successfully&message_type=success");
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
@@ -428,12 +428,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-center mb-4">
                         <h1 class="h2 mb-0 text-gray-900 font-weight-bolder">
-                            Doctor Details
+                            Insert New Doctor
                         </h1>
                     </div>
-                    <h3 class="d-sm-flex align-items-center justify-content-center mb-4">
-                        Insert the details here!
-                    </h3>
+                    <h4 class="d-sm-flex align-items-center justify-content-center mb-4">
+                        Fill in the details below.
+                    </h4>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
@@ -442,8 +442,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                         <form method="post" enctype="multipart/form-data" action="./doctor form.php">
                                             <div class="row">
                                                 <div class="col-md-6">
-                                                    <label for="">Full Name</label>
                                                     <div class="form-group">
+                                                        <label for="">Full Name</label>
                                                         <input type="text" name="txtName" class="form-control" placeholder="Doctor Name" value="<?php echo isset($Pt_name) ? htmlspecialchars($Pt_name) : ''; ?>" required />
                                                     </div>
 

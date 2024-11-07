@@ -360,10 +360,8 @@ $doctor_name = $_SESSION['doctor_name'];
                                         <!-- Fourth Column: Edit Button -->
                                         <td>
                                             <div class="form-group">
-                                                <a href="edit.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-success btn-sm">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>
-                                                <a href="send email patient.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-primary btn-sm">
+
+                                                <a href="./email/send email patient.php?id=<?php echo htmlspecialchars($patient['patient_id']); ?>" class="btn btn-primary btn-sm">
                                                     <i class="fa-regular fa-envelope"></i>
                                                 </a>
                                             </div>

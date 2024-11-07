@@ -61,9 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_FILES['imageUpload']) && $_FILES['imageUpload']['error'] == UPLOAD_ERR_OK) {
         $imageData = file_get_contents($_FILES['imageUpload']['tmp_name']);
     }
-    // else {
-    //     $imageData = $row['image'];
-    //     echo 'no images';
+    //  else {
+    //     $imageData = $image;
     // }
 
     // Prepare and execute update query
@@ -345,7 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                                             <div class="form-group">
                                                 <label for="ic_num">IC Number</label>
-                                                <input type="text" class="form-control" id="icInput" name="ic_num" value="<?php echo htmlspecialchars($ic); ?>">
+                                                <input type="text" class="form-control" id="icInput" name="ic_num" maxlength="14" value="<?php echo htmlspecialchars($ic); ?>">
                                             </div>
 
                                             <div class="form-group">
@@ -368,12 +367,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                                             <div class="form-group">
                                                 <label for="txtNum">Phone Number</label>
-                                                <input type="text" class="form-control" id="txtNum" name="txtNum" value="<?php echo htmlspecialchars($Num_Phone); ?>">
+                                                <input type="text" class="form-control" id="txtNum" name="txtNum" maxlength="12" value="<?php echo htmlspecialchars($Num_Phone); ?>">
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="emerCont">Emergency Contact</label>
-                                                <input type="text" class="form-control" id="emerCont" name="emerCont" value="<?php echo htmlspecialchars($emergency); ?>">
+                                                <input type="text" class="form-control" id="emerCont" name="emerCont" maxlength="12" value="<?php echo htmlspecialchars($emergency); ?>">
                                             </div>
 
                                             <div class="form-group">
@@ -404,6 +403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                                     ?>
                                                 </div>
                                                 <div>
+                                                    <a href="./patient_profile.php?id=<?php echo $_GET['id'] ?>" class="btn btn-primary">Back</a>
                                                     <button type="submit" class="btn btn-primary">Update Info</button>
                                                 </div>
                                             </div>

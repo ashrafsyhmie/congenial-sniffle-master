@@ -1,14 +1,70 @@
 <?php
-
-
-session_start();
-$admin_id = $_SESSION['admin_id'];
-$admin_name = $_SESSION['admin_name'];
-
 require_once "../../db conn.php";
+session_start();
 
+if (!isset($_SESSION['doctor_id'])) {
+    header("Location: login.php");
+    exit();
+}
 
+$doctor_id = $_SESSION['doctor_id'];
+$patient_id = isset($_GET['id']) ? $_GET['id'] : '';
+
+function fetchAlldoctorInfo($conn)
+{
+    global $doctor_id;
+    $stmt = $conn->prepare("SELECT * FROM doctor WHERE doctor_id = ?");
+    $stmt->bind_param("i", $doctor_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $doctorInfo = array();
+
+    while ($row = $result->fetch_assoc()) {
+        $doctorInfo[] = $row;
+    }
+
+    $stmt->close();
+    return $doctorInfo;
+}
+
+$alldoctorInfo = fetchAlldoctorInfo($conn);
+
+foreach ($alldoctorInfo as $doctor) {
+    $_SESSION['doctor_name'] = $doctor['doctor_name'];
+    $_SESSION['doctor_photo'] = $doctor['doctor_photo'];
+}
+
+$doctor_name = htmlspecialchars($_SESSION['doctor_name']);
+$doctor_photo = $_SESSION['doctor_photo'];
+
+function fetchAllpatientInfo($conn)
+{
+    global $patient_id;
+    $stmt = $conn->prepare("SELECT * FROM patient WHERE patient_id = ?");
+    $stmt->bind_param("i", $patient_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $patientInfo = array();
+
+    while ($row = $result->fetch_assoc()) {
+        $patientInfo[] = $row;
+    }
+
+    $stmt->close();
+    return $patientInfo;
+}
+
+$allpatientInfo = fetchAllpatientInfo($conn);
+
+foreach ($allpatientInfo as $patient) {
+    $_SESSION['patient_name'] = htmlspecialchars($patient['patient_name']);
+    $_SESSION['patient_photo'] = $patient['patient_photo'];
+    $_SESSION['patient_email'] = htmlspecialchars($patient['email']);
+}
+
+// Continue with the HTML structure...
 ?>
+
 
 
 <!DOCTYPE html>
@@ -42,8 +98,11 @@ require_once "../../db conn.php";
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet" />
 
+    <!-- <link rel="stylesheet" href="./style.css"> -->
+
     <!-- Custom styles for this template-->
     <link href="../../css/sb-admin-2.min.css" rel="stylesheet" />
+
     <style>
         .mini-photo {
             width: 45px;
@@ -55,6 +114,101 @@ require_once "../../db conn.php";
             border-radius: 50%;
             /* for a circular shape */
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+        }
+
+        .email-composer {
+
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin: 10px 0 5px;
+            color: #555;
+        }
+
+        input,
+        textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+
+
+        textarea {
+            height: 150px;
+            resize: none;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .send-btn {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .discard-btn {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            max-width: 400px;
+            margin: auto;
+        }
+
+        .close-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         .patient-photo {
@@ -118,7 +272,7 @@ require_once "../../db conn.php";
             display: inline-block;
         }
 
-        .status-cancelled {
+        .status-canceled {
             background-color: red;
             color: white;
             padding: 5px 10px;
@@ -146,36 +300,52 @@ require_once "../../db conn.php";
             <!-- Sidebar - Brand -->
             <a
                 class="sidebar-brand d-flex align-items-center justify-content-center"
-                href="../homepage.php">
+                href="./homepage.php">
                 <div class="sidebar-brand-icon">
-                    <img src="../img/svg/logo-only.svg" />
+                    <img src="../../img/svg/logo-only.svg" />
                 </div>
                 <div class="sidebar-brand-text mx-2">MedAssist</div>
             </a>
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item ml-1">
+            <li class="nav-item  ml-1">
                 <a class="nav-link" href="../homepage.php">
                     <i class="fa-solid fa-house"></i>
                     <span>Home</span></a>
             </li>
 
             <li class="nav-item ml-1">
-                <a class="nav-link" href="../manage doctor/view all doctors.php">
-                    <i class="fa-solid fa-stethoscope"></i>
-                    <span>View All Doctors</span></a>
+                <a class="nav-link" href="../appointment record.php">
+                    <i class="fa-solid fa-calendar"></i>
+                    <span>View Appointment</span></a>
+            </li>
+
+            <li class="nav-item ml-1 active">
+                <a class="nav-link" href="../view all patient.php">
+                    <i class="fa-solid fa-bookmark"></i>
+                    <span>View All Patient</span></a>
             </li>
 
             <li class="nav-item ml-1">
-                <a class="nav-link" href="../manage patient/view all patient.php ">
-                    <i class="fa-regular fa-user"></i>
-                    <span>View All Patients</span></a>
-            </li>
-
-            <li class="nav-item active ml-1">
-                <a class="nav-link" href="./view all appointment.php">
-                    <i class="fa-solid fa-bookmark"></i>
-                    <span>View All Appointment</span></a>
+                <a
+                    class="nav-link collapsed"
+                    href="settings.html"
+                    data-toggle="collapse"
+                    data-target="#collapseTwo"
+                    ria-expanded="true"
+                    aria-controls="collapseTwo">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span></a>
+                <div
+                    id="collapseTwo"
+                    class="collapse"
+                    aria-labelledby="headingTwo"
+                    data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Settings</h6>
+                        <a class="collapse-item" href="../change info.php">Change Info</a>
+                    </div>
+                </div>
             </li>
 
             <li class="nav-item ml-1">
@@ -260,9 +430,9 @@ require_once "../../db conn.php";
                                 data-toggle="dropdown"
                                 aria-haspopup="true"
                                 aria-expanded="false">
-                                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $admin_name  ?></span>
+                                <span class="mr-3 d-none d-lg-inline text-gray-600 small"><?php echo $doctor_name  ?></span>
                                 <?php
-                                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($_SESSION['admin_photo']) . '" alt="Admin photo" class="mini-photo"></td>'
+                                echo '<td><img src="data:image/jpeg;base64,' . base64_encode($doctor['doctor_photo']) . '" alt="doctor photo" class="mini-photo"></td>'
                                 ?>
                             </a>
                             <!-- Dropdown - User Information -->
@@ -302,95 +472,56 @@ require_once "../../db conn.php";
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
-
+                            Send Email to Patient
                         </h1>
 
                     </div>
-                    <div class="d-sm-flex align-items-center justify-content-center mb-4">
-                        <h1 class="h2 mb-0 text-gray-900 font-weight-bolder">
-                            Add New Appointment
-                        </h1>
-                    </div>
-                    <h4 class="d-sm-flex align-items-center justify-content-center mb-5">
-                        Please select Patient and Doctor to create a new appointment.
-                    </h4>
+                    <div class="email-composer">
+                        <h2>Compose Email</h2>
+                        <form action="./email handler.php" method="post">
+                            <label for="to">To</label>
+                            <input type="text" id="recipients" name="recipients" placeholder="Recipient email" value="<?php echo $patient['patient_name'] ?>" readonly class="form-control" />
+                            <input type="email" hidden name="recipients_email" value="<?php echo $patient['email'] ?>">
+                            <input type="text" hidden name="patient_id" value="<?php echo $patient_id ?>">
 
+                            <label for="subject">Enter Account Password (For Security Reasons)</label>
+                            <input type="text" id="password" name="password" placeholder="Email password" required />
 
-                    <!-- All Appointment table -->
-                    <div class="card shadow mb-4" style="max-width: 1000px; margin: 0 auto;">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">
-                                Select Patient and Doctor to Book Appointment
-                            </h6>
-                        </div>
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" placeholder="Email subject" required />
 
-                        <div class="card-body">
-                            <div class="form-container">
-                                <form action="./appointment handler/calendar.php" method="POST">
+                            <label for="body">Message</label>
+                            <textarea id="body" name="body" placeholder="Write your message..." required></textarea>
 
-                                    <!-- Step 1: Patient Selection -->
-                                    <div id="patient-step" class="step">
-                                        <div class="form-group mb-4">
-                                            <label for="patientSelect">Select Patient</label>
-                                            <select class="form-control" name="patient_id" id="patientSelect" required>
-                                                <option value="">--Select a Patient--</option>
-                                                <?php
-                                                $sqlPatients = "SELECT * FROM patient ORDER BY patient_name ASC";
-                                                $resultPatients = $conn->query($sqlPatients);
+                            <div class="actions">
 
-                                                if ($resultPatients->num_rows > 0) {
-                                                    while ($rowPatient = $resultPatients->fetch_assoc()) {
-                                                        echo '<option value="' . htmlspecialchars($rowPatient['patient_id']) . '">'
-                                                            . htmlspecialchars($rowPatient['patient_name']) . ' (' . htmlspecialchars($rowPatient['ic number']) . ')'
-                                                            . '</option>';
-                                                    }
-                                                } else {
-                                                    echo "<option value=''>No patients found</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-
-
-                                    </div>
-
-                                    <!-- Step 2: Doctor Selection (Initially Hidden) -->
-                                    <div id="doctor-step" class="step">
-
-                                        <div class="form-group mb-5">
-                                            <label for="doctorSelect">Select Doctor</label>
-                                            <select class="form-control" name="doctor_id" id="doctorSelect" required>
-                                                <option value="">--Select a Doctor--</option>
-                                                <?php
-                                                $sqlDoctors = "SELECT * FROM doctor ORDER BY doctor_name ASC";
-                                                $resultDoctors = $conn->query($sqlDoctors);
-
-                                                if ($resultDoctors->num_rows > 0) {
-                                                    while ($rowDoctor = $resultDoctors->fetch_assoc()) {
-                                                        echo '<option value="' . htmlspecialchars($rowDoctor['doctor_id']) . '">'
-                                                            . htmlspecialchars($rowDoctor['doctor_name']) . ' (' . htmlspecialchars($rowDoctor['ic number']) . ')'
-                                                            . '</option>';
-                                                    }
-                                                } else {
-                                                    echo "<option value=''>No doctors found</option>";
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-
-
-                                        <div class="d-flex justify-content-between mt-3">
-                                            <button type="reset" class="btn btn-danger">Reset</button>
-                                            <a href="./view all appointment.php" class="btn btn-primary">Back</a>
-                                            <button type="submit" class="btn btn-success">Create Appointment</button>
-                                        </div>
-
-                                    </div>
-                                </form>
+                                <button type="reset" class="btn btn-danger">
+                                    <i class="fa-solid fa-xmark"></i>
+                                    Discard</button>
+                                <a href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>">
+                                    <button type="button" class="btn btn-primary">
+                                        Back
+                                    </button>
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    Send</button>
                             </div>
+                        </form>
+                    </div>
+
+                    <!-- Custom Modal Popup -->
+                    <div id="emailSentModal" class="modal">
+                        <div class="modal-content">
+                            <h3>Email Sent!</h3>
+                            <p>Your email has been sent successfully.</p>
+                            <button id="closeModal" class="close-btn">Close</button>
                         </div>
                     </div>
                 </div>
+
+
+
                 <!-- /.container-fluid -->
             </div>
             <!-- End of Main Content -->
@@ -448,7 +579,6 @@ require_once "../../db conn.php";
     <script src="../../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 
-
     <!-- Core plugin JavaScript-->
     <script src="../../vendor/jquery-easing/jquery.easing.min.js"></script>
 
@@ -462,65 +592,21 @@ require_once "../../db conn.php";
     <script src="../../js/demo/chart-area-demo.js"></script>
     <script src="../../js/demo/chart-pie-demo.js"></script>
 
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const rowsPerPage = 10; //number of row per page (kalau nak tukar kat sini tau)
-            const table = document.querySelector('#dataTable');
-            const rows = table.querySelectorAll('tbody tr');
-            const totalRows = rows.length;
-            const totalPages = Math.ceil(totalRows / rowsPerPage);
-            let currentPage = 1;
-
-            function showPage(page) {
-                const start = (page - 1) * rowsPerPage;
-                const end = page * rowsPerPage;
-
-                rows.forEach((row, index) => {
-                    row.style.display = (index >= start && index < end) ? '' : 'none';
-                });
-
-                document.querySelector('.page-number').textContent = page;
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('status') === 'sent') {
+                // Show the modal when email is sent
+                document.getElementById('emailSentModal').style.display = 'flex';
             }
 
-            function setupPagination() {
-                document.querySelector('.previous').addEventListener('click', () => {
-                    if (currentPage > 1) {
-                        currentPage--;
-                        showPage(currentPage);
-                    }
-                });
-
-                document.querySelector('.next').addEventListener('click', () => {
-                    if (currentPage < totalPages) {
-                        currentPage++;
-                        showPage(currentPage);
-                    }
-                });
-            }
-
-            showPage(currentPage);
-            setupPagination();
-        });
+            // Close the modal when the user clicks the button
+            document.getElementById('closeModal').onclick = function() {
+                document.getElementById('emailSentModal').style.display = 'none';
+            };
+        };
     </script>
-    <!-- <script>
-        function goToNextStep() {
-            // Ensure a patient is selected before proceeding
-            const patientSelected = document.querySelector('input[name="patient_id"]:checked');
-            if (!patientSelected) {
-                alert('Please select a patient before proceeding.');
-                return;
-            }
-            // Hide patient step and show doctor step
-            document.getElementById('patient-step').style.display = 'none';
-            document.getElementById('doctor-step').style.display = 'block';
-        }
-
-        function goBack() {
-            // Show patient step and hide doctor step
-            document.getElementById('patient-step').style.display = 'block';
-            document.getElementById('doctor-step').style.display = 'none';
-        }
-    </script> -->
 </body>
 
 </html>

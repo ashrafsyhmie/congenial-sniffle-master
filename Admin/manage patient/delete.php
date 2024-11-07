@@ -12,7 +12,7 @@ if (isset($_GET["id"])) {
     if ($stmt->execute()) {
         // Record deleted successfully, now redirect
         echo "Record deleted successfully";
-        header("Location: http://localhost/congenial-sniffle-master/admin/manage%20patient/view%20all%20patient.php");
+        header("Location: ./view all patient.php?message=Patient deleted successfully&message_type=success");
         exit;
     } else {
         // Handle error if the deletion fails

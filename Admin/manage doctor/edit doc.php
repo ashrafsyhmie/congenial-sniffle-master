@@ -384,7 +384,7 @@ $conn->close();
 
                                             <div class="form-group">
                                                 <label for="txtNum">Phone Number</label>
-                                                <input type="text" class="form-control" id="txtNum" name="txtNum" value="<?php echo htmlspecialchars($Num_Phone); ?>" required>
+                                                <input type="text" class="form-control" id="txtNum" name="txtNum" maxlength="12" value="<?php echo htmlspecialchars($Num_Phone); ?>" required>
                                             </div>
 
                                             <div class="form-group">

@@ -139,30 +139,6 @@ $lifestyle_result = mysqli_query($conn, $sql);
 //Fetch current medical condition using patient_id
 $sql = "SELECT * FROM medical_conditions WHERE medical_record_id = $medical_record_id";
 $condition_result = mysqli_query($conn, $sql);
-$conditions = [
-    'Eye Problem' => 'None',
-    'Seizure' => 'None',
-    'Epilepsy' => 'None',
-    'Hearing Problem' => 'None',
-    'Diabetes' => 'None',
-    'Cardiovascular Disease' => 'None',
-    'History of Strokes' => 'None',
-    'Respiratory Problem' => 'None',
-    'Kidney Problem' => 'None',
-    'Stomach and Liver Problem' => 'None',
-    'Pancreatic Problems' => 'None',
-    'Anxiety and Depression' => 'None',
-    'Other Mental Health Issue' => 'None',
-    'Sleep Disorder' => 'None',
-    'Neck or Back Problem' => 'None',
-];
-if (mysqli_num_rows($condition_result) > 0) {
-    while ($row = mysqli_fetch_assoc($condition_result)) {
-        $conditions[$row['condition_name']] = $row['condition_status'];
-    }
-}
-
-
 
 
 ?>
@@ -521,99 +497,35 @@ if (mysqli_num_rows($condition_result) > 0) {
                             <th>Medical Condition</th>
                             <th>None</th>
                             <th>Yes</th>
-                            <th>I'm not sure</th>
+                            <th>Unsure</th>
                         </tr>
 
-                        <tr>
-                            <td>Eye Problem</td>
-                            <td><input type="radio" name="eye_problem" value="None" <?php echo ($conditions['Eye Problem'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="eye_problem" value="Yes" <?php echo ($conditions['Eye Problem'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="eye_problem" value="I'm not sure" <?php echo ($conditions['Eye Problem'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Seizure</td>
-                            <td><input type="radio" name="seizure" value="None" <?php echo ($conditions['Seizure'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="seizure" value="Yes" <?php echo ($conditions['Seizure'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="seizure" value="I'm not sure" <?php echo ($conditions['Seizure'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Epilepsy</td>
-                            <td><input type="radio" name="epilepsy" value="None" <?php echo ($conditions['Epilepsy'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="epilepsy" value="Yes" <?php echo ($conditions['Epilepsy'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="epilepsy" value="I'm not sure" <?php echo ($conditions['Epilepsy'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Hearing Problem</td>
-                            <td><input type="radio" name="hearing_problem" value="None" <?php echo ($conditions['Hearing Problem'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="hearing_problem" value="Yes" <?php echo ($conditions['Hearing Problem'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="hearing_problem" value="I'm not sure" <?php echo ($conditions['Hearing Problem'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Diabetes</td>
-                            <td><input type="radio" name="diabetes" value="None" <?php echo ($conditions['Diabetes'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="diabetes" value="Yes" <?php echo ($conditions['Diabetes'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="diabetes" value="I'm not sure" <?php echo ($conditions['Diabetes'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Cardiovascular Disease</td>
-                            <td><input type="radio" name="cardiovascular_disease" value="None" <?php echo ($conditions['Cardiovascular Disease'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="cardiovascular_disease" value="Yes" <?php echo ($conditions['Cardiovascular Disease'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="cardiovascular_disease" value="I'm not sure" <?php echo ($conditions['Cardiovascular Disease'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>History of Strokes</td>
-                            <td><input type="radio" name="history_of_strokes" value="None" <?php echo ($conditions['History of Strokes'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="history_of_strokes" value="Yes" <?php echo ($conditions['History of Strokes'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="history_of_strokes" value="I'm not sure" <?php echo ($conditions['History of Strokes'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Respiratory Problem</td>
-                            <td><input type="radio" name="respiratory_problem" value="None" <?php echo ($conditions['Respiratory Problem'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="respiratory_problem" value="Yes" <?php echo ($conditions['Respiratory Problem'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="respiratory_problem" value="I'm not sure" <?php echo ($conditions['Respiratory Problem'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Kidney Problem</td>
-                            <td><input type="radio" name="kidney_problem" value="None" <?php echo ($conditions['Kidney Problem'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="kidney_problem" value="Yes" <?php echo ($conditions['Kidney Problem'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="kidney_problem" value="I'm not sure" <?php echo ($conditions['Kidney Problem'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Stomach and Liver Problem</td>
-                            <td><input type="radio" name="stomach_liver_problem" value="None" <?php echo ($conditions['Stomach and Liver Problem'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="stomach_liver_problem" value="Yes" <?php echo ($conditions['Stomach and Liver Problem'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="stomach_liver_problem" value="I'm not sure" <?php echo ($conditions['Stomach and Liver Problem'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Pancreatic Problems</td>
-                            <td><input type="radio" name="pancreatic_problems" value="None" <?php echo ($conditions['Pancreatic Problems'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="pancreatic_problems" value="Yes" <?php echo ($conditions['Pancreatic Problems'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="pancreatic_problems" value="I'm not sure" <?php echo ($conditions['Pancreatic Problems'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Anxiety and Depression</td>
-                            <td><input type="radio" name="anxiety_depression" value="None" <?php echo ($conditions['Anxiety and Depression'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="anxiety_depression" value="Yes" <?php echo ($conditions['Anxiety and Depression'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="anxiety_depression" value="I'm not sure" <?php echo ($conditions['Anxiety and Depression'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Other Mental Health Issue</td>
-                            <td><input type="radio" name="mental_health_issue" value="None" <?php echo ($conditions['Other Mental Health Issue'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="mental_health_issue" value="Yes" <?php echo ($conditions['Other Mental Health Issue'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="mental_health_issue" value="I'm not sure" <?php echo ($conditions['Other Mental Health Issue'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Sleep Disorder</td>
-                            <td><input type="radio" name="sleep_disorder" value="None" <?php echo ($conditions['Sleep Disorder'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="sleep_disorder" value="Yes" <?php echo ($conditions['Sleep Disorder'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="sleep_disorder" value="I'm not sure" <?php echo ($conditions['Sleep Disorder'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
-                        <tr>
-                            <td>Neck or Back Problem</td>
-                            <td><input type="radio" name="neck_back_problem" value="None" <?php echo ($conditions['Neck or Back Problem'] == 'None') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="neck_back_problem" value="Yes" <?php echo ($conditions['Neck or Back Problem'] == 'Yes') ? 'checked' : ''; ?> disabled></td>
-                            <td><input type="radio" name="neck_back_problem" value="I'm not sure" <?php echo ($conditions['Neck or Back Problem'] == 'I\'m not sure') ? 'checked' : ''; ?> disabled></td>
-                        </tr>
+                        <?php
+                        if (mysqli_num_rows($condition_result) > 0) {
+                            while ($row = mysqli_fetch_assoc($condition_result)) {
+                                echo "<tr>";
+                                echo "<td>" . $row["condition_name"] . "</td>";
+                                if ($row["condition_status"] == "None") {
+                                    echo "<td>&#10003;</td>";
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                } else if ($row["condition_status"] == "Yes") {
+                                    echo "<td></td>";
+                                    echo "<td>&#10003;</td>";
+                                    echo "<td></td>";
+                                } else {
+                                    echo "<td></td>";
+                                    echo "<td></td>";
+                                    echo "<td>&#10003;</td>";
+                                }
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='4'>No medical condition data found</td></tr>";
+                        }
+
+
+                        ?>
                     </table>
                 </div>
             </section>
@@ -660,8 +572,8 @@ if (mysqli_num_rows($condition_result) > 0) {
                                 <p><?php echo $doctor['doctor_name']  ?></p>
                             </td>
                             <td>
-                                <p>Doctor Signature</p>
-                                <p>Doctor Signature</p>
+                                <p>Registration Number</p>
+                                <p><?php echo $doctor['mmc']  ?></p>
                             </td>
                         </tr>
                         <tr>

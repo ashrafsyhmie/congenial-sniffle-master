@@ -228,16 +228,23 @@ $timeslots = timeslots();
                             <input readonly type="text" class="form-control" id="dateBooked" name="dateBooked" value="<?php echo date('F d, Y', strtotime($date)); ?>">
                         </div>
                         <div class="form-group">
+                            <label for="patientName">Patient ID</label>
+                            <input readonly type="text" class="form-control" id="patient_id" name="patient_id" value="<?php echo $patient_id; ?>">
+                        </div>
+                        <div class="form-group">
                             <label for="patientName">Patient Name</label>
-                            <input readonly type="text" class="form-control" id="patientName" name="patientName" value="<?php echo $patient_name; ?>">
+                            <input readonly type="text" class="form-control" id="patient_name" name="patient_name" value="<?php echo $patient_name; ?>">
+                        </div>
+                        <div class="form-group">
+                            <label for="doctorName">Doctor ID</label>
+                            <input readonly type="text" class="form-control" id="doctor_id" name="doctor_id" value="<?php echo $doctor_id ?>">
                         </div>
                         <div class="form-group">
                             <label for="doctorName">Doctor Name</label>
-                            <input readonly type="text" class="form-control" id="doctorName" name="doctorName" value="<?php echo $doctor_name ?>">
+                            <input readonly type="text" class="form-control" id="doctor_name" name="doctor_name" value="<?php echo $doctor_name ?>">
                         </div>
 
                         <?php
-
 
                         $stmt->close();
                         ?>

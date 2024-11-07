@@ -45,7 +45,7 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
 
             // Execute the statement
             if ($stmt->execute()) {
-                $successmsg = "New record created successfully";
+                header("Location: ./view all patient.php?message= New Patient added successfully!&message_type=success");
             } else {
                 $successmsg = "Error executing statement: " . $stmt->error;
             }
@@ -96,6 +96,137 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
 
 <body id="page-top">
     <style>
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .custom-btn {
+            border-radius: 10px;
+            color: #161D6F;
+            padding: 6px 15px;
+            background-color: #D2E0FB;
+            font-size: 16px;
+            outline: none;
+            cursor: pointer;
+            margin: 0px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .custom-btn:hover,
+        .custom-btn:focus {
+            background-color: #2C57DD;
+            /* Darker blue for hover/focus */
+            color: #FFF;
+        }
+
+        input[type="radio"] {
+            display: none;
+            /* Hide the radio button itself */
+        }
+
+        input[type="radio"]:checked+label {
+            background-color: #0056b3;
+            /* Darker blue to indicate selection */
+            color: #FFF;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        #specialization {
+            width: 90%;
+        }
+
+        .gender-buttons {
+            background-color: #D2E0FB;
+            border-radius: 8px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-photo {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            margin-top: 10px;
+            margin-right: 20px;
+        }
+
+        .upload-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #161D6F;
+            margin-left: 20px;
+        }
+
+
+
+        .upload-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+        }
+
+        .upload-icon i {
+            font-size: 17px;
+            color: #2C57DD;
+        }
+
+        /* Hover effect */
+        .upload-label:hover {
+            color: #2C57DD;
+        }
+
+        .upload-label:hover .upload-icon {
+            background-color: #D2E0FB;
+        }
+
+        .upload-label span {
+            font-size: 15px;
+        }
+
+        .rounded-circle {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        #selectedImage {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .container {
+            background-color: #EEF7FF;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(44, 87, 221, 0.2);
+            width: 1000px;
+            margin-bottom: 30px;
+        }
+
+        .row {
+            color: #2C57DD;
+        }
+
+        .form-control {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-select {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
         .mini-photo {
             width: 45px;
             /* set the width */
@@ -271,58 +402,76 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
                 <div class="container-fluid">
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-center mb-4">
-                        <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
-                            Add New Patient
+                        <h1 class="h2 mb-0 text-gray-900 font-weight-bolder">
+                            Insert New Patient
                         </h1>
-
                     </div>
-
+                    <h4 class="d-sm-flex align-items-center justify-content-center mb-4">
+                        Fill in the details below.
+                    </h4>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                 <tbody>
                                     <div class="container contact-form">
                                         <form method="post" action="./patient form.php" enctype="multipart/form-data">
-                                            <h3>Patient Information</h3>
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
+                                                        <label for="">Full Name</label>
                                                         <input type="text" name="txtName" class="form-control" placeholder="Patient Name" required />
                                                     </div>
                                                     <div class="form-group">
+                                                        <label for="">IC Number</label>
                                                         <input type="text" id="icInput" name="ic_num" class="form-control" placeholder="IC Number" maxlength="14" required />
                                                     </div>
                                                     <div class="form-group">
+                                                        <label for="">Address</label>
                                                         <input type="text" name="add" class="form-control" placeholder="Address" required />
                                                     </div>
                                                     <div class="form-group">
+                                                        <label for="">Email Address</label>
                                                         <input type="email" name="email" class="form-control" placeholder="Email" required />
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label for="">Gender</label><br>
-                                                        <input type="radio" name="sex" value="Male" required> Male
-                                                        <br>
-                                                        <input type="radio" name="sex" value="Female"> Female
+                                                    <div class="upload-photo">
+                                                        <div class="mb-4 d-flex justify-content-center" ;>
+                                                            <img id="selectedImage" src="https://mdbootstrap.com/img/Photos/Others/placeholder.jpg"
+                                                                alt="example placeholder" class="rounded-circle" />
+
+                                                            <input type="file" name="image" id="image" onchange="displaySelectedImage(event, 'selectedImage')" hidden>
+                                                            <label for="image" class="upload-label">
+                                                                <div class="upload-icon">
+                                                                    <i class="fa fa-camera"></i> <!-- Camera icon -->
+                                                                </div><br>
+                                                                <span style="color: #2C57DD;">Upload a photo</span>
+                                                            </label>
+                                                        </div>
                                                     </div>
                                                 </div>
 
                                                 <div class="col-md-6">
                                                     <div class="form-group">
+                                                        <label for="">Contact Number</label>
                                                         <input type="text" name="txtNum" class="form-control" placeholder="Contact number" />
                                                     </div>
                                                     <div class="form-group">
+                                                        <label for="">Emergency Contact</label>
                                                         <input type="text" name="emerCont" class="form-control" placeholder="Emergency Contact" required />
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="">Date of Birthday</label>
                                                         <input type="date" name="dob" class="form-control" placeholder="Date of Birth" required />
                                                     </div>
-                                                    <label for="imageUpload">Profile Images</label>
-                                                    <div class="file-upload">
-                                                        <input type="file" name="image" required>
+                                                    <div class="form-group">
+                                                        <label>Gender:</label><br>
+                                                        <div class="gender-buttons">
+                                                            <input type="radio" id="genderMale" name="sex" value="Male" hidden />
+                                                            <label for="genderMale" class="btn custom-btn">Male</label>
+
+                                                            <input type="radio" id="genderFemale" name="sex" value="Female" hidden />
+                                                            <label for="genderFemale" class="btn custom-btn">Female</label>
+                                                        </div>
                                                     </div>
-
-
                                                 </div>
                                             </div>
 
@@ -438,6 +587,22 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
             }
             e.target.value = icNumber;
         });
+    </script>
+    <script>
+        function displaySelectedImage(event, elementId) {
+            const selectedImage = document.getElementById(elementId);
+            const fileInput = event.target;
+
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    selectedImage.src = e.target.result;
+                };
+
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
     </script>
 
 

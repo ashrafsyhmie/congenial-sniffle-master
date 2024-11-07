@@ -114,20 +114,20 @@ $admin_name = $_SESSION['admin_name'];
                     <span>Home</span></a>
             </li>
 
-            <li class="nav-item  ml-1">
-                <a class="nav-link" href="../manage doctor/view all doctors.php ">
+            <li class="nav-item ml-1">
+                <a class="nav-link" href="../manage doctor/view all doctors.php">
                     <i class="fa-solid fa-stethoscope"></i>
                     <span>View All Doctors</span></a>
             </li>
 
-            <li class="nav-item active ml-1">
-                <a class="nav-link" href="./view all patient.php">
+            <li class="nav-item ml-1">
+                <a class="nav-link" href="../manage patient/view all patient.php ">
                     <i class="fa-regular fa-user"></i>
                     <span>View All Patients</span></a>
             </li>
 
-            <li class="nav-item ml-1">
-                <a class="nav-link" href="../manage appointment/view all appointment.php">
+            <li class="nav-item active ml-1">
+                <a class="nav-link" href="./view all appointment.php">
                     <i class="fa-solid fa-bookmark"></i>
                     <span>View All Appointment</span></a>
             </li>
@@ -262,14 +262,15 @@ $admin_name = $_SESSION['admin_name'];
                         echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
                         echo '</div>';
                     }
-
+                    ?>
+                    <?php
                     // Database connection
                     require_once "../../db conn.php";
                     // Fetch the patient ID from the URL
-                    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+                    $appointment_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-                    // SQL Query to fetch the specific patient's data using the patient ID
-                    $sql = "SELECT * FROM patient WHERE patient_id = $id";
+                    // SQL Query to fetch the specific appointment's data using the appointment ID
+                    $sql = "SELECT * FROM appointment WHERE appointment_id = $appointment_id";
                     $result = $conn->query($sql);
 
                     // Check if the query was successful
@@ -277,12 +278,51 @@ $admin_name = $_SESSION['admin_name'];
                         die("Error executing query: " . $conn->error);
                     }
 
-                    // Fetch the specific patient data
+                    // Fetch the specific appointment data
                     if ($result->num_rows > 0) {
-                        $patient = $result->fetch_assoc();
+                        $appointment = $result->fetch_assoc();
                     } else {
-                        $patient = null;
+                        $appointment = null;
                     }
+
+                    // Fetch patient data if appointment exists
+                    if ($appointment) {
+                        $patient_id = $appointment['patient_id'];
+                        $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
+                        $result = $conn->query($sql);
+
+                        // Check if the query was successful
+                        if ($result === false) {
+                            die("Error executing query: " . $conn->error);
+                        }
+
+                        // Fetch the specific patient data
+                        if ($result->num_rows > 0) {
+                            $patient = $result->fetch_assoc();
+                        } else {
+                            $patient = null;
+                        }
+                    }
+
+                    // Fetch doctor data if appointment exists
+                    if ($appointment) {
+                        $doctor_id = $appointment['doctor_id'];
+                        $sql = "SELECT * FROM doctor WHERE doctor_id = $doctor_id";
+                        $result = $conn->query($sql);
+
+                        // Check if the query was successful
+                        if ($result === false) {
+                            die("Error executing query: " . $conn->error);
+                        }
+
+                        // Fetch the specific doctor data
+                        if ($result->num_rows > 0) {
+                            $doctor = $result->fetch_assoc();
+                        } else {
+                            $doctor = null;
+                        }
+                    }
+
                     ?>
 
                     <!-- Display Patient Profile -->
@@ -359,146 +399,76 @@ $admin_name = $_SESSION['admin_name'];
                         </div>
                     </div>
 
-                    <!-- Display Patient appointment -->
+                    <!-- Display Doctor Profile -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
                             <h6 class="m-0 font-weight-bold text-primary">
-                                All Appointments </h6>
+                                Doctor Profile
+                            </h6>
                         </div>
 
                         <div class="card-body">
-
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr class="text-center">
-                                            <th>Dr. Photo</th>
-                                            <th>Name</th>
-                                            <th>Date</th>
-                                            <th>Appointment Action</th>
-                                            <th>Medical Record Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-                                        $patient_id = $_GET['id'];
-
-                                        $sql = "SELECT appointment.*, patient.patient_name, doctor.doctor_name, doctor.doctor_photo, medical_record.medical_record_id 
-                                        FROM appointment 
-                                        JOIN patient ON appointment.patient_id = patient.patient_id 
-                                        JOIN doctor ON appointment.doctor_id = doctor.doctor_id
-                                        LEFT JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id
-                                        WHERE appointment.patient_id = $patient_id";
-
-                                        $result = mysqli_query($conn, $sql);
-
-                                        while ($row = mysqli_fetch_assoc($result)) {
-                                            $appointment_id = $row['appointment_id'];
-
-                                            // Display appointment data
-                                            echo "<tr class='text-center'>";
-
-                                            echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class="patient-photo"></td>';
-                                            echo "<td>" . $row['doctor_name'] . "</td>";
-                                            echo "<td class='text-center'>" . $row['date'] . '<br>' . $row['timeslot'] . '<br><br>';
-
-                                            // Appointment status
-                                            if ($row['status'] == 'done') {
-                                                echo '<span class="status-done">Done</span></td>';
-                                                echo '<td class="text-center">Appointment ID: ' . $row['appointment_id'] . '</td>';
-                                            } elseif ($row['status'] == 'cancelled') {
-                                                echo "<span class='status-canceled'>Cancelled</span></td><td></td>";
-                                            } elseif ($row['status'] == 'upcoming') {
-                                                echo "<span class='status-upcoming'>Upcoming</span></td>";
-                                                echo '<td class="text-center"><a href="#" class="btn btn-info btn-sm" style="width: 95px;" data-toggle="modal"data-target="#rescheduleAppModal<?php echo $appointment_id; ?>">
-                                                    <i class="fa-regular fa-calendar"></i><br>Reschedule
-                                                </a>
-                                                <!-- Each appointment has its own Cancel button and modal -->
-                                                <a href="#" class="btn btn-danger btn-sm" style="width: 90px;" data-toggle="modal" data-target="#cancelAppModal<?php echo $appointment_id; ?>">
-                                                    <i class="fa-solid fa-trash"></i><br>Cancel
-                                                </a>
-                                                <p></p>
-                                                <p>Appointment Record ID: ' . $row['appointment_id'] . ' </p>
-                                            </td>';
-                                            }
-
-                                            // Appointment action buttons
-
-
-                                            if (isset($row['medical_record_id'])) {
-                                                // Medical record action buttons
-                                                echo "<td class='text-center'><a href='../medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' style = 'width: 80px;' class='btn btn-success btn-sm mr-3'> 
-                                                      <i class='fa fa-edit'></i><br>Edit</a>";
-                                                echo "<a href='../medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' style = 'width: 80px;' class='btn btn-primary btn-sm'><i class='fa-solid fa-eye'></i><br>View</a><p></p> Medical Record ID: " . $row['medical_record_id'] . "</td>";
-                                            } elseif ($row['status'] == 'done') {
-                                                echo "<td class='text-center'><a style = 'width: 100px;' href='../medical record/medical history form.php?appointment_id=" . $row['appointment_id'] . "' style = 'width: 100px;' class='btn btn-primary btn-sm mr-3'> 
-                                                <i class='fa fa-plus mr-1'></i></br>Add</a></td>";
-                                            } else {
-                                                echo "<td class='text-center' width=20%>No medical record</td>";
-                                            }
-                                            echo "</tr>";
-                                        }
-                                        ?>
-
-
-                                        <!-- Cancel Modal for each appointment -->
-                                        <div class="modal fade" id="cancelAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Do You Want to Cancel Appointment?</h5>
-                                                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">×</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        Select "Yes" below if you want to cancel this appointment.
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
-                                                        <!-- Form with appointment_id -->
-                                                        <form action="../manage appointment/cancel appointment.php" method="POST">
-                                                            <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
-                                                            <button type="submit" class="btn btn-primary">Yes</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
+                            <table class="table table-striped table-border-0" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30%;">Doctor Photo</th>
+                                        <th style="width: 30%;">Information</th>
+                                        <th style="width: 30%;">Address & Contact</th>
+                                        <th style="width: 25%;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <!-- First Column: Patient Photo -->
+                                        <td>
+                                            <div class="form-group">
+                                                <img src="data:image/jpeg;base64,<?php echo base64_encode($doctor['doctor_photo']); ?>" alt="doctor photo" class="patient-photo" style="max-width: 100%; height: auto;">
                                             </div>
-                                        </div>
+                                        </td>
 
-                                        <!-- Reschedule modal -->
-                                        <div class="modal fade" id="rescheduleAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Reschedule Appointment</h5>
-                                                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">×</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        Do you want to reschedule this appointment?
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                                        <!-- Reschedule form -->
-                                                        <form action="../manage appointment/reschedule handler/calendar.php" method="GET">
-                                                            <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
-                                                            <button type="submit" class="btn btn-primary">Yes</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
+                                        <!-- Second Column: Basic Information -->
+                                        <td>
+                                            <div class="form-group">
+                                                <div>Name: <?php echo htmlspecialchars($doctor['doctor_name']); ?></div>
                                             </div>
-                                        </div>
+                                            <div class="form-group">
+                                                <div>IC: <?php echo htmlspecialchars($doctor['ic number']); ?></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div>Gender: <?php echo htmlspecialchars($doctor['gender']); ?></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div>Date of Birth: <?php echo htmlspecialchars($doctor['d_o_b']); ?></div>
+                                            </div>
+                                        </td>
 
+                                        <!-- Third Column: Address and Contact Information -->
+                                        <td>
+                                            <div class="form-group">
+                                                <div>Address: <?php echo htmlspecialchars($doctor['address']); ?></div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div>Contact Number: <?php echo htmlspecialchars($doctor['phone number']); ?></div>
+                                            </div>
 
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </td>
 
+                                        <!-- Fourth Column: Edit Button -->
+                                        <td>
+                                            <div class="form-group">
+                                                <a href="../manage doctor/edit doc.php?id=<?php echo htmlspecialchars($doctor['doctor_id']); ?>" class="btn btn-success btn-sm">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a href="../manage doctor/send email doc.php?id=<?php echo htmlspecialchars($doctor['doctor_id']); ?>" class="btn btn-primary btn-sm">
+                                                    <i class="fa-regular fa-envelope"></i>
+                                                </a>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
-
-
                     </div>
 
                     <!-- Close the connection -->
@@ -508,17 +478,17 @@ $admin_name = $_SESSION['admin_name'];
 
                 <div class="d-flex justify-content-center">
                     <div class="mr-2">
-                        <a href="view all patient.php">
+                        <a href="./view all appointment.php">
                             <button type="button" class="btn btn-primary mb-2">
                                 <i class="fa-solid fa-chevron-left mr-1"></i> Back
                             </button>
-                        </a>
+                        </a>;
 
 
                     </div>
                 </div>
-
-                <!-- End of Main Content -->
+                <
+                    <!-- End of Main Content -->
 
             </div>
             <!-- End of Content Wrapper -->

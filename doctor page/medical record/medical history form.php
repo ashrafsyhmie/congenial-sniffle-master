@@ -3,8 +3,8 @@
 require_once('../../db conn.php');
 session_start();
 
-$admin_id = $_SESSION['admin_id'];
-$admin_name = $_SESSION['admin_name'];
+$doctor_id = $_SESSION['doctor_id'];
+$doctor_name = $_SESSION['doctor_name'];
 
 $appointment_id = $_GET['appointment_id'];
 
@@ -139,7 +139,7 @@ if (!empty($appointment)) {
                 <div class="row align-items-center">
                     <div class="col-md-4">
                         <a
-                            href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>"
+                            href="../patient profile.php?id=<?php echo $patient_id ?>"
                             class="btn btn-light previous-btn">&#8249;</a>
 
 
@@ -485,7 +485,7 @@ if (!empty($appointment)) {
             </div>
 
             <div class="container text-center">
-                <a href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>">
+                <a href="../patient profile.php?id=<?php echo $patient_id ?>">
                     <button class="btn btn-primary previous-btn">Back</button>
                 </a>
                 <button type="submit" name="submit" class="btn btn-primary">Submit</button>

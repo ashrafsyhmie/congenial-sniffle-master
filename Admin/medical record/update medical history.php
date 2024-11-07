@@ -47,8 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $update_stmt->bind_param("sssss", $purpose, $dosage, $frequency, $medical_record_id, $medication_name);
 
                 if ($update_stmt->execute()) {
-                    echo "Updated medication: $medication_name<br>";
-                    $messages[] = "Updated medication: $medication_name";
+                    // echo "Updated medication: $medication_name<br>";
+                    // $messages[] = "Updated medication: $medication_name";
                 } else {
                     echo "Failed to update medication: $medication_name. Error: " . $update_stmt->error . "<br>";
                     $messages[] = "Failed to update medication: $medication_name. Error: " . $update_stmt->error;
@@ -62,8 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $insert_stmt->bind_param("issss", $medical_record_id, $medication_name, $purpose, $dosage, $frequency);
 
                 if ($insert_stmt->execute()) {
-                    echo "Inserted new medication: $medication_name<br>";
-                    $messages[] = "Insert New medication: $medication_name";
+                    // echo "Inserted new medication: $medication_name<br>";
+                    // $messages[] = "Insert New medication: $medication_name";
                 } else {
                     echo "Failed to insert medication: $medication_name. Error: " . $insert_stmt->error . "<br>";
                     $messages[] = "Failed to insert medication: $medication_name. Error: " . $update_stmt->error;
@@ -74,8 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $check_stmt->close();
         }
-    } else {
-        echo "No medication data found.<br>";
     }
 
 
@@ -102,8 +100,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("ssss", $smoking, $alcohol, $allergies, $patient_id);
 
         if ($stmt->execute()) {
-            echo "Patient lifestyle updated successfully!<br>"; // Echo success message
-            $messages[] = "Patient lifestyle updated successfully!";
+            // echo "Patient lifestyle updated successfully!<br>"; // Echo success message
+            // $messages[] = "Patient lifestyle updated successfully!";
         } else {
             echo "Failed to update patient lifestyle: $patient_id. Error: " . $stmt->error . "<br>";
             $messages[] = "Failed to update patient lifestyle: $patient_id. Error: " . $stmt->error;
@@ -130,8 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("sssss", $temperature, $blood_pressure, $heart_rate, $respiratory_rate, $medical_record_id);
 
         if ($stmt->execute()) {
-            echo "Physical exam updated successfully!<br>"; // Echo success message
-            $messages[] = "Physical exam updated successfully!";
+            // echo "Physical exam updated successfully!<br>"; // Echo success message
+            // $messages[] = "Physical exam updated successfully!";
         } else {
             echo "Failed to update physical exam. Error: " . $stmt->error . "<br>";
             $messages[] = "Failed to update physical exam. Error: " . $stmt->error;
@@ -170,8 +168,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if ($stmt) {
                     $stmt->bind_param("ssis", $diagnosis_purpose, $diagnosis_result, $medical_record_id, $procedure_name);
                     if ($stmt->execute()) {
-                        echo "Diagnosis updated successfully for procedure: $procedure_name!<br>";
-                        $messages[] = "Diagnosis updated successfully for procedure: $procedure_name!";
+                        // echo "Diagnosis updated successfully for procedure: $procedure_name!<br>";
+                        // $messages[] = "Diagnosis updated successfully for procedure: $procedure_name!";
                     } else {
                         echo "Failed to update diagnosis: $procedure_name. Error: " . $stmt->error . "<br>";
                         $messages[] = "Failed to update diagnosis: $procedure_name. Error: " . $stmt->error;
@@ -188,8 +186,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 if ($stmt) {
                     $stmt->bind_param("isss", $medical_record_id, $procedure_name, $diagnosis_purpose, $diagnosis_result);
                     if ($stmt->execute()) {
-                        echo "New diagnosis inserted successfully for procedure: $procedure_name!<br>";
-                        $messages[] = "New diagnosis inserted successfully for procedure: $procedure_name!";
+                        // echo "New diagnosis inserted successfully for procedure: $procedure_name!<br>";
+                        // $messages[] = "New diagnosis inserted successfully for procedure: $procedure_name!";
                     } else {
                         echo "Failed to insert diagnosis: $procedure_name. Error: " . $stmt->error . "<br>";
                         $messages[] = "Failed to insert diagnosis: $procedure_name. Error: " . $stmt->error;
@@ -249,8 +247,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $messages[] = "Failed to update condition: $condition_name. Error: " . $stmt_update->error;
                     $all_success = false;
                 } else {
-                    echo "Condition updated successfully: $condition_name!<br>";
-                    $messages[] = "Condition updated successfully: $condition_name!";
+                    // echo "Condition updated successfully: $condition_name!<br>";
+                    // $messages[] = "Condition updated successfully: $condition_name!";
                 }
 
                 $stmt_update->close();
@@ -272,20 +270,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $stmt_check->close();
         }
 
-        echo 'Conditions updated successfully!';
         $success_message = 'Medical history has been updated successfully!';
     }
 
-
-
-
-
-
-
-
-
     if ($all_success) {
-        echo "All records updated successfully!";
+        header("Location: ../manage patient/patient_profile.php?id=$patient_id&message=Medical Record ID $medical_record_id Updated Successfully&message_type=success");
     } else {
         echo "One or more updates failed.";
     }

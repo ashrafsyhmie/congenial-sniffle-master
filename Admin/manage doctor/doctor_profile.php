@@ -242,67 +242,69 @@ $admin_name = $_SESSION['admin_name'];
                         </div>
 
                         <div class="card-body">
-                            <table class="table table-striped table-border-0" width="100%" cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 30%;">Doctor Photo</th>
-                                        <th style="width: 30%;">Information</th>
-                                        <th style="width: 30%;">Address & Contact</th>
-                                        <th style="width: 25%;">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <!-- First Column: doctor Photo -->
-                                        <td>
-                                            <div class="form-group">
-                                                <img src="data:image/jpeg;base64,<?php echo base64_encode($doctor['doctor_photo']); ?>" alt="Doctor photo" class="doctor-photo">
-                                            </div>
-                                            <div class="form-group">
-                                                <div><?php echo htmlspecialchars($doctor['specialization']); ?></div>
-                                            </div>
-                                        </td>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-border-0" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 30%;">Doctor Photo</th>
+                                            <th style="width: 30%;">Information</th>
+                                            <th style="width: 30%;">Address & Contact</th>
+                                            <th style="width: 25%;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <!-- First Column: doctor Photo -->
+                                            <td>
+                                                <div class="form-group">
+                                                    <img src="data:image/jpeg;base64,<?php echo base64_encode($doctor['doctor_photo']); ?>" alt="Doctor photo" class="doctor-photo">
+                                                </div>
+                                                <div class="form-group">
+                                                    <div><?php echo htmlspecialchars($doctor['specialization']); ?></div>
+                                                </div>
+                                            </td>
 
-                                        <!-- Second Column: Basic Information -->
-                                        <td>
-                                            <div class="form-group">
-                                                <div>Name: <?php echo htmlspecialchars($doctor['doctor_name']); ?></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div>IC: <?php echo htmlspecialchars($doctor['ic number']); ?></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div>Gender: <?php echo htmlspecialchars($doctor['gender']); ?></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div>Date of Birth: <?php echo htmlspecialchars($doctor['d_o_b']); ?></div>
-                                            </div>
-                                        </td>
+                                            <!-- Second Column: Basic Information -->
+                                            <td>
+                                                <div class="form-group">
+                                                    <div>Name: <?php echo htmlspecialchars($doctor['doctor_name']); ?></div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div>IC: <?php echo htmlspecialchars($doctor['ic number']); ?></div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div>Gender: <?php echo htmlspecialchars($doctor['gender']); ?></div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div>Date of Birth: <?php echo htmlspecialchars($doctor['d_o_b']); ?></div>
+                                                </div>
+                                            </td>
 
-                                        <!-- Third Column: Address and Contact Information -->
-                                        <td>
-                                            <div class="form-group">
-                                                <div>Address: <?php echo htmlspecialchars($doctor['address']); ?></div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div>Contact Number: <?php echo htmlspecialchars($doctor['phone number']); ?></div>
-                                            </div>
-                                        </td>
+                                            <!-- Third Column: Address and Contact Information -->
+                                            <td>
+                                                <div class="form-group">
+                                                    <div>Address: <?php echo htmlspecialchars($doctor['address']); ?></div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div>Contact Number: <?php echo htmlspecialchars($doctor['phone number']); ?></div>
+                                                </div>
+                                            </td>
 
-                                        <!-- Fourth Column: Edit Button -->
-                                        <td>
-                                            <div class="form-group">
-                                                <a href="edit doc.php?id=<?php echo htmlspecialchars($doctor['doctor_id']); ?>" class="btn btn-success btn-sm">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>
-                                                <a href="send email doc.php?id=<?php echo htmlspecialchars($doctor['doctor_id']); ?>" class="btn btn-primary btn-sm">
-                                                    <i class="fa-regular fa-envelope"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                            <!-- Fourth Column: Edit Button -->
+                                            <td>
+                                                <div class="form-group">
+                                                    <a href="edit doc.php?id=<?php echo htmlspecialchars($doctor['doctor_id']); ?>" class="btn btn-success btn-sm">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                    <a href="send email doc.php?id=<?php echo htmlspecialchars($doctor['doctor_id']); ?>" class="btn btn-primary btn-sm">
+                                                        <i class="fa-regular fa-envelope"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -315,69 +317,72 @@ $admin_name = $_SESSION['admin_name'];
 
                         <div class="card-body">
 
-                            <table
-                                class="table table-bordered"
-                                id="dataTable"
-                                width="100%"
-                                cellspacing="0">
-                                <thead>
-                                    <tr>
-                                        <th>Appointment ID</th>
-                                        <th>Photo</th>
-                                        <th>Name</th>
-                                        <th>Date </th>
-                                        <th>Time</th>
-                                        <th>Status</th>
+                            <div class="table-responsive">
+                                <table
+                                    class="table table-bordered"
+                                    id="dataTable"
+                                    width="100%"
+                                    cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>Appointment ID</th>
+                                            <th>Photo</th>
+                                            <th>Name</th>
+                                            <th>Date </th>
+                                            <th>Time</th>
+                                            <th>Status</th>
 
 
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
 
-                                    $doctor_id = $_GET['id'];
+                                        $doctor_id = $_GET['id'];
 
-                                    $sql = "SELECT * FROM appointment 
+                                        $sql = "SELECT * FROM appointment 
                                     JOIN doctor ON appointment.doctor_id = doctor.doctor_id 
                                     WHERE doctor.doctor_id = $doctor_id";
 
-                                    //  AND status = 'upcoming'
-                                    $result = mysqli_query($conn, $sql);
+                                        //  AND status = 'upcoming'
+                                        $result = mysqli_query($conn, $sql);
 
-                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        while ($row = mysqli_fetch_assoc($result)) {
 
-                                        //   $doctor_id = $row['doctor_id'];
-                                        //   $sql2 = "SELECT * FROM `doctor` WHERE `doctor_id` = '$doctor_id'";
-                                        //   $result2 = mysqli_query($connection, $sql2);
-                                        //   $row2 = mysqli_fetch_assoc($result2);
+                                            //   $doctor_id = $row['doctor_id'];
+                                            //   $sql2 = "SELECT * FROM `doctor` WHERE `doctor_id` = '$doctor_id'";
+                                            //   $result2 = mysqli_query($connection, $sql2);
+                                            //   $row2 = mysqli_fetch_assoc($result2);
 
-                                        //   $doctor_name = $row2['doctor_name'];
+                                            //   $doctor_name = $row2['doctor_name'];
 
-                                        echo "<tr>";
-                                        echo "<td>" . $row['appointment_id'] . "</td>";
-                                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>';
+                                            echo "<tr>";
+                                            echo "<td>" . $row['appointment_id'] . "</td>";
+                                            echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>';
 
-                                        echo "<td>" . $row['doctor_name'] . "</td>";
-                                        echo "<td>" . $row['date'] . "</td>";
-                                        echo "<td>" . $row['timeslot'] .  "</td>";
+                                            echo "<td>" . $row['doctor_name'] . "</td>";
+                                            echo "<td>" . $row['date'] . "</td>";
+                                            echo "<td>" . $row['timeslot'] .  "</td>";
 
 
 
-                                        if ($row['status'] == 'done') {
-                                            echo '<td><span class="status-done">Done</span></td>';
-                                        } elseif ($row['status'] == 'cancelled') {
-                                            echo "<td><span class='status-canceled'>Cancelled</span></td>";
-                                        } elseif ($row['status'] == 'upcoming') {
-                                            echo "<td><span class='status-upcoming'>Upcoming</span></td>";
+                                            if ($row['status'] == 'done') {
+                                                echo '<td><span class="status-done">Done</span></td>';
+                                            } elseif ($row['status'] == 'cancelled') {
+                                                echo "<td><span class='status-canceled'>Cancelled</span></td>";
+                                            } elseif ($row['status'] == 'upcoming') {
+                                                echo "<td><span class='status-upcoming'>Upcoming</span></td>";
+                                            }
+                                            echo "</tr>";
                                         }
-                                        echo "</tr>";
-                                    }
 
 
 
-                                    ?>
-                                </tbody>
-                            </table>
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+
 
                         </div>
 

@@ -1,6 +1,6 @@
 <?php
 
-$password = "dLobjz@0";
+$password = "password456";
 
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 

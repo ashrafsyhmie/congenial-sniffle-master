@@ -202,7 +202,7 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
             <div class="container text-center bg-primary p-4 mb-5">
                 <div class="row align-items-center">
                     <div class="col-md-4">
-                        <a href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>" class="btn btn-light previous-btn">&#8249;</a>
+                        <a href="../patient profile.php?id=<?php echo $patient_id ?>" class="btn btn-light previous-btn">&#8249;</a>
                     </div>
                     <div class="col-md-4">
                         <h3 class="text-white">Patient Medical Record</h3>
@@ -726,7 +726,7 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
         <div class="container text-center" style="display: flex; justify-content: space-evenly; gap: 1px;">
 
             <input type="reset" value="Reset" class="btn btn-primary">
-            <a href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>" class="btn btn-primary">Back</a>
+            <a href="../patient profile.php?id=<?php echo $patient_id ?>" class="btn btn-primary">Back</a>
             <input type="submit" value="Submit" class="btn btn-primary">
 
         </div>

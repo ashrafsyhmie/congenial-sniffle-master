@@ -336,10 +336,8 @@ require_once "../../db conn.php";
                   width="100%"
                   cellspacing="0">
                   <thead>
-                    <td>Appointment ID</td>
-                    <td></td>
+                    <td>App. ID</td>
                     <td>Doctor Name</td>
-                    <td></td>
                     <td>Patient Name</td>
                     <td>Date & Time</td>
                     <td>Status</td>
@@ -360,15 +358,26 @@ require_once "../../db conn.php";
 
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['appointment_id']) . "</td>";
-                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Patient photo" class="patient-photo"></td>';
-                        echo  "<td>" . htmlspecialchars($row['doctor_name']) . "</td>";
-                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class="patient-photo"></td>';
-                        echo "<td>" . htmlspecialchars($row['patient_name']) . "<br>" . htmlspecialchars($row['ic number']) . "</td>";
+                        echo '<td class="text-center">
+        <div class="doctor-info">
+            <img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class="doctor-photo">
+            <div class="doctor-name">' . htmlspecialchars($row['doctor_name']) . '</div>
+        </div>
+      </td>';
+                        echo '<td class="text-center">
+      <div class="patient-info">
+          <img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class="patient-photo">
+          <div class="patient-details">
+              ' . htmlspecialchars($row['patient_name']) . '
+          </div>
+      </div>
+    </td>';
+
                         echo "<td>" . htmlspecialchars($row['date']) . "<br>" . htmlspecialchars($row['timeslot']) . "</td>";
                         echo '<td><span class="status-' . htmlspecialchars($row['status']) . '">' . ucfirst(htmlspecialchars($row['status'])) . '</span></td>';
 
                         echo '<td>';
-                        echo '<a href="../manage patient/patient_profile.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm"><i class="fa-solid fa-eye"></i></a> ';
+                        echo '<a href="../manage appointment/appointment list.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-primary btn-sm"><i class="fa-solid fa-eye"></i></a> ';
                         echo '<a href="delete.php?id=' . htmlspecialchars($row['patient_id']) . '" class="btn btn-danger btn-sm btn-delete" onclick="return confirm(\'Are you sure you want to delete this patient?\');">';
                         echo '<i class="fa fa-trash"></i>';
                         echo '</a>';
@@ -468,7 +477,7 @@ require_once "../../db conn.php";
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const rowsPerPage = 10; //number of row per page (kalau nak tukar kat sini tau)
+      const rowsPerPage = 5; //number of row per page (kalau nak tukar kat sini tau)
       const table = document.querySelector('#dataTable');
       const rows = table.querySelectorAll('tbody tr');
       const totalRows = rows.length;

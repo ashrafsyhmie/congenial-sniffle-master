@@ -220,6 +220,15 @@ $admin_name = $_SESSION['admin_name'];
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+          <?php
+          // Display success or error message
+          if (isset($_GET['message'])) {
+            $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+            echo '<div class="alert ' . $messageType . '">';
+            echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+            echo '</div>';
+          }
+          ?>
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
