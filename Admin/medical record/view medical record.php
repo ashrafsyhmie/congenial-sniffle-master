@@ -523,8 +523,6 @@ $condition_result = mysqli_query($conn, $sql);
                         } else {
                             echo "<tr><td colspan='4'>No medical condition data found</td></tr>";
                         }
-
-
                         ?>
                     </table>
                 </div>

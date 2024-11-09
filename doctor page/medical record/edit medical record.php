@@ -10,6 +10,8 @@ if (!isset($_GET['medical_record_id'])) {
 }
 
 
+
+
 function getMedicalRecordData($conn, $medical_record_id)
 {
     $sql = "SELECT * FROM medical_record WHERE medical_record_id=?";
@@ -57,6 +59,7 @@ if (!$DoctorRow) {
 }
 
 $doctor_name = $DoctorRow['doctor_name'];
+$mmc = $DoctorRow['mmc'];
 
 
 $patient_id = $Appointmentrow['patient_id'];
@@ -127,35 +130,15 @@ $lifestyle_result = mysqli_query($conn, $sql);
 
 //Fetch current medical condition using patient_id
 
-$conditions = [
-    'Eye Problem' => 'None',
-    'Seizure' => 'None',
-    'Epilepsy' => 'None',
-    'Hearing Problem' => 'None',
-    'Diabetes' => 'None',
-    'Cardiovascular Disease' => 'None',
-    'History of Strokes' => 'None',
-    'Respiratory Problem' => 'None',
-    'Kidney Problem' => 'None',
-    'Stomach and Liver Problem' => 'None',
-    'Pancreatic Problems' => 'None',
-    'Anxiety and Depression' => 'None',
-    'Other Mental Health Issue' => 'None',
-    'Sleep Disorder' => 'None',
-    'Neck or Back Problem' => 'None',
-];
+
 // Fetch current medical condition using medical_record_id
 $sql = "SELECT * FROM medical_conditions WHERE medical_record_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $medical_record_id);
 $stmt->execute();
-$condition_result = $stmt->get_result();
+$medical_condition_result = $stmt->get_result();
 
-if ($condition_result && mysqli_num_rows($condition_result) > 0) {
-    while ($row = mysqli_fetch_assoc($condition_result)) {
-        $conditions[$row['condition_name']] = $row['condition_status'];
-    }
-}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -202,7 +185,7 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
             <div class="container text-center bg-primary p-4 mb-5">
                 <div class="row align-items-center">
                     <div class="col-md-4">
-                        <a href="../patient profile.php?id=<?php echo $patient_id ?>" class="btn btn-light previous-btn">&#8249;</a>
+                        <a href="../appointment record.php" class="btn btn-light previous-btn">&#8249;</a>
                     </div>
                     <div class="col-md-4">
                         <h3 class="text-white">Patient Medical Record</h3>
@@ -377,12 +360,12 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
                                     <label for="smoking">Smoking History</label>
                                     <div class="form-group">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="smoking" value="No"
+                                            <input class="form-check-input" type="radio" name="smoking" value="No" required
                                                 <?php if ($row['smoking_history'] == 'No') echo 'checked'; ?> />
                                             <label class="form-check-label">No</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="smoking" value="Yes"
+                                            <input class="form-check-input" type="radio" name="smoking" value="Yes" required
                                                 <?php if ($row['smoking_history'] === 'Yes') echo 'checked'; ?> />
                                             <label class="form-check-label">Yes</label>
                                         </div>
@@ -391,12 +374,12 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
                                 <td>
                                     <label for="alcohol">Alcohol Consumption</label>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="alcohol" value="No"
+                                        <input class="form-check-input" type="radio" name="alcohol" value="No" required
                                             <?php if ($row['alcohol_consumption'] == 'No') echo 'checked'; ?> />
                                         <label class="form-check-label">No</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="alcohol" value="Yes"
+                                        <input class="form-check-input" type="radio" name="alcohol" value="Yes" required
                                             <?php if ($row['alcohol_consumption'] === 'Yes') echo 'checked'; ?> />
                                         <label class="form-check-label">Yes</label>
                                     </div>
@@ -408,14 +391,14 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
                                     <label for="allergies">Allergies History</label>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="allergies_choice" id="no" value="no"
+                                        <input class="form-check-input" type="radio" name="allergies_choice" id="no" value="no" required
                                             <?php if ($row['allergies_history'] == NULL || $row['allergies_history'] === 'No') echo 'checked'; ?>
                                             onclick="toggleAllergiesInput(false)" />
                                         <label class="form-check-label" for="no">No</label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="allergies_choice" id="yes" value="yes"
+                                        <input class="form-check-input" type="radio" name="allergies_choice" id="yes" value="yes" required
                                             <?php if ($row['allergies_history'] !== NULL && $row['allergies_history'] !== 'No') echo 'checked'; ?>
                                             onclick="toggleAllergiesInput(true)" />
                                         <label class="form-check-label" for="yes">Yes ; Specify</label>
@@ -506,151 +489,52 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
         <div class="page-break">
             <section>
                 <div class="medical-condition container mt-5">
-                    <h3>Current Medical Condition</h3>
-                    <p>Kindly indicate if you have the following medical condition:</p>
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3>Current Medical Condition</h3>
+                            <p>Kindly indicate if you have the following medical condition:</p>
+                        </div>
 
-                    <table class="table" style="background-color: #fafbfc">
+                        <div class="col-auto">
+                            <button id="addRowBtnCond" class="btn btn-primary mr-2" name="insert_new_row">+</button>
+                            <button id="removeRowBtnCond" class="btn btn-primary" name="delete_latest_row">-</button>
+                        </div>
+                    </div>
+
+                    <table id="conditionTable" class="table text-center" style="background-color: #fafbfc">
                         <tr>
                             <th>Medical Condition</th>
                             <th>None</th>
                             <th>Yes</th>
-                            <th>I'm not sure</th>
+                            <th>Unsure</th>
                         </tr>
 
                         <?php
-                        foreach ($conditions as $condition_name => $condition_status) {
-                            echo "<tr>";
-                            echo "<td>{$condition_name}</td>";
-                            echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='None' " . ($condition_status == 'None' ? 'checked' : '') . " ></td>";
-                            echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='Yes' " . ($condition_status == 'Yes' ? 'checked' : '') . " ></td>";
-                            // echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='I\'m not sure' " . ($condition_status == "I'm not sure" ? 'checked' : '') . " ></td>";
-                            echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value=\"I'm not sure\" " . ($condition_status == "I'm not sure" ? 'checked' : '') . " ></td>";
+                        if (mysqli_num_rows($medical_condition_result) > 0) {
+                            while ($row = mysqli_fetch_assoc($medical_condition_result)) {
+                                $condition_id = $row['condition_id'];
 
-                            echo "</tr>";
+                                echo "<tr>";
+                                // Editable condition name input field
+                                echo "<td><input type='text' name='condition_name[$condition_id]' value='" . htmlspecialchars($row['condition_name']) . "' class='form-control' /></td>";
+
+                                // Radio buttons for selecting condition status
+                                echo "<td><input class='form-check-input' type='radio' name='medical_condition_status[$condition_id]' value='None' " . ($row['condition_status'] == "None" ? "checked" : "") . " /></td>";
+                                echo "<td><input class='form-check-input' type='radio' name='medical_condition_status[$condition_id]' value='Yes' " . ($row['condition_status'] == "Yes" ? "checked" : "") . " /></td>";
+                                echo "<td><input class='form-check-input' type='radio' name='medical_condition_status[$condition_id]' value='Unsure' " . ($row['condition_status'] == "Unsure" ? "checked" : "") . " /></td>";
+
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='4'>No medical condition data found</td></tr>";
                         }
                         ?>
                     </table>
                 </div>
             </section>
-
-            <!-- <section>
-                <div class="medical-condition container mt-5">
-                    <h3>Current Medical Condition</h3>
-                    <p>Kindly indicate if you have the following medical condition:</p>
-
-                    <table class="table" style="background-color: #fafbfc">
-                        <tr>
-                            <th>Medical Condition</th>
-                            <th class="text-center">None</th>
-                            <th class="text-center">Yes</th>
-                            <th class="text-center">Im not sure</th>
-                        </tr>
-                        <tr>
-                            <td>Eye Problem</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="eye-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="eye-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="eye-problem" /></td>
-                        </tr>
-                        <tr>
-                            <td>Seizure</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="seizure" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="seizure" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="seizure" /></td>
-                        </tr>
-                        <tr>
-                            <td>Epilepsy</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="epilepsy" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="epilepsy" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="epilepsy" /></td>
-                        </tr>
-                        <tr>
-                            <td>Hearing Problem</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="hearing-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="hearing-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="hearing-problem" /></td>
-                        </tr>
-                        <tr>
-                            <td>Diabetes</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="diabetes" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="diabetes" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="diabetes" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Cardiovascular Disease</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="cardiovascular-disease" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="cardiovascular-disease" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="cardiovascular-disease" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>History of Strokes</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="strokes" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="strokes" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="strokes" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Respiratory Problem</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="respiratory-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="respiratory-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="respiratory-problem" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Kidney Problem</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="kidney-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="kidney-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="kidney-problem" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Stomach and Liver Problem</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="stomach-liver-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="stomach-liver-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="stomach-liver-problem" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Pancreatic Problems</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="pancreatic-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="pancreatic-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="pancreatic-problem" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Anxiety and Depression</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="anxiety-depression" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="anxiety-depression" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="anxiety-depression" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Other Mental Health Issue</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="other-mental-health" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="other-mental-health" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="other-mental-health" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Sleep Disorder</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="sleep-disorder" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="sleep-disorder" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="sleep-disorder" /></td>
-
-                        </tr>
-                        <tr>
-                            <td>Neck or Back Problem</td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="neck-back-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="neck-back-problem" /></td>
-                            <td class="text-center"><input class="form-check-input" type="radio" name="neck-back-problem" /></td>
-
-                        </tr>
-                        <tr></tr>
-                    </table>
-                </div>
-            </section> -->
         </div>
+
+
 
         <!-- Diagnosis -->
         <div class="page-break">
@@ -708,8 +592,8 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
                                 <input type="doctor name" class="form-control" disabled value="<?php echo $doctor_name ?>">
                             </td>
                             <td>
-                                <p>Doctor Signature</p>
-                                <input type="doctor sign" class="form-control" readonly>
+                                <p>Registration Number</p>
+                                <input type="doctor name" class="form-control" disabled value="<?php echo $mmc ?>">
                             </td>
                         </tr>
                         <tr>
@@ -725,9 +609,9 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
 
         <div class="container text-center" style="display: flex; justify-content: space-evenly; gap: 1px;">
 
-            <input type="reset" value="Reset" class="btn btn-primary">
-            <a href="../patient profile.php?id=<?php echo $patient_id ?>" class="btn btn-primary">Back</a>
-            <input type="submit" value="Submit" class="btn btn-primary">
+            <input type="reset" value="Reset" class="btn btn-danger">
+            <a href="../appointment record.php" class="btn btn-primary">Back</a>
+            <input type="submit" value="Submit" class="btn btn-success">
 
         </div>
 
@@ -835,6 +719,31 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
                 }
             ]);
 
+
+            addEventListeners('#addRowBtnCond', '#removeRowBtnCond', '#conditionTable', [{
+                    name: 'medical_condition',
+                    placeholder: 'Medical Condition'
+                },
+                {
+                    name: 'medical_condition_status[]',
+                    value: 'no',
+                    placeholder: 'No',
+                    type: 'radio'
+                },
+                {
+                    name: 'medical_condition_status[]',
+                    value: 'unsure',
+                    placeholder: 'Unsure',
+                    type: 'radio'
+                },
+                {
+                    name: 'medical_condition_status[]',
+                    value: 'yes',
+                    placeholder: 'Yes',
+                    type: 'radio'
+                }
+            ]);
+
             addEventListeners('#addRowBtnDiagnosis', '#removeRowBtnDiagnosis', '#diagnosisTable', [{
                     name: 'procedure_name',
                     placeholder: 'Procedure Name'
@@ -864,8 +773,22 @@ if ($condition_result && mysqli_num_rows($condition_result) > 0) {
 
         function addRow(tableSelector, columns) {
             let markup = "<tr>";
-            columns.forEach((column, index) => {
-                markup += `<td><input type='text' name='${column.name}[]' class='form-control' placeholder='${column.placeholder}' /></td>`;
+            let rowIndex = $(tableSelector + ' tbody tr').length + 1;
+            columns.forEach((column) => {
+                if (column.type === 'radio') {
+                    // For radio buttons, generate a group of radio buttons with unique names per row
+                    markup += `
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="condition_${rowIndex}_${column.name}" value="${column.placeholder.toLowerCase()}" id="${column.name + rowIndex}" />
+                           
+                        </div>
+                    </td>
+                `;
+                } else {
+                    // For text input fields
+                    markup += `<td><input type="text" name="${column.name}[]" class="form-control" placeholder="${column.placeholder}" /></td>`;
+                }
             });
             markup += "</tr>";
             $(tableSelector + ' tbody').append(markup);

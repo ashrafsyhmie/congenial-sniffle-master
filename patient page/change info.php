@@ -370,8 +370,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       </div>
 
                       <div class="form-group">
-                        <label for="ic_number">IC Number</label>
-                        <input type="text" class="form-control" id="ic_number" name="ic_number" value="<?php echo htmlspecialchars($ic_number); ?>" required>
+                        <label for="">IC Number</label>
+                        <input type="text" id="icInput" name="ic_num" class="form-control" placeholder="IC Number" maxlength="14" value="<?php echo htmlspecialchars($ic_number); ?>" required />
                       </div>
 
                       <div class="form-group">
@@ -394,12 +394,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                       <div class="form-group">
                         <label for="phone_number">Phone Number</label>
-                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required>
+                        <input type="text" class="form-control" id="number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" maxlength="13" required>
                       </div>
 
                       <div class="form-group">
                         <label for="emergency">Emergency Contact</label>
-                        <input type="text" class="form-control" id="emergency" name="emergency" value="<?php echo htmlspecialchars($emergency); ?>" required>
+                        <input type="text" class="form-control" id="emergency" name="emergency" value="<?php echo htmlspecialchars($emergency); ?>" maxlength="13" required>
                       </div>
 
                       <div class="form-group">
@@ -481,6 +481,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <!-- Page level custom scripts -->
   <script src="../js/demo/chart-area-demo.js"></script>
   <script src="../js/demo/chart-pie-demo.js"></script>
+
+  <script>
+    document.getElementById('icInput').addEventListener('input', function(e) {
+      let icNumber = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+      if (icNumber.length > 6) {
+        icNumber = icNumber.slice(0, 6) + '-' + icNumber.slice(6);
+      }
+      if (icNumber.length > 9) {
+        icNumber = icNumber.slice(0, 9) + '-' + icNumber.slice(9);
+      }
+      e.target.value = icNumber; // Update the input field with the formatted value
+    });
+  </script>
+  <script>
+    document.getElementById('number').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+      // Insert hyphens at the correct positions
+      if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+      if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+      e.target.value = value;
+    });
+    document.getElementById('emergency').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+      // Insert hyphens at the correct positions
+      if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+      if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+      e.target.value = value;
+    });
+  </script>
 </body>
 
 </html>

@@ -368,6 +368,15 @@ foreach ($allDoctorAppointments as $appointment) {
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+          <?php
+          // Display success or error message
+          if (isset($_GET['message'])) {
+            $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+            echo '<div class="alert ' . $messageType . '">';
+            echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+            echo '</div>';
+          }
+          ?>
           <!-- Page Heading -->
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
@@ -377,63 +386,107 @@ foreach ($allDoctorAppointments as $appointment) {
 
           <!-- All Appointment table -->
           <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">
-                Appointment Record
-              </h6>
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+              <h6 class="m-0 font-weight-bold text-primary">Appointment Record</h6>
+              <div class="filter-form">
+                <form method="GET" action="" class="form-inline">
+                  <label for="filter" class="mr-2">Show:</label>
+                  <select name="filter" id="filter" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
+                    <option value="all" <?php if (isset($_GET['filter']) && $_GET['filter'] == 'all') echo 'selected'; ?>>All</option>
+                    <option value="upcoming" <?php if (isset($_GET['filter']) && $_GET['filter'] == 'upcoming') echo 'selected'; ?>>Upcoming</option>
+                    <option value="done" <?php if (isset($_GET['filter']) && $_GET['filter'] == 'done') echo 'selected'; ?>>Done</option>
+                    <option value="cancelled" <?php if (isset($_GET['filter']) && $_GET['filter'] == 'cancelled') echo 'selected'; ?>>Cancelled</option>
+                  </select>
+                  <noscript><button type="submit" class="btn btn-primary btn-sm">Apply</button></noscript>
+                </form>
+              </div>
             </div>
 
             <div class="card-body">
               <div class="table-responsive">
-                <table
-                  class="table table-striped table-border-0"
-                  id="dataTable"
-                  width="100%"
-                  cellspacing="0">
+                <table class="table table-striped table-border-0 text-center" id="dataTable" width="100%" cellspacing="0">
                   <thead>
-                    <td>Appointment ID</td>
-                    <td></td>
-                    <td>Patient Name</td>
-                    <td>Date</td>
-                    <td>Time</td>
-                    <td>Status</td>
-
+                    <tr>
+                      <td>App. ID</td>
+                      <td></td>
+                      <td>Patient Name</td>
+                      <td>Date</td>
+                      <td>Time</td>
+                      <td>Medical Record Action</td>
+                    </tr>
                   </thead>
-
                   <tbody>
                     <?php
+                    // Get the filter selection (default to 'all' if not set)
+                    $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 
-                    $sql = "SELECT * FROM appointment WHERE doctor_id = $doctor_id";
-                    //  AND status = 'upcoming'
+                    // Prepare the SQL query with the filter applied
+                    $sql = "SELECT *
+                        FROM appointment 
+                        JOIN patient ON appointment.patient_id = patient.patient_id 
+                        JOIN doctor ON appointment.doctor_id = doctor.doctor_id 
+                        JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id";
+
+                    // Apply the filter to the SQL query
+                    if ($filter == 'upcoming') {
+                      $sql .= " WHERE appointment.status = 'upcoming'";
+                    } elseif ($filter == 'done') {
+                      $sql .= " WHERE appointment.status = 'done'";
+                    } elseif ($filter == 'cancelled') {
+                      $sql .= " WHERE appointment.status = 'cancelled'";
+                    }
+
+                    $sql .= " ORDER BY appointment.appointment_id ASC";
                     $result = mysqli_query($conn, $sql);
 
                     while ($row = mysqli_fetch_assoc($result)) {
-                      echo "<tr>";
-                      echo "<td>" . $row['appointment_id'] . "</td>";
-                      echo '<td><img src="data:image/jpeg;base64,' . base64_encode($appointment['patient_photo']) . '" alt="Doctor photo" class = "photo"></td>';
+                    ?>
+                      <tr>
+                        <td><?= htmlspecialchars($row['appointment_id']); ?></td>
+                        <td><img src="data:image/jpeg;base64,<?= base64_encode($row['patient_photo']); ?>" alt="Patient photo" class="photo"></td>
+                        <td><?= htmlspecialchars($row['patient_name']); ?></td>
+                        <td><?= htmlspecialchars($row['date']); ?></td>
+                        <td><?= htmlspecialchars($row['timeslot']) . "<br><br>";
+                            if ($row['status'] == 'done') {
+                              echo '<span class="status-done">Done</span>';
+                            } elseif ($row['status'] == 'cancelled') {
+                              echo "<span class='status-canceled'>Cancelled</span>";
+                            } elseif ($row['status'] == 'upcoming') {
+                              echo "<span class='status-upcoming'>Upcoming</span>";
+                            } ?></td>
+                        <td>
+                          <?php if ($row['status'] == 'done' && isset($row['medical_record_id'])): ?>
+                            <!-- Show Edit and View buttons if there's a medical record ID -->
+                            <a href="./medical record/edit medical record.php?medical_record_id=<?= $row['medical_record_id']; ?>" class="btn btn-success btn-md mr-3">
+                              <i class="fa fa-edit"></i>
+                            </a>
+                            <a href="./medical record/view medical record.php?medical_record_id=<?= $row['medical_record_id']; ?>" class="btn btn-primary btn-md">
+                              <i class="fa-solid fa-eye"></i>
+                            </a><br><br> Medical Record ID: <?= htmlspecialchars($row['medical_record_id']); ?>
 
-                      echo "<td>" . $appointment['patient_name'] . "</td>";
-                      echo "<td>" . $row['date'] . "</td>";
-                      echo "<td>" . $row['timeslot'] .  "</td>";
+                          <?php elseif ($row['status'] == 'done' && !isset($row['medical_record_id'])): ?>
+                            <!-- Show Add button if status is done but no medical record ID -->
+                            <a href="./medical record/medical history form.php?appointment_id=<?= $row['appointment_id']; ?>" class="btn btn-primary btn-md">
+                              <i class="fa fa-plus mr-1"></i> Add Record
+                            </a>
 
-                      if ($row['status'] == 'done') {
-                        echo '<td><span class="status-done">Done</span></td>';
-                      } elseif ($row['status'] == 'cancelled') {
-                        echo "<td><span class='status-canceled'>Cancelled</span></td>";
-                      } elseif ($row['status'] == 'upcoming') {
-                        echo "<td><span class='status-upcoming'>Upcoming</span></td>";
-                      }
-                      echo "</tr>";
+                          <?php else: ?>
+                            <!-- Show 'No medical record' if status is not 'done' -->
+                            No medical record
+                          <?php endif; ?>
+                        </td>
+
+                      </tr>
+                    <?php
                     }
-
-
-
                     ?>
                   </tbody>
                 </table>
               </div>
             </div>
+
           </div>
+
         </div>
 
         <!-- Pagination Controls -->

@@ -482,12 +482,12 @@ $admin_name = $_SESSION['admin_name'];
                             <button type="button" class="btn btn-primary mb-2">
                                 <i class="fa-solid fa-chevron-left mr-1"></i> Back
                             </button>
-                        </a>;
+                        </a>
 
 
                     </div>
                 </div>
-                <
+                
                     <!-- End of Main Content -->
 
             </div>

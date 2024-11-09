@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sql = "UPDATE doctor SET doctor_name=?, `ic number`=?, address=?, email=?, `phone number`=?, gender=?, d_o_b=?, doctor_photo=? WHERE doctor_id=?";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssssssi", $doctor_name, $ic_number, $address, $email, $phone_number, $gender, $dob, $imageData, $doctor_id);
+    $stmt->bind_param("ssssssssi", $doctor_name, $ic_number, $address, $email, $phone_number, $gender, $dob, $imageData, $doctor_id);
 
     if ($stmt->execute()) {
       $successmsg = "Doctor information updated successfully.";
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       // Execute the query
       if ($stmt->execute()) {
-        $successMsg = "doctor information updated successfully.";
+        $successMsg = "Doctor information updated successfully.";
       } else {
         $errorMsg = "Error updating doctor information: " . $conn->error;
       }
@@ -357,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                       <div class="form-group">
                         <label for="ic_number">IC Number</label>
-                        <input type="text" class="form-control" id="ic_number" name="ic_number" value="<?php echo htmlspecialchars($ic_number); ?>" required>
+                        <input type="text" class="form-control" id="icInput" name="ic_number" value="<?php echo htmlspecialchars($ic_number); ?>" maxlength="14" required>
                       </div>
 
                       <div class="form-group">
@@ -380,7 +380,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                       <div class="form-group">
                         <label for="phone_number">Phone Number</label>
-                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required>
+                        <input type="text" class="form-control" id="number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" maxlength="13" required>
                       </div>
 
                       <div class="form-group">
@@ -453,7 +453,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <!-- Core plugin JavaScript-->
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
+  <script>
+    document.getElementById('icInput').addEventListener('input', function(e) {
+      let icNumber = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+      if (icNumber.length > 6) {
+        icNumber = icNumber.slice(0, 6) + '-' + icNumber.slice(6);
+      }
+      if (icNumber.length > 9) {
+        icNumber = icNumber.slice(0, 9) + '-' + icNumber.slice(9);
+      }
+      e.target.value = icNumber; // Update the input field with the formatted value
+    });
+  </script>
+  <script>
+    document.getElementById('number').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
 
+      // Insert hyphens at the correct positions
+      if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+      if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+      e.target.value = value;
+    });
+    document.getElementById('emergency').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+      // Insert hyphens at the correct positions
+      if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+      if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+      e.target.value = value;
+    });
+  </script>
 </body>
 
 </html>

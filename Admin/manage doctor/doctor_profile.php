@@ -319,7 +319,7 @@ $admin_name = $_SESSION['admin_name'];
 
                             <div class="table-responsive">
                                 <table
-                                    class="table table-bordered"
+                                    class="table table-bordered text-center"
                                     id="dataTable"
                                     width="100%"
                                     cellspacing="0">
@@ -328,11 +328,7 @@ $admin_name = $_SESSION['admin_name'];
                                             <th>Appointment ID</th>
                                             <th>Photo</th>
                                             <th>Name</th>
-                                            <th>Date </th>
-                                            <th>Time</th>
-                                            <th>Status</th>
-
-
+                                            <th>Date & Time</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -361,17 +357,17 @@ $admin_name = $_SESSION['admin_name'];
                                             echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>';
 
                                             echo "<td>" . $row['doctor_name'] . "</td>";
-                                            echo "<td>" . $row['date'] . "</td>";
-                                            echo "<td>" . $row['timeslot'] .  "</td>";
+                                            echo "<td>" . $row['date'] . "<br>";
+                                            echo   $row['timeslot'] . "<br><br>";
 
 
 
                                             if ($row['status'] == 'done') {
-                                                echo '<td><span class="status-done">Done</span></td>';
+                                                echo '<span class="status-done">Done</span></td>';
                                             } elseif ($row['status'] == 'cancelled') {
-                                                echo "<td><span class='status-canceled'>Cancelled</span></td>";
+                                                echo "<span class='status-canceled'>Cancelled</span></td>";
                                             } elseif ($row['status'] == 'upcoming') {
-                                                echo "<td><span class='status-upcoming'>Upcoming</span></td>";
+                                                echo "<span class='status-upcoming'>Upcoming</span></td>";
                                             }
                                             echo "</tr>";
                                         }

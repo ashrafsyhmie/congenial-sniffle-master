@@ -544,7 +544,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['admin_id'] = $userData['id'];
                     echo "<script>
                             alert('Successfully logged in!');
-                            window.location.href = './admin/homepage.php?message=Login Success&message_type=success';
+                            window.location.href = './Admin/homepage.php?message=Login Success&message_type=success';
                           </script>";
                     break;
 

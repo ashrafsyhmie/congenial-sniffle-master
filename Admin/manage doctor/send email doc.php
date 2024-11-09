@@ -469,7 +469,7 @@ foreach ($allDoctorInfo as $doctor) {
                             <input type="text" id="recipients" name="recipients" placeholder="Recipient email" value="<?php echo $doctor['doctor_name'] ?>" readonly class="form-control" />
                             <input type="email" hidden name="recipients_email" value="<?php echo $doctor['email'] ?>">
                             <input type="text" hidden name="doctor_id" value="<?php echo $doctor_id ?>">
-                            
+
                             <label for="subject">Enter Account Password (For Security Reasons)</label>
                             <input type="text" id="password" name="password" placeholder="Email password" required />
 
@@ -483,7 +483,7 @@ foreach ($allDoctorInfo as $doctor) {
 
                                 <button type="reset" class="btn btn-danger">
                                     <i class="fa-solid fa-xmark"></i>
-                                    Discard</button>
+                                    Reset</button>
                                 <a href="../manage doctor/doctor_profile.php?id=<?php echo $doctor_id ?>">
                                     <button type="button" class="btn btn-primary">
                                         Back

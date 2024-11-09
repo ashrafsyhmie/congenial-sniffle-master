@@ -94,22 +94,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log("Email could not be sent. Error: {$mail->ErrorInfo}");
 
                 // Redirect back with error message
-                $_SESSION['error'] = "Email could not be sent. Error: {$mail->ErrorInfo}";
-                header('Location: ./send email patient.php');
+                // $_SESSION['error'] = "Email could not be sent. Error: {$mail->ErrorInfo}";
+                header('Location: ./send email patient.php?message=' . $_SESSION["error"] . '&message_type=error');
                 exit();
             }
         } else {
             $_SESSION['error'] = "Invalid password. Please try again.";
-            echo "Invalid password. Please try again.";
+            // echo "Invalid password. Please try again.";
             // Optionally redirect back after showing the error
-            header('Location: ./send email patient.php');
+            header('Location: ./send email patient.php?message=Invalid password. Please try again.&message_type=error');
             exit();
         }
     } else {
         $_SESSION['error'] = "Could not fetch doctor credentials.";
-        echo "Could not fetch doctor credentials.";
+        // echo "Could not fetch doctor credentials.";
         // Optionally redirect back after showing the error
-        header('Location: ./send email patient.php');
+        header('Location: ./send email patient.php?message=Could not fetch doctor credentials.&message_type=error');
         exit();
     }
 }

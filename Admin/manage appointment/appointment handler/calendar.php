@@ -1,5 +1,7 @@
 <?php
 session_start();
+require_once '../../../db conn.php';
+require_once './timeslots-function.php';
 
 if (isset($_GET['doctor_id'])) {
     $doctor_id = $_GET['doctor_id'];
@@ -9,35 +11,11 @@ if (isset($_GET['doctor_id'])) {
     $doctor_id = $_POST['doctor_id'];
 }
 
-
-
-require_once '../../../db conn.php';
-
-require './timeslots-function.php';
-
-
-
-
-$date = "2024-09-3"; // Example date
-
-
-
+// Display available slots function
 function displayAvailableSlots($date, $doctor_id, $patient_id, $conn)
 {
-    // Define slot parameters
-
-
-    // Generate all possible time slots for the day
     $all_slots = timeslots();
-
-    // Prepare the SQL statement to get booked slots
     $stmt = $conn->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
-
-    if (!$stmt) {
-        die('Prepare failed: ' . $conn->error);
-    }
-
-    // Bind parameters and execute
     $stmt->bind_param('sss', $date, $doctor_id, $patient_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -46,60 +24,16 @@ function displayAvailableSlots($date, $doctor_id, $patient_id, $conn)
         $booked_slots[] = $row['timeslot'];
     }
     $stmt->close();
-
-    // Find available slots
-    $available_slots = array_diff($all_slots, $booked_slots);
-
-    if (empty($available_slots)) {
-
-        return true;
-    }
+    return array_diff($all_slots, $booked_slots) ? false : true;
 }
 
-
-// function isDateFullyBooked($date, $doctor_id, $conn)
-// {
-
-//     // Get the total number of time slots for the day
-//     $duration = 30;
-//     $cleanup = 10;
-//     $start = "08:00";
-//     $end = "17:00";
-//     $all_slots = timeslots($duration, $cleanup, $start, $end);
-//     $total_slots = count($all_slots);
-
-//     $stmt = $conn->prepare("SELECT COUNT(DISTINCT timeslot) AS slot_count FROM appointment WHERE DATE = ? AND doctor_id = ?");
-//     if (!$stmt) {
-//         die('Prepare failed: ' . $conn->error);
-//     }
-//     $stmt->bind_param('si', $date, $doctor_id);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-//     $row = $result->fetch_assoc();
-//     $stmt->close();
-
-
-
-
-
-//     // echo $row['slot_count'];
-
-//     // echo $total_slots;
-
-
-
-
-//     echo $date;
-
-//     // return ($row['slot_count'] >= $total_slots);
-// }
-
+// Build calendar function
 function build_calendar($month, $year, $patient_id, $conn)
 {
     global $doctor_id;
     $stmt = $conn->prepare("SELECT DATE FROM appointment WHERE MONTH(DATE) = ? AND YEAR(DATE) = ? AND patient_id = ?");
     $stmt->bind_param('iis', $month, $year, $patient_id);
-    $bookings = array();
+    $bookings = [];
 
     if ($stmt->execute()) {
         $result = $stmt->get_result();
@@ -109,7 +43,7 @@ function build_calendar($month, $year, $patient_id, $conn)
         $stmt->close();
     }
 
-    $daysOfWeek = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+    $daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     $firstDayOfMonth = mktime(0, 0, 0, $month, 1, $year);
     $numberDays = date('t', $firstDayOfMonth);
     $dateComponents = getdate($firstDayOfMonth);
@@ -118,9 +52,9 @@ function build_calendar($month, $year, $patient_id, $conn)
 
     $calendar = "<table class='table table-bordered'>";
     $calendar .= "<center><h2>$monthName $year</h2>";
-    $calendar .= "<a class='btn btn-xs btn-danger' href='?month=" . date('m', mktime(0, 0, 0, $month - 1, 1, $year)) . "&year=" . date('Y', mktime(0, 0, 0, $month - 1, 1, $year)) . "'>Previous Month</a> ";
-    $calendar .= " <a class='btn btn-xs btn-success' href='?month=" . date('m') . "&year=" . date('Y') . "'>Current Month</a> ";
-    $calendar .= "<a class='btn btn-xs btn-primary' href='?month=" . date('m', mktime(0, 0, 0, $month + 1, 1, $year)) . "&year=" . date('Y', mktime(0, 0, 0, $month + 1, 1, $year)) . "'>Next Month</a></center><br>";
+    $calendar .= "<a class='btn btn-xs btn-danger' onclick='navigateMonth(" . ($month - 1) . ", $year)'>Previous Month</a> ";
+    $calendar .= "<a class='btn btn-xs btn-success' onclick='navigateMonth(" . date('m') . ", " . date('Y') . ")'>Current Month</a> ";
+    $calendar .= "<a class='btn btn-xs btn-primary' onclick='navigateMonth(" . ($month + 1) . ", $year)'>Next Month</a></center><br>";
 
     $calendar .= "<tr>";
     foreach ($daysOfWeek as $day) {
@@ -134,7 +68,6 @@ function build_calendar($month, $year, $patient_id, $conn)
         }
     }
 
-
     $currentDay = 1;
     $month = str_pad($month, 2, "0", STR_PAD_LEFT);
 
@@ -147,17 +80,13 @@ function build_calendar($month, $year, $patient_id, $conn)
         $currentDayRel = str_pad($currentDay, 2, "0", STR_PAD_LEFT);
         $date = "$year-$month-$currentDayRel";
         $today = $date == date('Y-m-d') ? "today" : "";
-
-        // $fullyBooked = isDateFullyBooked($date, $doctor_id, $conn);
         $fullyBooked = displayAvailableSlots($date, $doctor_id, $patient_id, $conn);
 
         if ($fullyBooked || $date < date('Y-m-d')) {
-            // Date is fully booked or in the past, display as not clickable
             $calendar .= "<td class='$today'><h4>$currentDay</h4> <button class='btn btn-danger btn-xs' disabled>";
             $calendar .= $fullyBooked ? "<span class='glyphicon glyphicon-lock'></span> Fully Booked" : "<span class='glyphicon glyphicon-ban-circle'></span> Not Available";
             $calendar .= "</button></td>";
         } else {
-            // Date is available for booking, include doctor_id in the URL
             $calendar .= "<td class='$today'><h4>$currentDay</h4> <a href='timeslots.php?date=" . $date . "&doctor_id=" . $doctor_id . "&patient_id=" . $patient_id . "' class='btn btn-success btn-xs'><span class='glyphicon glyphicon-ok'></span> Book Now</a></td>";
         }
 
@@ -174,8 +103,6 @@ function build_calendar($month, $year, $patient_id, $conn)
     $calendar .= "</table>";
     echo $calendar;
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -183,129 +110,9 @@ function build_calendar($month, $year, $patient_id, $conn)
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment Calendar</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body,
-        table,
-        thead,
-        tbody,
-        th,
-        td,
-        tr,
-        .alert {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        :root {
-            --bs-body-font-family: 'Poppins';
-        }
-
-        .table td {
-            text-align: center;
-            /* Center the text within the table cells */
-        }
-
-        @media only screen and (max-width: 760px),
-        (min-device-width: 802px) and (max-device-width: 1020px) {
-
-            table,
-            thead,
-            tbody,
-            th,
-            td,
-            tr {
-                display: block;
-            }
-
-            .empty {
-                display: none;
-            }
-
-            th {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-
-            tr {
-                border: 1px solid #ccc;
-            }
-
-            td {
-                border: none;
-                border-bottom: 1px solid #eee;
-                position: relative;
-                padding-left: 50%;
-                text-align: center;
-                /* Center the text within the table cells */
-            }
-
-            td:nth-of-type(1):before {
-                content: "Sunday";
-            }
-
-            td:nth-of-type(2):before {
-                content: "Monday";
-            }
-
-            td:nth-of-type(3):before {
-                content: "Tuesday";
-            }
-
-            td:nth-of-type(4):before {
-                content: "Wednesday";
-            }
-
-            td:nth-of-type(5):before {
-                content: "Thursday";
-            }
-
-            td:nth-of-type(6):before {
-                content: "Friday";
-            }
-
-            td:nth-of-type(7):before {
-                content: "Saturday";
-            }
-        }
-
-        @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
-            body {
-                padding: 0;
-                margin: 0;
-            }
-        }
-
-        @media only screen and (min-device-width: 802px) and (max-device-width: 1020px) {
-            body {
-                width: 495px;
-                margin: 7.5px;
-                background-color: #FAFBFC;
-            }
-        }
-
-        @media (min-width: 641px) {
-            table {
-                table-layout: fixed;
-            }
-
-            td {
-                width: 33%;
-                text-align: center;
-                /* Center the text within the table cells */
-            }
-        }
-
-        .row {
-            margin-top: 20px;
-        }
-
         .today {
             background: #eee;
         }
@@ -316,29 +123,54 @@ function build_calendar($month, $year, $patient_id, $conn)
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <div class="alert alert-danger bg-primary" style=" border:none; color:#fff">
-                    <h1>Appointment Calendar</h1>
-                </div>
-                <?php
-                $dateComponents = getdate();
-                if (isset($_GET['month']) && isset($_GET['year'])) {
-                    $month = (int)$_GET['month'];
-                    $year = (int)$_GET['year'];
-                } else {
-                    $month = $dateComponents['mon'];
-                    $year = $dateComponents['year'];
-                }
+                <div id="calendar">
+                    <div class="alert alert-primary bg-primary" style="border:none; color:#fff; display: flex; justify-content: space-between; align-items: center;">
+                        <!-- Left-aligned button -->
+                        <a href="../new appointment.php">
+                            <button type="button" id="backButton" class="btn btn-light previous-btn ">&#8249;</button>
+                        </a>
 
-                build_calendar($month, $year, $patient_id, $conn);
-                ?>
+                        <!-- Centered Heading -->
+                        <h1 class="text-center" style="flex-grow: 1; text-align: center;">Appointment Calendar</h1>
+                    </div>
+
+                </div>
             </div>
         </div>
-        <a href="../new appointment.php"><button type="button" class="btn btn-primary text-white">Back</button></a>
-    </div>
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-</body>
 
-</html>
+
+    </div>
+
+    <script>
+        function loadCalendar(month, year) {
+            // Hide the back button while fetching the calendar
+            document.getElementById('backButton').style.display = 'none';
+
+            fetch(`calendar_fetch.php?month=${month}&year=${year}&patient_id=<?php echo $patient_id; ?>&doctor_id=<?php echo $doctor_id; ?>`)
+                .then(response => response.text())
+                .then(data => {
+                    // Update the calendar content
+                    document.getElementById('calendar').innerHTML = data;
+
+                    // Show the back button after the calendar is updated
+                    document.getElementById('backButton').style.display = 'inline-block';
+                })
+                .catch(error => console.error('Error fetching calendar:', error));
+        }
+
+        // Function to navigate to the previous, current, or next month
+        function navigateMonth(month, year) {
+            loadCalendar(month, year); // Call loadCalendar to reload the calendar for the new month
+        }
+
+        // Load the current month's calendar on initial page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            loadCalendar(today.getMonth() + 1, today.getFullYear()); // Load current month
+        });
+    </script>
+
+
+</body>
 
 </html>

@@ -16,7 +16,7 @@ if (isset($_GET['id'])) {
     if (mysqli_query($conn, $deleteQuery)) {
         // If successful, redirect to the articles list page
         location:
-        header('Location: manage_article.php');
+        header('Location: manage_article.php?message=Article deleted successfully&message_type=success');
         exit;
     } else {
         // Handle errors if the query fails

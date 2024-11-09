@@ -517,7 +517,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                                             if (!empty($successmsg)) {
                                                 echo "<script>alert('" . htmlspecialchars($successmsg) . "')</script>";
                                                 if (strpos($successmsg, 'created successfully') !== false) {
-                                                    header("Location: http://localhost/congenial-sniffle-master/admin/manage%20doctor/view%20all%20doctors.php");
+                                                    header("Location: ./view all doctors.php");
                                                 }
                                             }
                                             ?>

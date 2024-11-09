@@ -1,13 +1,11 @@
 <?php
 session_start();
-$patient_id = $_SESSION['patient_id'];
+$admin_id = $_SESSION['admin_id'];
 
-require_once '../../db conn.php';
+require_once '../../../db conn.php';
 require './timeslots-function.php';
 
 $date = isset($_GET['date']) ? $_GET['date'] : '';
-$doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
-
 $appointment_id = $_GET['appointment_id'];
 
 // Fetch the appointment details using the appointment_id
@@ -29,13 +27,32 @@ function fetchAppointmentById($conn, $appointment_id)
     }
 }
 
-// Process the data (e.g., reschedule, display the details, etc.)
 if ($appointmentDetails) {
     // Store or display the appointment details
+    $patient_id = $appointmentDetails['patient_id'];
+    $doctor_id = $appointmentDetails['doctor_id'];
+
+    // Fetch doctor and patient details
+    $doctorInfo = fetchDoctorById($conn, $doctor_id);
+    $patientInfo = fetchPatientById($conn, $patient_id);
+
+    if ($doctorInfo) {
+        $_SESSION['doctor_name'] = $doctorInfo['doctor_name'];
+        $_SESSION['doctor_specialization'] = $doctorInfo['specialization'];
+    } else {
+        echo "No doctor found with the provided doctor_id!";
+    }
+
+    if ($patientInfo) {
+        $_SESSION['patient_name'] = $patientInfo['patient_name'];
+    } else {
+        echo "No patient found with the provided patient_id!";
+    }
+
+    // Store appointment details in session
     $_SESSION['appointment_id'] = $appointmentDetails['appointment_id'];
-    $_SESSION['appointment_date'] = $appointmentDetails['date'];
     $_SESSION['appointment_timeslot'] = $appointmentDetails['timeslot'];
-    $_SESSION['appointment_doctor'] = $appointmentDetails['doctor_id'];
+    $_SESSION['appointment_date'] = $appointmentDetails['date'];
 } else {
     echo "Appointment not found!";
 }
@@ -43,22 +60,12 @@ if ($appointmentDetails) {
 // Function to fetch doctor information using doctor_id
 function fetchDoctorById($conn, $doctor_id)
 {
-    // Prepare the SQL query to fetch the doctor info based on doctor_id
     $sql = "SELECT * FROM doctor WHERE doctor_id = ?";
-
-    // Prepare the statement
     $stmt = mysqli_prepare($conn, $sql);
-
-    // Bind the doctor_id parameter to the query
     mysqli_stmt_bind_param($stmt, "i", $doctor_id);
-
-    // Execute the query
     mysqli_stmt_execute($stmt);
-
-    // Get the result
     $result = mysqli_stmt_get_result($stmt);
 
-    // Fetch the doctor details if found
     if ($row = mysqli_fetch_assoc($result)) {
         return $row; // Return the doctor details
     } else {
@@ -66,46 +73,22 @@ function fetchDoctorById($conn, $doctor_id)
     }
 }
 
+// Function to fetch patient information using patient_id
+function fetchPatientById($conn, $patient_id)
+{
+    $sql = "SELECT * FROM patient WHERE patient_id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $patient_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
-
-// Fetch the doctor details using the doctor_id
-$doctorInfo = fetchDoctorById($conn, $appointmentDetails['doctor_id']);
-
-if ($doctorInfo) {
-    // Store doctor info in session or display it as needed
-    $_SESSION['doctor_name'] = $doctorInfo['doctor_name'];
-} else {
-    echo "No doctor found with the provided doctor_id!";
+    if ($row = mysqli_fetch_assoc($result)) {
+        return $row; // Return the patient details
+    } else {
+        return null; // Return null if no patient is found
+    }
 }
 
-$sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
-
-// Execute the query
-$result = mysqli_query($conn, $sql);
-
-// Check for errors
-if (!$result) {
-    die("Query failed: " . mysqli_error($conn));
-}
-
-$row = mysqli_fetch_assoc($result);
-
-$patient_name = $row['patient_name'];
-
-
-$sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
-
-// Execute the query
-$result = mysqli_query($conn, $sql);
-
-// Check for errors
-if (!$result) {
-    die("Query failed: " . mysqli_error($conn));
-}
-
-$row = mysqli_fetch_assoc($result);
-
-$doctor_name = $doctorInfo['doctor_name'];
 
 
 $booked_timeslot = isset($_GET['booked_timeslot']) ? $_GET['booked_timeslot'] : '';
@@ -153,7 +136,7 @@ if (isset($_POST['submit'])) {
 
 
         if ($stmt->execute()) {
-            header("Location: ../all appointment.php?message=Appointment Rescheduled Successfully&message_type=success");
+            header("Location: ../view all appointment.php?message=Appointment Rescheduled Successfully&message_type=success");
             exit;
         } else {
             $msg = "<div class='alert alert-danger'>Booking Failed: " . $stmt->error . "</div>";
@@ -162,31 +145,6 @@ if (isset($_POST['submit'])) {
     }
 }
 
-// function timeslots($duration, $cleanup, $start, $end)
-// {
-//     $start = new DateTime($start);
-//     $end = new DateTime($end);
-//     $interval = new DateInterval("PT" . $duration . "M");
-//     $cleanupInterval = new DateInterval("PT" . $cleanup . "M");
-//     $slots = [];
-
-//     for ($intStart = $start; $intStart < $end; $intStart->add($interval)->add($cleanupInterval)) {
-//         $endPeriod = clone $intStart;
-//         $endPeriod->add($interval);
-//         if ($endPeriod > $end) {
-//             break;
-//         }
-//         $slots[] = $intStart->format("H:iA") . " - " . $endPeriod->format("H:iA");
-//     }
-
-//     return $slots;
-// }
-
-// $duration = 30;
-// $cleanup = 10;
-// $start = "08:00";
-// $end = "17:00";
-// $timeslots = timeslots($duration, $cleanup, $start, $end);
 
 $timeslots = timeslots();
 ?>
@@ -235,7 +193,8 @@ $timeslots = timeslots();
 
             foreach ($timeslots as $t) {
                 $isBooked = in_array($t, $bookings);
-                $isPreviousAppointment = ($t == $_SESSION['appointment_timeslot']); // Check if this timeslot is the previous appointment's timeslot
+                $isPreviousAppointment = ($t == $_SESSION['appointment_timeslot'] && $date == $appointmentDetails['date']); // Check for same timeslot and same date
+                // Check if this timeslot is the previous appointment's timeslot
 
                 // Determine the button class
                 if ($isPreviousAppointment) {
@@ -320,11 +279,11 @@ $timeslots = timeslots();
                         </div>
                         <div class="form-group">
                             <label for="patientName">Patient Name</label>
-                            <input readonly type="text" class="form-control" id="patientName" name="patientName" value="<?php echo $patient_name; ?>">
+                            <input readonly type="text" class="form-control" id="patientName" name="patientName" value="<?php echo $_SESSION['patient_name']; ?>">
                         </div>
                         <div class="form-group">
                             <label for="doctorName">Doctor Name</label>
-                            <input readonly type="text" class="form-control" id="doctorName" name="doctorName" value="<?php echo $doctor_name ?>">
+                            <input readonly type="text" class="form-control" id="doctorName" name="doctorName" value="<?php echo  $_SESSION['doctor_name']; ?>">
                         </div>
 
                         <?php

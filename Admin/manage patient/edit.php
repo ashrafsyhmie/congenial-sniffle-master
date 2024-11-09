@@ -51,9 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $Address = $_POST['add'];
     $Email = $_POST['email'];
     $gender = $_POST['sex'];
-    $Num_Phone = $_POST['txtNum'];
+    $Num_Phone = $_POST['number'];
     $dob = $_POST['dob'];
-    $emergency = $_POST['emerCont'];
+    $emergency = $_POST['emergency_number'];
     $ic = $_POST['ic_num'];
 
     // Handle file upload
@@ -343,8 +343,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
                                             <div class="form-group">
-                                                <label for="ic_num">IC Number</label>
-                                                <input type="text" class="form-control" id="icInput" name="ic_num" maxlength="14" value="<?php echo htmlspecialchars($ic); ?>">
+                                                <label for="">IC Number</label>
+                                                <input type="text" id="icInput" name="ic_num" class="form-control" placeholder="IC Number" maxlength="14" value="<?php echo htmlspecialchars($ic); ?>" required />
                                             </div>
 
                                             <div class="form-group">
@@ -366,13 +366,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="txtNum">Phone Number</label>
-                                                <input type="text" class="form-control" id="txtNum" name="txtNum" maxlength="12" value="<?php echo htmlspecialchars($Num_Phone); ?>">
+                                                <label for="">Contact Number</label>
+                                                <input type="text" name="number" class="form-control" id="number" placeholder="Contact number" value="<?php echo htmlspecialchars($Num_Phone); ?>" required maxlength="13" />
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="emerCont">Emergency Contact</label>
-                                                <input type="text" class="form-control" id="emerCont" name="emerCont" maxlength="12" value="<?php echo htmlspecialchars($emergency); ?>">
+                                                <label for="">Emergency Number</label>
+                                                <input type="text" name="emergency_number" class="form-control" id="emergency_number" placeholder="Emergency number" value="<?php echo htmlspecialchars($emergency); ?>" required maxlength="13" />
                                             </div>
 
                                             <div class="form-group">
@@ -403,7 +403,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                                     ?>
                                                 </div>
                                                 <div>
-                                                    <a href="./patient_profile.php?id=<?php echo $_GET['id'] ?>" class="btn btn-primary">Back</a>
+                                                    <a href="./view all patient.php" class="btn btn-primary">Back</a>
                                                     <button type="submit" class="btn btn-primary">Update Info</button>
                                                 </div>
                                             </div>
@@ -480,6 +480,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 icNumber = icNumber.slice(0, 9) + '-' + icNumber.slice(9);
             }
             e.target.value = icNumber; // Update the input field with the formatted value
+        });
+    </script>
+    <script>
+        document.getElementById('number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+            // Insert hyphens at the correct positions
+            if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+            if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+            e.target.value = value;
+        });
+        document.getElementById('emergency_number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+            // Insert hyphens at the correct positions
+            if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+            if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+            e.target.value = value;
         });
     </script>
 

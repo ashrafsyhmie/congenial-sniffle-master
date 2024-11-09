@@ -469,6 +469,15 @@ foreach ($allpatientInfo as $patient) {
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
+                    <?php
+                    // Display success or error message
+                    if (isset($_GET['message'])) {
+                        $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+                        echo '<div class="alert ' . $messageType . '">';
+                        echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+                        echo '</div>';
+                    }
+                    ?>
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
                         <h1 class="h3 mb-0 text-gray-900 font-weight-bolder">
@@ -498,7 +507,7 @@ foreach ($allpatientInfo as $patient) {
                                 <button type="reset" class="btn btn-danger">
                                     <i class="fa-solid fa-xmark"></i>
                                     Discard</button>
-                                <a href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>">
+                                <a href="../patient profile.php?id=<?php echo $patient_id ?>">
                                     <button type="button" class="btn btn-primary">
                                         Back
                                     </button>

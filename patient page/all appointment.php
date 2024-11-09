@@ -310,79 +310,108 @@ $patient_name = $_SESSION['patient_name'];
           </div>
 
 
+          <?php
+
+
+          // Check if patient_id is set in the session
+          $patient_id = isset($_SESSION['patient_id']) ? $_SESSION['patient_id'] : null;
+
+          if (!$patient_id) {
+            echo "Patient ID is missing.";
+            exit; // Stop execution if patient_id is not found
+          }
+
+          // Get the filter selection (default to 'all' if not set)
+          $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
+
+          // Prepare the SQL query
+          $sql = "SELECT * FROM appointment 
+        JOIN doctor ON appointment.doctor_id = doctor.doctor_id 
+        WHERE patient_id = $patient_id";
+
+          if ($filter == 'upcoming') {
+            $sql .= " AND appointment.status = 'upcoming'";
+          } elseif ($filter == 'done') {
+            $sql .= " AND appointment.status = 'done'";
+          } elseif ($filter == 'cancelled') {
+            $sql .= " AND appointment.status = 'cancelled'";
+          }
+
+          $result = mysqli_query($conn, $sql);
+
+          ?>
 
           <div class="card shadow mb-4">
-            <div class="card-header py-3">
-              <h6 class="m-0 font-weight-bold text-primary">
-                Upcoming Appointment
-              </h6>
+            <div class="card-header d-flex align-items-center justify-content-between py-3">
+              <h6 class="m-0 font-weight-bold text-primary">Appointments</h6>
+
+              <!-- Filter Form -->
+              <form method="GET" action="" class="form-inline">
+                <label for="filter" class="mr-2">Show:</label>
+                <select name="filter" id="filter" class="form-control form-control-sm mr-2" onchange="this.form.submit()">
+                  <option value="all" <?php if ($filter == 'all') echo 'selected'; ?>>All</option>
+                  <option value="upcoming" <?php if ($filter == 'upcoming') echo 'selected'; ?>>Upcoming</option>
+                  <option value="done" <?php if ($filter == 'done') echo 'selected'; ?>>Done</option>
+                  <option value="cancelled" <?php if ($filter == 'cancelled') echo 'selected'; ?>>Cancelled</option>
+                </select>
+                <noscript><button type="submit" class="btn btn-primary btn-sm">Apply</button></noscript> <!-- fallback for non-JS -->
+              </form>
             </div>
+
             <div class="card-body">
               <div class="table-responsive">
-                <table
-                  class="table table-bordered"
-                  id="dataTable"
-                  width="100%"
-                  cellspacing="0">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                   <thead>
                     <tr>
                       <th>Appointment ID</th>
                       <th>Photo</th>
                       <th>Name</th>
-                      <th>Date </th>
+                      <th>Date</th>
                       <th>Time</th>
                       <th>Status</th>
                       <th>Action</th>
-
-
                     </tr>
                   </thead>
                   <tbody>
                     <?php
-                    $sql = "SELECT * FROM appointment JOIN doctor ON appointment.doctor_id=doctor.doctor_id WHERE patient_id = $patient_id";
-                    $result = mysqli_query($conn, $sql);
+                    if (mysqli_num_rows($result) > 0) {
+                      while ($row = mysqli_fetch_assoc($result)) {
+                        $appointment_id = $row['appointment_id'];
+                        echo "<tr>";
+                        echo "<td>" . $row['appointment_id'] . "</td>";
+                        echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class="doctor-photo"></td>';
+                        echo "<td>" . $row['doctor_name'] . "</td>";
+                        echo "<td>" . $row['date'] . "</td>";
+                        echo "<td>" . $row['timeslot'] . "</td>";
 
-                    while ($row = mysqli_fetch_assoc($result)) {
-                      $appointment_id = $row['appointment_id'];
-                      echo "<tr>";
-                      echo "<td>" . $row['appointment_id'] . "</td>";
-                      echo '<td><img src="data:image/jpeg;base64,' . base64_encode($row['doctor_photo']) . '" alt="Doctor photo" class = "doctor-photo"></td>';
-                      echo "<td>" . $row['doctor_name'] . "</td>";
-                      echo "<td>" . $row['date'] . "</td>";
-                      echo "<td>" . $row['timeslot'] . "</td>";
+                        // Check appointment status and display accordingly
+                        if ($row['status'] == 'done') {
+                          echo '<td><span class="status-done">Done</span></td>';
+                        } elseif ($row['status'] == 'cancelled') {
+                          echo "<td><span class='status-canceled'>Cancelled</span></td>";
+                        } elseif ($row['status'] == 'upcoming') {
+                          echo "<td><span class='status-upcoming'>Upcoming</span></td>";
+                        }
 
-                      if ($row['status'] == 'done') {
-                        echo '<td><span class="status-done">Done</span></td>';
-                      } elseif ($row['status'] == 'cancelled') {
-                        echo "<td><span class='status-canceled'>Cancelled</span></td>";
-                      } elseif ($row['status'] == 'upcoming') {
-                        echo "<td><span class='status-upcoming'>Upcoming</span></td>";
-                      }
+                        echo "<td>";
+                        if ($row['status'] == 'cancelled') {
+                          echo "<p>Your appointment is cancelled.</p>";
+                        } elseif ($row['status'] == 'done') {
+                          echo "<p>Your appointment is done.</p>";
+                        } else {
+                          echo '<a href="#" class="btn btn-info mr-3 btn-md" data-toggle="modal" data-target="#rescheduleAppModal' . $appointment_id . '">
+                                        <i class="fa-regular fa-calendar"></i>
+                                      </a>';
+                          echo '<a href="#" class="btn btn-danger btn-md" data-toggle="modal" data-target="#cancelAppModal' . $appointment_id . '">
+                                        <i class="fa-solid fa-trash"></i>
+                                      </a>';
+                        }
+                        echo "</td>";
+                        echo "</tr>";
                     ?>
 
-                      <td>
-
-
-                        <?php if ($row['status']  == 'cancelled') : ?>
-                          <p>Your appointment is cancelled.</p>
-                        <?php elseif ($row['status']  == 'done') : ?>
-                          <p>Your appointment is done.</p>
-                        <?php else : ?>
-                          <!-- Reschedule Button -->
-                          <a href="#" class="btn btn-info" data-toggle="modal" data-target="#rescheduleAppModal<?php echo $appointment_id; ?>">
-                            <i class="fa-regular fa-calendar"></i> Reschedule
-                          </a>
-
-                          <!-- Cancel Button -->
-                          <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#cancelAppModal<?php echo $appointment_id; ?>">
-                            <i class="fa-solid fa-trash"></i> Cancel
-                          </a>
-                        <?php endif; ?>
-
-
-
-                        <!-- Modal for each appointment -->
-                        <div class="modal fade" id="cancelAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <!-- Cancel appointment modal -->
+                        <div class="modal fade" id="cancelAppModal<?php echo $row['appointment_id']; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
@@ -396,9 +425,8 @@ $patient_name = $_SESSION['patient_name'];
                               </div>
                               <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
-                                <!-- Form with appointment_id -->
-                                <form action="cancel appointment.php" method="POST">
-                                  <input type="hidden" name="appointment_id" value="<?php echo $appointment_id; ?>">
+                                <form action="./cancel appointment.php" method="POST">
+                                  <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
                                   <button type="submit" class="btn btn-primary">Yes</button>
                                 </form>
                               </div>
@@ -406,8 +434,8 @@ $patient_name = $_SESSION['patient_name'];
                           </div>
                         </div>
 
-                        <!-- Reschedule Modal for each appointment -->
-                        <div class="modal fade" id="rescheduleAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <!-- Reschedule modal -->
+                        <div class="modal fade" id="rescheduleAppModal<?php echo $row['appointment_id']; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                           <div class="modal-dialog" role="document">
                             <div class="modal-content">
                               <div class="modal-header">
@@ -421,28 +449,28 @@ $patient_name = $_SESSION['patient_name'];
                               </div>
                               <div class="modal-footer">
                                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                <!-- Reschedule form -->
                                 <form action="./reschedule handler/calendar.php" method="GET">
-                                  <input type="hidden" name="appointment_id" value="<?php echo $appointment_id; ?>">
+                                  <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
                                   <button type="submit" class="btn btn-primary">Yes</button>
                                 </form>
                               </div>
                             </div>
                           </div>
                         </div>
-                      </td>
 
                     <?php
-                      echo "</tr>";
+                      }
+                    } else {
+                      echo "<tr><td colspan='7'>No appointments found.</td></tr>";
                     }
                     ?>
                   </tbody>
-
-
                 </table>
               </div>
             </div>
           </div>
+
+
         </div>
         <!-- /.container-fluid -->
       </div>

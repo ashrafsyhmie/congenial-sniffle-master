@@ -452,11 +452,11 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="">Contact Number</label>
-                                                        <input type="text" name="txtNum" class="form-control" placeholder="Contact number" />
+                                                        <input type="text" name="txtNum" class="form-control" id="number" placeholder="Contact number" required maxlength="13" />
                                                     </div>
                                                     <div class="form-group">
-                                                        <label for="">Emergency Contact</label>
-                                                        <input type="text" name="emerCont" class="form-control" placeholder="Emergency Contact" required />
+                                                        <label for="">Emergency Number</label>
+                                                        <input type="text" name="txtNum" class="form-control" id="emergency_number" placeholder="Contact number" required maxlength="13" />
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="">Date of Birthday</label>
@@ -577,6 +577,19 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
     <script src="../../js/demo/chart-area-demo.js"></script>
     <script src="../../js/demo/chart-pie-demo.js"></script>
     <script>
+        document.querySelectorAll('.gender-buttons label').forEach(function(label) {
+            label.addEventListener('click', function() {
+                // Remove active state from all labels
+                document.querySelectorAll('.gender-buttons label').forEach(function(lbl) {
+                    lbl.classList.remove('active');
+                });
+                // Add active state to the clicked label
+                this.classList.add('active');
+            });
+        });
+    </script>
+
+    <script>
         document.getElementById('icInput').addEventListener('input', function(e) {
             let icNumber = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
             if (icNumber.length > 6) {
@@ -585,9 +598,10 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
             if (icNumber.length > 9) {
                 icNumber = icNumber.slice(0, 9) + '-' + icNumber.slice(9);
             }
-            e.target.value = icNumber;
+            e.target.value = icNumber; // Update the input field with the formatted value
         });
     </script>
+
     <script>
         function displaySelectedImage(event, elementId) {
             const selectedImage = document.getElementById(elementId);
@@ -603,6 +617,27 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
                 reader.readAsDataURL(fileInput.files[0]);
             }
         }
+    </script>
+
+    <script>
+        document.getElementById('number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+            // Insert hyphens at the correct positions
+            if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+            if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+            e.target.value = value;
+        });
+        document.getElementById('emergency_number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+            // Insert hyphens at the correct positions
+            if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+            if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+            e.target.value = value;
+        });
     </script>
 
 

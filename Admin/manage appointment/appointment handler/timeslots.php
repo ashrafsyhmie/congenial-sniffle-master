@@ -1,70 +1,64 @@
 <?php
 session_start();
+$admin_id = $_SESSION['admin_id'];
 
 require_once '../../../db conn.php';
 require './timeslots-function.php';
 
-if (isset($_GET['patient_id'])) {
+if (isset($_GET['doctor_id'])) {
+    $doctor_id = $_GET['doctor_id'];
     $patient_id = $_GET['patient_id'];
-    $date = isset($_GET['date']) ? $_GET['date'] : '';
-    $doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
+    $date = $_GET['date'];
 } elseif (isset($_POST['patient_id'])) {
     $patient_id = $_POST['patient_id'];
-    $date = isset($_POST['date']) ? $_POST['date'] : '';
-    $doctor_id = isset($_POST['doctor_id']) ? $_POST['doctor_id'] : '';
+    $doctor_id = $_POST['doctor_id'];
+    $date = $_POST['date'];
+    $date = date('Y-m-d', strtotime($date));
+}
+
+
+
+
+// Your SQL query should now work with a valid patient_id
+$sql = "SELECT * FROM patient WHERE patient_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('s', $patient_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $patient_name = $row['patient_name'];
+    $patient_ID = $row['patient_id'];
+}
+$stmt->close();
+
+
+// Prepared statement for doctor query
+$sql = "SELECT * FROM doctor WHERE doctor_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('s', $doctor_id); // Bind the doctor_id to the query
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $doctor_name = $row['doctor_name'];
+    $doctor_ID = $row['doctor_id'];
 } else {
+    die("No doctor found with the provided ID.");
 }
+$stmt->close();
 
-
-
-
-
-$sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
-
-// Execute the query
-$result = mysqli_query($conn, $sql);
-
-// Check for errors
-if (!$result) {
-    die("Query failed: " . mysqli_error($conn));
-}
-
-$row = mysqli_fetch_assoc($result);
-
-$patient_name = $row['patient_name'];
-
-
-$sql = "SELECT * FROM doctor WHERE doctor_id = $doctor_id";
-
-// Execute the query
-$result = mysqli_query($conn, $sql);
-
-// Check for errors
-if (!$result) {
-    die("Query failed: " . mysqli_error($conn));
-}
-
-$row = mysqli_fetch_assoc($result);
-
-$doctor_name = $row['doctor_name'];
-
-
-$booked_timeslot = isset($_GET['booked_timeslot']) ? $_GET['booked_timeslot'] : '';
-$bookings = [];
-
-if ($booked_timeslot) {
-    $bookings[] = $booked_timeslot;
-}
-
-// Retrieve existing bookings for the selected date and doctor_id (including all patients)
+// Retrieve existing bookings for the selected date and doctor_id (including all patients) and their statuses
 if (!empty($date)) {
-    $stmt = $conn->prepare("SELECT timeslot FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
+    $stmt = $conn->prepare("SELECT timeslot, status FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
     $stmt->bind_param('sss', $date, $doctor_id, $patient_id);
 
     if ($stmt->execute()) {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
-            $bookings[] = $row['timeslot'];
+            $bookings[$row['timeslot']] = $row['status']; // Store timeslot and status
         }
         $stmt->close();
     } else {
@@ -78,10 +72,12 @@ if (isset($_POST['submit'])) {
     $timeslot = $_POST['timeslot'];
 
     // Check if the timeslot is already booked for the patient_id
-    $stmt = $conn->prepare("SELECT * FROM appointment WHERE DATE = ? AND TIMESLOT = ? AND patient_id = ? AND doctor_id = ?");
+    $stmt = $conn->prepare("SELECT * FROM appointment WHERE DATE = ? AND TIMESLOT = ? AND patient_id = ? AND doctor_id = ? ");
     $stmt->bind_param('ssss', $date, $timeslot, $patient_id, $doctor_id);
     $stmt->execute();
     $result = $stmt->get_result();
+
+
 
     if ($result->num_rows > 0) {
         $msg = "<div class='alert alert-danger'>Already Booked</div>";
@@ -92,8 +88,8 @@ if (isset($_POST['submit'])) {
 
         if ($stmt->execute()) {
             $msg = "<div class='alert alert-success'>Booking Successful</div>";
-            header("Location: timeslots.php?date=" . $date . "&doctor_id=" . $doctor_id);
-            // date=$date&booked_timeslot=$timeslot
+            header("Location: ../view all appointment.php?message=Booked successfully&message_type=success");
+            // header("Location: timeslots.php?patient_id=" . $patient_id . "&date=" . $date . "&doctor_id=" . $doctor_id . "&message=Booked successfully&message_type=success");
             exit;
         } else {
             $msg = "<div class='alert alert-danger'>Booking Failed: " . $stmt->error . "</div>";
@@ -102,31 +98,6 @@ if (isset($_POST['submit'])) {
     }
 }
 
-// function timeslots($duration, $cleanup, $start, $end)
-// {
-//     $start = new DateTime($start);
-//     $end = new DateTime($end);
-//     $interval = new DateInterval("PT" . $duration . "M");
-//     $cleanupInterval = new DateInterval("PT" . $cleanup . "M");
-//     $slots = [];
-
-//     for ($intStart = $start; $intStart < $end; $intStart->add($interval)->add($cleanupInterval)) {
-//         $endPeriod = clone $intStart;
-//         $endPeriod->add($interval);
-//         if ($endPeriod > $end) {
-//             break;
-//         }
-//         $slots[] = $intStart->format("H:iA") . " - " . $endPeriod->format("H:iA");
-//     }
-
-//     return $slots;
-// }
-
-// $duration = 30;
-// $cleanup = 10;
-// $start = "08:00";
-// $end = "17:00";
-// $timeslots = timeslots($duration, $cleanup, $start, $end);
 
 $timeslots = timeslots();
 ?>
@@ -162,27 +133,48 @@ $timeslots = timeslots();
     <div class="container">
         <h1 class="text-center">Book for Date: <?php echo date('F d, Y', strtotime($date)); ?></h1>
         <hr>
+        <?php
+        // Display success or error message
+        if (isset($_GET['message'])) {
+            $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+            echo '<div class="alert ' . $messageType . '">';
+            echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+            echo '</div>';
+        }
+        ?>
         <div class="row">
             <div class="col-md-12">
                 <?php echo $msg; ?>
             </div>
             <?php
+            // Generate buttons with 'upcoming' status check
             foreach ($timeslots as $t) {
-                $isBooked = in_array($t, $bookings);
+                $isBooked = isset($bookings[$t]) && $bookings[$t] != 'cancelled'; // Check if status is 'upcoming'
                 $buttonClass = $isBooked ? 'btn-danger' : 'btn-success book';
                 echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' " . ($isBooked ? "disabled" : "data-timeslot='$t'") . ">$t</button>";
             }
             ?>
             <br><br>
             <div class="container" style="text-align: center;">
-                <a href="./calendar.php?doctor_id=<?php echo $doctor_id; ?>&patient_id=<?php echo $patient_id ?>"><button class="btn btn-primary">BACK</button></a>
+                <a href="./calendar.php?doctor_id=<?php echo $doctor_id; ?>&patient_id=<?php echo $patient_id; ?>"><button class="btn btn-primary">BACK</button></a>
             </div>
+        </div>
+
+        <div class="legend">
+            <h4>Legend:</h4>
+            <button class="btn btn-success" style="width:5%; cursor: default;" disabled></button>
+            <span>Available</span>
+            <br>
+            <br>
+            <button class="btn btn-danger" style="width:5%; cursor: default;" disabled></button>
+            <span>Booked</span>
+
         </div>
     </div>
 
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
-            <form method="post" action="./timeslots.php">
+            <form method="POST" action="./timeslots.php">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -207,47 +199,29 @@ $timeslots = timeslots();
                         $row = mysqli_fetch_assoc($result);
 
 
-
-                        // $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
-
-                        // // Execute the query
-                        // $result = mysqli_query($conn, $sql);
-
-                        // // Check for errors
-                        // if (!$result) {
-                        //     die("Query failed: " . mysqli_error($conn));
-                        // }
-
-                        // $row = mysqli_fetch_assoc($result);
-                        // echo $row['patient_name'];
-
-
                         ?>
                         <div class="form-group">
                             <label for="date">Date</label>
-                            <input readonly type="text" class="form-control" id="dateBooked" name="dateBooked" value="<?php echo date('F d, Y', strtotime($date)); ?>">
+                            <input readonly type="text" class="form-control" id="dateBooked" name="date" value="<?php echo date('F d, Y', strtotime($date)); ?>">
                         </div>
                         <div class="form-group">
                             <label for="patientName">Patient ID</label>
-                            <input readonly type="text" class="form-control" id="patient_id" name="patient_id" value="<?php echo $patient_id; ?>">
+                            <input readonly type="text" class="form-control" id="patientID" name="patient_id" value="<?php echo $patient_ID; ?>">
                         </div>
                         <div class="form-group">
                             <label for="patientName">Patient Name</label>
-                            <input readonly type="text" class="form-control" id="patient_name" name="patient_name" value="<?php echo $patient_name; ?>">
+                            <input readonly type="text" class="form-control" id="patientName" name="patientName" value="<?php echo $patient_name; ?>">
                         </div>
                         <div class="form-group">
                             <label for="doctorName">Doctor ID</label>
-                            <input readonly type="text" class="form-control" id="doctor_id" name="doctor_id" value="<?php echo $doctor_id ?>">
+                            <input readonly type="text" class="form-control" id="doctorID" name="doctor_id" value="<?php echo $doctor_ID ?>">
                         </div>
                         <div class="form-group">
                             <label for="doctorName">Doctor Name</label>
-                            <input readonly type="text" class="form-control" id="doctor_name" name="doctor_name" value="<?php echo $doctor_name ?>">
+                            <input readonly type="text" class="form-control" id="doctorName" name="doctorName" value="<?php echo $doctor_name ?>">
                         </div>
 
-                        <?php
 
-                        $stmt->close();
-                        ?>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" name="submit" class="btn btn-primary">Submit</button>

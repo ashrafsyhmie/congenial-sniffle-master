@@ -44,41 +44,6 @@ if (!empty($appointment)) {
         $_SESSION['doctor_name'] = $doctor['doctor_name'];
         $_SESSION['doctor_photo'] = $doctor['doctor_photo'];
     }
-
-
-
-
-
-    // Fetch current medical conditions
-    $stmt = $conn->prepare("SELECT * FROM medical_conditions WHERE medical_record_id = ?");
-    $stmt->bind_param("i", $medical_record_id);
-    $stmt->execute();
-    $condition_result = $stmt->get_result();
-
-    $conditions = [
-        'Eye Problem' => 'None',
-        'Seizure' => 'None',
-        'Epilepsy' => 'None',
-        'Hearing Problem' => 'None',
-        'Diabetes' => 'None',
-        'Cardiovascular Disease' => 'None',
-        'History of Strokes' => 'None',
-        'Respiratory Problem' => 'None',
-        'Kidney Problem' => 'None',
-        'Stomach and Liver Problem' => 'None',
-        'Pancreatic Problems' => 'None',
-        'Anxiety and Depression' => 'None',
-        'Other Mental Health Issue' => 'None',
-        'Sleep Disorder' => 'None',
-        'Neck or Back Problem' => 'None',
-    ];
-
-    if ($condition_result->num_rows > 0) {
-        while ($row = $condition_result->fetch_assoc()) {
-            $conditions[$row['condition_name']] = $row['condition_status'];
-        }
-    }
-    $stmt->close();
 }
 
 ?>
@@ -139,7 +104,7 @@ if (!empty($appointment)) {
                 <div class="row align-items-center">
                     <div class="col-md-4">
                         <a
-                            href="../patient profile.php?id=<?php echo $patient_id ?>"
+                            href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>"
                             class="btn btn-light previous-btn">&#8249;</a>
 
 
@@ -240,7 +205,7 @@ if (!empty($appointment)) {
                         </tr>
                         <tr>
                             <td>
-                                <textarea name="notes" id="notes" class="form-control"></textarea>
+                                <textarea name="notes" id="notes" class="form-control" required></textarea>
                             </td>
                         </tr>
                     </table>
@@ -297,11 +262,11 @@ if (!empty($appointment)) {
                                     <div class="form-group">
 
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="smoking" value="No" />
+                                            <input class="form-check-input" type="radio" name="smoking" value="No" required />
                                             <label class="form-check-label" for="no">No</label>
                                         </div>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="smoking" value="Yes" />
+                                            <input class="form-check-input" type="radio" name="smoking" value="Yes" required />
                                             <label class="form-check-label">Yes</label>
                                         </div>
 
@@ -310,11 +275,11 @@ if (!empty($appointment)) {
                                 <td>
                                     <label for="alcohol">Alcohol Consumption</label>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="alcohol" value="No" />
+                                        <input class="form-check-input" type="radio" name="alcohol" value="No" required />
                                         <label class="form-check-label">No</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="alcohol" value="Yes" />
+                                        <input class="form-check-input" type="radio" name="alcohol" value="Yes" required />
                                         <label class="form-check-label">Yes</label>
                                     </div>
                                 </td>
@@ -325,12 +290,12 @@ if (!empty($appointment)) {
                                     <label for="allergies">Allergence History</label>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="allergies" id="no" value="no" />
+                                        <input class="form-check-input" type="radio" name="allergies" id="no" value="no" required />
                                         <label class="form-check-label" for="no">No</label>
                                     </div>
 
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="allergies" id="yes" value="yes" />
+                                        <input class="form-check-input" type="radio" name="allergies" id="yes" value="yes" required />
                                         <label class="form-check-label" for="yes">Yes; Specify</label>
 
                                         <!-- Specify allergies text input -->
@@ -395,31 +360,52 @@ if (!empty($appointment)) {
             <div class="page-break">
                 <section>
                     <div class="medical-condition container mt-5">
-                        <h3>Current Medical Condition</h3>
-                        <p>Kindly indicate if you have the following medical condition:</p>
-
-                        <table class="table" style="background-color: #fafbfc">
-                            <tr>
+                        <table id="medical-conditionTable" class="table" style="background-color: #fafbfc">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h4 class="h4">Medical Condition</h4>
+                                </div>
+                                <div class="col-auto">
+                                    <button id="addRowBtnCond" class="btn btn-primary mr-2" name="insert_new_row">+</button>
+                                    <button id="removeRowBtnCond" class="btn btn-primary" name="delete_latest_row">-</button>
+                                </div>
+                            </div>
+                            <br>
+                            <thead>
                                 <th>Medical Condition</th>
-                                <th>None</th>
+                                <th>No</th>
+                                <th>Unsure</th>
                                 <th>Yes</th>
-                                <th>I'm not sure</th>
+                            </thead>
+
+
+                            <tr>
+                                <td><input type="text" name="medical_condition[]" class="form-control" placeholder="Medical Condition" /></td>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="medical_condition_status[]" value="None" id="no" required />
+                                        <label class="form-check-label" for="medical_condition_status[]">No</label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="medical_condition_status[]" value="I'm not sure" id="unsure" required />
+                                        <label class="form-check-label" for="medical_condition_status">Unsure</label>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="medical_condition_status[]" value="Yes" id="yes" required />
+                                        <label class="form-check-label" for="medical_condition_status">Yes</label>
+                                    </div>
+                                </td>
                             </tr>
 
-                            <?php
-                            foreach ($conditions as $condition_name => $condition_status) {
-                                echo "<tr>";
-                                echo "<td>{$condition_name}</td>";
-                                echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='None' " . ($condition_status == 'None' ? 'checked' : '') . " ></td>";
-                                echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='Yes' " . ($condition_status == 'Yes' ? 'checked' : '') . " ></td>";
-                                // echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value='I\'m not sure' " . ($condition_status == "I'm not sure" ? 'checked' : '') . " ></td>";
-                                echo "<td><input type='radio' name='" . strtolower(str_replace(' ', '_', $condition_name)) . "' value=\"I'm not sure\" " . ($condition_status == "I'm not sure" ? 'checked' : '') . " ></td>";
 
-                                echo "</tr>";
-                            }
-                            ?>
                         </table>
+
                     </div>
+
                 </section>
             </div>
 
@@ -469,8 +455,8 @@ if (!empty($appointment)) {
                                     <input type="doctor name" class="form-control" disabled value="<?php echo $doctor['doctor_name'] ?>">
                                 </td>
                                 <td>
-                                    <p>Doctor Signature</p>
-                                    <input type="doctor sign" class="form-control" readonly>
+                                    <p>Registration Number</p>
+                                    <input type="doctor name" class="form-control" disabled value="<?php echo $doctor['mmc'] ?>">
                                 </td>
                             </tr>
                             <tr>
@@ -484,13 +470,13 @@ if (!empty($appointment)) {
                 </section>
             </div>
 
-            <div class="container text-center">
-                <a href="../patient profile.php?id=<?php echo $patient_id ?>">
-                    <button class="btn btn-primary previous-btn">Back</button>
+            <div class="container text-center mt-3">
+                <button type="reset" class="btn btn-danger">Reset</button>
+                <a class="btn btn-primary previous-btn" href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>">
+                    Back
                 </a>
-                <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" name="submit" class="btn btn-success">Submit</button>
             </div>
-
         </form>
     </div>
 
@@ -510,7 +496,6 @@ if (!empty($appointment)) {
                     name: 'purpose',
                     placeholder: 'Purpose'
                 },
-
                 {
                     name: 'dosage',
                     placeholder: 'Dosage'
@@ -518,6 +503,30 @@ if (!empty($appointment)) {
                 {
                     name: 'frequency',
                     placeholder: 'Frequency'
+                }
+            ]);
+
+            addEventListeners('#addRowBtnCond', '#removeRowBtnCond', '#medical-conditionTable', [{
+                    name: 'medical_condition',
+                    placeholder: 'Medical Condition'
+                },
+                {
+                    name: 'medical_condition_status[]',
+                    value: 'no',
+                    placeholder: 'No',
+                    type: 'radio'
+                },
+                {
+                    name: 'medical_condition_status[]',
+                    value: 'unsure',
+                    placeholder: 'Unsure',
+                    type: 'radio'
+                },
+                {
+                    name: 'medical_condition_status[]',
+                    value: 'yes',
+                    placeholder: 'Yes',
+                    type: 'radio'
                 }
             ]);
 
@@ -550,8 +559,22 @@ if (!empty($appointment)) {
 
         function addRow(tableSelector, columns) {
             let markup = "<tr>";
-            columns.forEach((column, index) => {
-                markup += `<td><input type='text' name='${column.name}[]' class='form-control' placeholder='${column.placeholder}' /></td>`;
+            let rowIndex = $(tableSelector + ' tbody tr').length + 1; // Get current row index for unique IDs
+            columns.forEach((column) => {
+                if (column.type === 'radio') {
+                    // For radio buttons, generate a group of radio buttons with unique names per row
+                    markup += `
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="condition_${rowIndex}_${column.name}" value="${column.placeholder.toLowerCase()}" id="${column.name + rowIndex}" />
+                            <label class="form-check-label" for="${column.name + rowIndex}">${column.placeholder}</label>
+                        </div>
+                    </td>
+                `;
+                } else {
+                    // For text input fields
+                    markup += `<td><input type="text" name="${column.name}[]" class="form-control" placeholder="${column.placeholder}" /></td>`;
+                }
             });
             markup += "</tr>";
             $(tableSelector + ' tbody').append(markup);
@@ -564,6 +587,9 @@ if (!empty($appointment)) {
             }
         }
     </script>
+
+
+
 
     <script>
         // JavaScript to show/hide allergies input field based on Yes/No selection

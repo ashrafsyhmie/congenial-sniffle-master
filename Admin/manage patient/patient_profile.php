@@ -402,96 +402,97 @@ $admin_name = $_SESSION['admin_name'];
                                             echo "<td>" . $row['doctor_name'] . "</td>";
                                             echo "<td class='text-center'>" . $row['date'] . '<br>' . $row['timeslot'] . '<br><br>';
 
+
                                             // Appointment status
                                             if ($row['status'] == 'done') {
                                                 echo '<span class="status-done">Done</span></td>';
                                                 echo '<td class="text-center">Appointment ID: ' . $row['appointment_id'] . '</td>';
                                             } elseif ($row['status'] == 'cancelled') {
-                                                echo "<span class='status-canceled'>Cancelled</span></td><td></td>";
+                                                echo "<span class='status-canceled'>Cancelled</span></td>";
+                                                echo '<td class="text-center">Appointment ID: ' . $row['appointment_id'] . '</td>';
                                             } elseif ($row['status'] == 'upcoming') {
                                                 echo "<span class='status-upcoming'>Upcoming</span></td>";
-                                                echo '<td class="text-center"><a href="#" class="btn btn-info btn-sm" style="width: 95px;" data-toggle="modal"data-target="#rescheduleAppModal<?php echo $appointment_id; ?>">
-                                                    <i class="fa-regular fa-calendar"></i><br>Reschedule
-                                                </a>
-                                                <!-- Each appointment has its own Cancel button and modal -->
-                                                <a href="#" class="btn btn-danger btn-sm" style="width: 90px;" data-toggle="modal" data-target="#cancelAppModal<?php echo $appointment_id; ?>">
-                                                    <i class="fa-solid fa-trash"></i><br>Cancel
-                                                </a>
-                                                <p></p>
-                                                <p>Appointment Record ID: ' . $row['appointment_id'] . ' </p>
-                                            </td>';
+                                                echo '<td class="text-center">
+                                                        <a href="#" class="btn btn-info btn-md mr-3" data-toggle="modal" data-target="#rescheduleAppModal' .  $row['appointment_id'] . '">
+                                                            <i class="fa-regular fa-calendar"></i>
+                                                        </a>
+                                                        <!-- Each appointment has its own Cancel button and modal -->
+                                                        <a href="#" class="btn btn-danger btn-md"  data-toggle="modal" data-target="#cancelAppModal' .  $row['appointment_id'] . '">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </a>
+                                                        <p></p>
+                                                        <p>Appointment ID: ' . $row['appointment_id'] . ' </p>
+                                                    </td>';
                                             }
 
                                             // Appointment action buttons
 
-
                                             if (isset($row['medical_record_id'])) {
                                                 // Medical record action buttons
-                                                echo "<td class='text-center'><a href='../medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' style = 'width: 80px;' class='btn btn-success btn-sm mr-3'> 
-                                                      <i class='fa fa-edit'></i><br>Edit</a>";
-                                                echo "<a href='../medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' style = 'width: 80px;' class='btn btn-primary btn-sm'><i class='fa-solid fa-eye'></i><br>View</a><p></p> Medical Record ID: " . $row['medical_record_id'] . "</td>";
+                                                echo "<td class='text-center'><a href='../medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "'class='btn btn-success btn-md mr-3'> 
+                                                         <i class='fa fa-edit'></i></a>";
+                                                echo "<a href='../medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "'  class='btn btn-primary btn-md'><i class='fa-solid fa-eye'></i></a><p></p> Medical Record ID: " . $row['medical_record_id'] . "</td>";
                                             } elseif ($row['status'] == 'done') {
-                                                echo "<td class='text-center'><a style = 'width: 100px;' href='../medical record/medical history form.php?appointment_id=" . $row['appointment_id'] . "' style = 'width: 100px;' class='btn btn-primary btn-sm mr-3'> 
-                                                <i class='fa fa-plus mr-1'></i></br>Add</a></td>";
+                                                echo "<td class='text-center'><a style = 'width: 100px;' href='../medical record/medical history form.php?appointment_id=" . $row['appointment_id'] . "' class='btn btn-primary btn-md mr-3'> 
+                                                            <i class='fa fa-plus mr-1'></i></a></td>";
                                             } else {
                                                 echo "<td class='text-center' width=20%>No medical record</td>";
                                             }
                                             echo "</tr>";
-                                        }
                                         ?>
 
-
-                                        <!-- Cancel Modal for each appointment -->
-                                        <div class="modal fade" id="cancelAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Do You Want to Cancel Appointment?</h5>
-                                                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">×</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        Select "Yes" below if you want to cancel this appointment.
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
-                                                        <!-- Form with appointment_id -->
-                                                        <form action="../manage appointment/cancel appointment.php" method="POST">
-                                                            <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
-                                                            <button type="submit" class="btn btn-primary">Yes</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Reschedule modal -->
-                                        <div class="modal fade" id="rescheduleAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="exampleModalLabel">Reschedule Appointment</h5>
-                                                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">×</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        Do you want to reschedule this appointment?
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                                                        <!-- Reschedule form -->
-                                                        <form action="../manage appointment/reschedule handler/calendar.php" method="GET">
-                                                            <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
-                                                            <button type="submit" class="btn btn-primary">Yes</button>
-                                                        </form>
+                                            <!-- Cancel appointment modal -->
+                                            <div class="modal fade" id="cancelAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Do You Want to Cancel Appointment?</h5>
+                                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Select "Yes" below if you want to cancel this appointment.
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-secondary" type="button" data-dismiss="modal">No</button>
+                                                            <!-- Form with appointment_id -->
+                                                            <form action="../manage appointment/cancel appointment.php" method="POST">
+                                                                <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
+                                                                <button type="submit" class="btn btn-primary">Yes</button>
+                                                            </form>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-
+                                            <!-- Reschedule modal -->
+                                            <div class="modal fade" id="rescheduleAppModal<?php echo $appointment_id; ?>" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Reschedule Appointment</h5>
+                                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">×</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            Do you want to reschedule this appointment?
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                                                            <!-- Reschedule form -->
+                                                            <form action="../manage appointment/reschedule handler/calendar.php" method="GET">
+                                                                <input type="hidden" name="appointment_id" value="<?php echo $row['appointment_id']; ?>">
+                                                                <button type="submit" class="btn btn-primary">Yes</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- Close the connection -->
+                                            <?php
+                                        };
+                                        $conn->close(); ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -501,8 +502,7 @@ $admin_name = $_SESSION['admin_name'];
 
                     </div>
 
-                    <!-- Close the connection -->
-                    <?php $conn->close(); ?>
+
 
                 </div>
 

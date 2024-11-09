@@ -313,7 +313,7 @@ $doctor_name = $_SESSION['doctor_name'];
                 <table class="table table-striped table-border-0" id="dataTable" width="100%" cellspacing="0">
                   <tbody>
                   <thead>
-                <tr>
+                <tr class="text-center">
                   <th>Patient Photo</th>
                   <th>Patient Name</th>
                   <th>Gender</th>
@@ -325,7 +325,7 @@ $doctor_name = $_SESSION['doctor_name'];
               while ($row = $result->fetch_assoc()) {
                 $patient_id = $row["patient_id"];
                 echo '
-                                <tr>
+                                <tr class="text-center">
                 <td><img src="data:image/jpeg;base64,' . base64_encode($row['patient_photo']) . '" alt="Patient photo" class = "photo"></td>
                
                 <td>' . $row["patient_name"] . '<br />' . $row["email"] . '</td>

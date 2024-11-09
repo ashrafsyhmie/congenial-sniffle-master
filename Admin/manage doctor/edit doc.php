@@ -85,16 +85,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // Prepare and execute update query
     $sql = "UPDATE doctor SET 
-            name = ?, 
-            ic_number = ?, 
+            doctor_name = ?, 
+            `ic number` = ?, 
             address = ?, 
             email = ?, 
-            cont_number = ?, 
-            gender = ?, 
-            specialization = ?, 
+            `phone number` = ?, 
+            gender = ?,            specialization = ?, 
             d_o_b = ?, 
-            image = ? 
-        WHERE id = ?";
+            doctor_photo = ? 
+        WHERE doctor_id = ?";
+
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("sssssssssi", $Pt_name, $ic, $Address, $Email, $Num_Phone, $gender, $specialization, $dob, $imageData, $id);
@@ -360,8 +360,8 @@ $conn->close();
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="ic_num">IC</label>
-                                                <input type="text" class="form-control" id="icInput" name="ic_num" value="<?php echo htmlspecialchars($ic); ?>" required>
+                                                <label for="">IC Number</label>
+                                                <input type="text" id="icInput" name="ic_num" class="form-control" placeholder="IC Number" maxlength="14" value="<?php echo htmlspecialchars($ic); ?>" required />
                                             </div>
 
                                             <div class="form-group">
@@ -383,8 +383,8 @@ $conn->close();
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="txtNum">Phone Number</label>
-                                                <input type="text" class="form-control" id="txtNum" name="txtNum" maxlength="12" value="<?php echo htmlspecialchars($Num_Phone); ?>" required>
+                                                <label for="">Contact Number</label>
+                                                <input type="text" name="txtNum" class="form-control" id="number" placeholder="Contact number" value="<?php echo htmlspecialchars($Num_Phone); ?>" required maxlength="13" />
                                             </div>
 
                                             <div class="form-group">
@@ -513,6 +513,38 @@ $conn->close();
                 icNumber = icNumber.slice(0, 9) + '-' + icNumber.slice(9);
             }
             e.target.value = icNumber; // Update the input field with the formatted value
+        });
+    </script>
+    <script>
+        document.getElementById('icInput').addEventListener('input', function(e) {
+            let icNumber = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+            if (icNumber.length > 6) {
+                icNumber = icNumber.slice(0, 6) + '-' + icNumber.slice(6);
+            }
+            if (icNumber.length > 9) {
+                icNumber = icNumber.slice(0, 9) + '-' + icNumber.slice(9);
+            }
+            e.target.value = icNumber; // Update the input field with the formatted value
+        });
+    </script>
+    <script>
+        document.getElementById('number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+            // Insert hyphens at the correct positions
+            if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+            if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+            e.target.value = value;
+        });
+        document.getElementById('emergency_number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+            // Insert hyphens at the correct positions
+            if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+            if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+            e.target.value = value;
         });
     </script>
 

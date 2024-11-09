@@ -489,41 +489,52 @@ $medical_condition_result = $stmt->get_result();
         <div class="page-break">
             <section>
                 <div class="medical-condition container mt-5">
-                    <h3>Current Medical Condition</h3>
-                    <p>Kindly indicate if you have the following medical condition:</p>
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3>Current Medical Condition</h3>
+                            <p>Kindly indicate if you have the following medical condition:</p>
+                        </div>
 
-                    <table class="table" style="background-color: #fafbfc">
+                        <div class="col-auto">
+                            <button id="addRowBtnCond" class="btn btn-primary mr-2" name="insert_new_row">+</button>
+                            <button id="removeRowBtnCond" class="btn btn-primary" name="delete_latest_row">-</button>
+                        </div>
+                    </div>
+
+                    <table id="conditionTable" class="table text-center" style="background-color: #fafbfc">
                         <tr>
                             <th>Medical Condition</th>
                             <th>None</th>
                             <th>Yes</th>
-                            <th>I'm not sure</th>
+                            <th>Unsure</th>
                         </tr>
 
                         <?php
                         if (mysqli_num_rows($medical_condition_result) > 0) {
                             while ($row = mysqli_fetch_assoc($medical_condition_result)) {
+                                $condition_id = $row['condition_id'];
+
                                 echo "<tr>";
-                                echo "<td>" . htmlspecialchars($row['condition_name']) . "</td>";
+                                // Editable condition name input field
+                                echo "<td><input type='text' name='condition_name[$condition_id]' value='" . htmlspecialchars($row['condition_name']) . "' class='form-control' /></td>";
 
-                                // Generate radio buttons with checked status based on `condition_status`
-                                $condition_id = $row['condition_id']; // Assuming each row has a unique 'id'
-
+                                // Radio buttons for selecting condition status
                                 echo "<td><input class='form-check-input' type='radio' name='medical_condition_status[$condition_id]' value='None' " . ($row['condition_status'] == "None" ? "checked" : "") . " /></td>";
                                 echo "<td><input class='form-check-input' type='radio' name='medical_condition_status[$condition_id]' value='Yes' " . ($row['condition_status'] == "Yes" ? "checked" : "") . " /></td>";
-                                echo "<td><input class='form-check-input' type='radio' name='medical_condition_status[$condition_id]' value='I'm not sure' " . ($row['condition_status'] == "Unsure" ? "checked" : "") . " /></td>";
+                                echo "<td><input class='form-check-input' type='radio' name='medical_condition_status[$condition_id]' value='Unsure' " . ($row['condition_status'] == "Unsure" ? "checked" : "") . " /></td>";
 
                                 echo "</tr>";
                             }
                         } else {
                             echo "<tr><td colspan='4'>No medical condition data found</td></tr>";
                         }
-
                         ?>
                     </table>
                 </div>
             </section>
         </div>
+
+
 
         <!-- Diagnosis -->
         <div class="page-break">
@@ -708,6 +719,31 @@ $medical_condition_result = $stmt->get_result();
                 }
             ]);
 
+
+            addEventListeners('#addRowBtnCond', '#removeRowBtnCond', '#conditionTable', [{
+                    name: 'medical_condition',
+                    placeholder: 'Medical Condition'
+                },
+                {
+                    name: 'medical_condition_status[]',
+                    value: 'no',
+                    placeholder: 'No',
+                    type: 'radio'
+                },
+                {
+                    name: 'medical_condition_status[]',
+                    value: 'unsure',
+                    placeholder: 'Unsure',
+                    type: 'radio'
+                },
+                {
+                    name: 'medical_condition_status[]',
+                    value: 'yes',
+                    placeholder: 'Yes',
+                    type: 'radio'
+                }
+            ]);
+
             addEventListeners('#addRowBtnDiagnosis', '#removeRowBtnDiagnosis', '#diagnosisTable', [{
                     name: 'procedure_name',
                     placeholder: 'Procedure Name'
@@ -737,8 +773,22 @@ $medical_condition_result = $stmt->get_result();
 
         function addRow(tableSelector, columns) {
             let markup = "<tr>";
-            columns.forEach((column, index) => {
-                markup += `<td><input type='text' name='${column.name}[]' class='form-control' placeholder='${column.placeholder}' /></td>`;
+            let rowIndex = $(tableSelector + ' tbody tr').length + 1;
+            columns.forEach((column) => {
+                if (column.type === 'radio') {
+                    // For radio buttons, generate a group of radio buttons with unique names per row
+                    markup += `
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="condition_${rowIndex}_${column.name}" value="${column.placeholder.toLowerCase()}" id="${column.name + rowIndex}" />
+                           
+                        </div>
+                    </td>
+                `;
+                } else {
+                    // For text input fields
+                    markup += `<td><input type="text" name="${column.name}[]" class="form-control" placeholder="${column.placeholder}" /></td>`;
+                }
             });
             markup += "</tr>";
             $(tableSelector + ' tbody').append(markup);

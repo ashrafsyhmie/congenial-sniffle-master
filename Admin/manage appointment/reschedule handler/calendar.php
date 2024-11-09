@@ -2,10 +2,6 @@
 session_start();
 
 $appointment_id = $_GET['appointment_id'];
-global $appointment_id;
-
-
-
 
 require_once '../../../db conn.php';
 
@@ -35,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Function to fetch the appointment details by ID
+// Fetch appointment details using the appointment_id
 function fetchAppointmentById($conn, $appointment_id)
 {
     $sql = "SELECT * FROM appointment WHERE appointment_id = ?";
@@ -46,49 +42,52 @@ function fetchAppointmentById($conn, $appointment_id)
 
     // Fetch the appointment details
     if ($row = mysqli_fetch_assoc($result)) {
-        return $row;
+        return $row; // Return the appointment details
     } else {
-        return null;
+        return null; // Return null if no appointment found
     }
 }
 
-function fetchAllPatientInfo($conn)
+// Fetch patient details based on patient_id
+function fetchPatientInfo($conn, $patient_id)
 {
-    global $patient_id;
-    $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
-    $result = mysqli_query($conn, $sql);
+    $sql = "SELECT * FROM patient WHERE patient_id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $patient_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
-    // Initialize an array to store the results
-    $patientInfo = array();
-
-    // Fetch each row and store it in the array
-    while ($row = mysqli_fetch_assoc($result)) {
-        $patientInfo[] = $row;
+    // Fetch the patient details
+    if ($row = mysqli_fetch_assoc($result)) {
+        return $row; // Return the patient details
+    } else {
+        return null; // Return null if no patient found
     }
-
-    // Return the array containing all patient information
-    return $patientInfo;
 }
 
+$appointment_id = $_GET['appointment_id']; // Get the appointment_id from the query string
 
+// Fetch the appointment details
+$appointmentDetails = fetchAppointmentById($conn, $appointment_id);
 
-// Fetch all patient information
-$allPatientInfo = fetchAllPatientInfo($conn);
+if ($appointmentDetails) {
+    // Get the patient_id from the fetched appointment details
+    $patient_id = $appointmentDetails['patient_id'];
 
+    // Now fetch the patient information using the patient_id
+    $patientInfo = fetchPatientInfo($conn, $patient_id);
 
-
-// Output the fetched information
-
-
-foreach ($allPatientInfo as $patient) {
-
-
-    $_SESSION['patient_name'] = $patient['patient_name'];
-    $_SESSION['patient_photo'] = $patient['patient_photo'];
+    if ($patientInfo) {
+        // Process or display the patient information
+        $_SESSION['patient_name'] = $patientInfo['patient_name'];
+        $_SESSION['patient_photo'] = $patientInfo['patient_photo'];
+    } else {
+        echo "Patient not found!";
+    }
+} else {
+    echo "Appointment not found!";
 }
 
-
-$patient_name = $_SESSION['patient_name'];
 
 
 function displayAvailableSlots($date, $doctor_id, $patient_id, $conn)
@@ -367,7 +366,7 @@ function build_calendar($month, $year, $patient_id, $conn)
                 ?>
             </div>
         </div>
-        <a href="../all appointment.php"><button type="button" class="btn btn-primary text-white">Back</button></a>
+        <a href="../view all appointment.php"><button type="button" class="btn btn-primary text-white">Back</button></a>
     </div>
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>

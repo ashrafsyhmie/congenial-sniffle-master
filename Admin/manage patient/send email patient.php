@@ -481,7 +481,7 @@ foreach ($allpatientInfo as $patient) {
 
                                 <button type="reset" class="btn btn-danger">
                                     <i class="fa-solid fa-xmark"></i>
-                                    Discard</button>
+                                    Reset</button>
                                 <a href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>">
                                     <button type="button" class="btn btn-primary">
                                         Back
