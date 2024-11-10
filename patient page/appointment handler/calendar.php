@@ -11,10 +11,6 @@ require './timeslots-function.php';
 
 
 
-$date = "2024-09-3"; // Example date
-
-
-
 function displayAvailableSlots($date, $doctor_id, $patient_id, $conn)
 {
     // Define slot parameters
@@ -48,44 +44,6 @@ function displayAvailableSlots($date, $doctor_id, $patient_id, $conn)
         return true;
     }
 }
-
-
-// function isDateFullyBooked($date, $doctor_id, $conn)
-// {
-
-//     // Get the total number of time slots for the day
-//     $duration = 30;
-//     $cleanup = 10;
-//     $start = "08:00";
-//     $end = "17:00";
-//     $all_slots = timeslots($duration, $cleanup, $start, $end);
-//     $total_slots = count($all_slots);
-
-//     $stmt = $conn->prepare("SELECT COUNT(DISTINCT timeslot) AS slot_count FROM appointment WHERE DATE = ? AND doctor_id = ?");
-//     if (!$stmt) {
-//         die('Prepare failed: ' . $conn->error);
-//     }
-//     $stmt->bind_param('si', $date, $doctor_id);
-//     $stmt->execute();
-//     $result = $stmt->get_result();
-//     $row = $result->fetch_assoc();
-//     $stmt->close();
-
-
-
-
-
-//     // echo $row['slot_count'];
-
-//     // echo $total_slots;
-
-
-
-
-//     echo $date;
-
-//     // return ($row['slot_count'] >= $total_slots);
-// }
 
 function build_calendar($month, $year, $patient_id, $conn)
 {
@@ -127,7 +85,6 @@ function build_calendar($month, $year, $patient_id, $conn)
         }
     }
 
-
     $currentDay = 1;
     $month = str_pad($month, 2, "0", STR_PAD_LEFT);
 
@@ -167,8 +124,6 @@ function build_calendar($month, $year, $patient_id, $conn)
     $calendar .= "</table>";
     echo $calendar;
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -326,8 +281,10 @@ function build_calendar($month, $year, $patient_id, $conn)
                 ?>
             </div>
         </div>
-        <a href="../new appointment.php"><button type="button" class="btn btn-primary text-white">Back</button></a>
     </div>
+
+    <a href="../new appointment.php"><button type="button" class="btn btn-primary text-white">Back</button></a>
+
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
