@@ -9,6 +9,9 @@ $date = isset($_GET['date']) ? $_GET['date'] : '';
 $doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
 
 
+
+
+
 $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
 
 // Execute the query
@@ -166,13 +169,35 @@ $timeslots = timeslots();
                 <?php echo $msg; ?>
             </div>
             <?php
-            // Generate buttons with 'upcoming' status check
+            // Set the correct time zone
+            date_default_timezone_set('Asia/Kuala_Lumpur');
+
+            // Get today's date and current time
+            $today = date("Y-m-d");
+            $currentTime = date("H:i");
+
             foreach ($timeslots as $t) {
-                $isBooked = isset($bookings[$t]) && $bookings[$t] != 'cancelled'; // Check if status is 'upcoming'
-                $buttonClass = $isBooked ? 'btn-danger' : 'btn-success book';
-                echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' " . ($isBooked ? "disabled" : "data-timeslot='$t'") . ">$t</button>";
+                // Extract the start time of the timeslot
+                $timeslotStart = explode(" - ", $t)[0]; // Assuming "H:iA - H:iA" format
+                $timeslotStart24 = date("H:i", strtotime($timeslotStart)); // Convert to 24-hour format
+
+                // Check if the date matches today
+                $isToday = $date === $today;
+
+                // Check if the timeslot is booked or in the past (only for today)
+                $isBooked = isset($bookings[$t]) && $bookings[$t] != 'cancelled';
+                $isPast = $isToday && $timeslotStart24 < $currentTime; // Only check time for today's date
+
+                // Set button class and state
+                $buttonClass = $isBooked || $isPast ? 'btn-danger' : 'btn-success book';
+                $disabled = $isBooked || $isPast ? "disabled" : "data-timeslot='$t'";
+
+                echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' $disabled>$t</button>";
             }
             ?>
+
+
+
             <br><br>
             <div class="container" style="text-align: center;">
                 <a href="./calendar.php?doctor_id=<?php echo $doctor_id; ?>"><button class="btn btn-primary">BACK</button></a>

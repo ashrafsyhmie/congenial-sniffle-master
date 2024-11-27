@@ -5,18 +5,10 @@ $admin_id = $_SESSION['admin_id'];
 require_once '../../../db conn.php';
 require './timeslots-function.php';
 
-if (isset($_GET['doctor_id'])) {
-    $doctor_id = $_GET['doctor_id'];
-    $patient_id = $_GET['patient_id'];
-    $date = $_GET['date'];
-} elseif (isset($_POST['patient_id'])) {
-    $patient_id = $_POST['patient_id'];
-    $doctor_id = $_POST['doctor_id'];
-    $date = $_POST['date'];
-    $date = date('Y-m-d', strtotime($date));
-}
 
-
+$patient_id = $_SESSION['patient_id'];
+$doctor_id = $_SESSION['doctor_id'];
+$date = date('Y-m-d', strtotime($_GET['date']));
 
 
 // Your SQL query should now work with a valid patient_id
@@ -48,7 +40,14 @@ if ($result->num_rows > 0) {
 } else {
     die("No doctor found with the provided ID.");
 }
-$stmt->close();
+
+
+$booked_timeslot = isset($_GET['booked_timeslot']) ? $_GET['booked_timeslot'] : '';
+$bookings = [];
+
+if ($booked_timeslot) {
+    $bookings[] = $booked_timeslot;
+}
 
 // Retrieve existing bookings for the selected date and doctor_id (including all patients) and their statuses
 if (!empty($date)) {
@@ -77,8 +76,6 @@ if (isset($_POST['submit'])) {
     $stmt->execute();
     $result = $stmt->get_result();
 
-
-
     if ($result->num_rows > 0) {
         $msg = "<div class='alert alert-danger'>Already Booked</div>";
     } else {
@@ -88,8 +85,8 @@ if (isset($_POST['submit'])) {
 
         if ($stmt->execute()) {
             $msg = "<div class='alert alert-success'>Booking Successful</div>";
-            header("Location: ../view all appointment.php?message=Booked successfully&message_type=success");
-            // header("Location: timeslots.php?patient_id=" . $patient_id . "&date=" . $date . "&doctor_id=" . $doctor_id . "&message=Booked successfully&message_type=success");
+            header("Location: timeslots.php?date=" . $date . "&patient_id=" . $patient_id . "&doctor_id=" . $doctor_id . "&message=Booked successfully&message_type=success");
+            // date=$date&booked_timeslot=$timeslot
             exit;
         } else {
             $msg = "<div class='alert alert-danger'>Booking Failed: " . $stmt->error . "</div>";
@@ -98,6 +95,31 @@ if (isset($_POST['submit'])) {
     }
 }
 
+// function timeslots($duration, $cleanup, $start, $end)
+// {
+//     $start = new DateTime($start);
+//     $end = new DateTime($end);
+//     $interval = new DateInterval("PT" . $duration . "M");
+//     $cleanupInterval = new DateInterval("PT" . $cleanup . "M");
+//     $slots = [];
+
+//     for ($intStart = $start; $intStart < $end; $intStart->add($interval)->add($cleanupInterval)) {
+//         $endPeriod = clone $intStart;
+//         $endPeriod->add($interval);
+//         if ($endPeriod > $end) {
+//             break;
+//         }
+//         $slots[] = $intStart->format("H:iA") . " - " . $endPeriod->format("H:iA");
+//     }
+
+//     return $slots;
+// }
+
+// $duration = 30;
+// $cleanup = 10;
+// $start = "08:00";
+// $end = "17:00";
+// $timeslots = timeslots($duration, $cleanup, $start, $end);
 
 $timeslots = timeslots();
 ?>
@@ -147,11 +169,30 @@ $timeslots = timeslots();
                 <?php echo $msg; ?>
             </div>
             <?php
-            // Generate buttons with 'upcoming' status check
+            // Set the correct time zone
+            date_default_timezone_set('Asia/Kuala_Lumpur');
+
+            // Get today's date and current time
+            $today = date("Y-m-d");
+            $currentTime = date("H:i");
+
             foreach ($timeslots as $t) {
-                $isBooked = isset($bookings[$t]) && $bookings[$t] != 'cancelled'; // Check if status is 'upcoming'
-                $buttonClass = $isBooked ? 'btn-danger' : 'btn-success book';
-                echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' " . ($isBooked ? "disabled" : "data-timeslot='$t'") . ">$t</button>";
+                // Extract the start time of the timeslot
+                $timeslotStart = explode(" - ", $t)[0]; // Assuming "H:iA - H:iA" format
+                $timeslotStart24 = date("H:i", strtotime($timeslotStart)); // Convert to 24-hour format
+
+                // Check if the date matches today
+                $isToday = $date === $today;
+
+                // Check if the timeslot is booked or in the past (only for today)
+                $isBooked = isset($bookings[$t]) && $bookings[$t] != 'cancelled';
+                $isPast = $isToday && $timeslotStart24 < $currentTime; // Only check time for today's date
+
+                // Set button class and state
+                $buttonClass = $isBooked || $isPast ? 'btn-danger' : 'btn-success book';
+                $disabled = $isBooked || $isPast ? "disabled" : "data-timeslot='$t'";
+
+                echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' $disabled>$t</button>";
             }
             ?>
             <br><br>
@@ -174,7 +215,7 @@ $timeslots = timeslots();
 
     <div id="myModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
-            <form method="POST" action="./timeslots.php">
+            <form method="post" action="">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -199,29 +240,40 @@ $timeslots = timeslots();
                         $row = mysqli_fetch_assoc($result);
 
 
+
+                        // $sql = "SELECT * FROM patient WHERE patient_id = $patient_id";
+
+                        // // Execute the query
+                        // $result = mysqli_query($conn, $sql);
+
+                        // // Check for errors
+                        // if (!$result) {
+                        //     die("Query failed: " . mysqli_error($conn));
+                        // }
+
+                        // $row = mysqli_fetch_assoc($result);
+                        // echo $row['patient_name'];
+
+
                         ?>
                         <div class="form-group">
                             <label for="date">Date</label>
-                            <input readonly type="text" class="form-control" id="dateBooked" name="date" value="<?php echo date('F d, Y', strtotime($date)); ?>">
-                        </div>
-                        <div class="form-group">
-                            <label for="patientName">Patient ID</label>
-                            <input readonly type="text" class="form-control" id="patientID" name="patient_id" value="<?php echo $patient_ID; ?>">
+                            <input readonly type="text" class="form-control" id="dateBooked" name="dateBooked" value="<?php echo date('F d, Y', strtotime($date)); ?>">
                         </div>
                         <div class="form-group">
                             <label for="patientName">Patient Name</label>
                             <input readonly type="text" class="form-control" id="patientName" name="patientName" value="<?php echo $patient_name; ?>">
                         </div>
                         <div class="form-group">
-                            <label for="doctorName">Doctor ID</label>
-                            <input readonly type="text" class="form-control" id="doctorID" name="doctor_id" value="<?php echo $doctor_ID ?>">
-                        </div>
-                        <div class="form-group">
                             <label for="doctorName">Doctor Name</label>
                             <input readonly type="text" class="form-control" id="doctorName" name="doctorName" value="<?php echo $doctor_name ?>">
                         </div>
 
+                        <?php
 
+
+                        $stmt->close();
+                        ?>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" name="submit" class="btn btn-primary">Submit</button>

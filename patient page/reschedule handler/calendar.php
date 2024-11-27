@@ -1,7 +1,16 @@
 <?php
 session_start();
 
-$appointment_id = $_GET['appointment_id'];
+if (isset($_GET['appointment_id'])) {
+    $_SESSION['appointment_id'] = $_GET['appointment_id'];
+    $appointment_id = $_SESSION['appointment_id'];
+}
+
+
+echo $appointment_id . "<br>";
+
+// $appointment_id = $_GET['appointment_id'];
+// $_SESSION["appointment_id"] = $appointment_id;
 global $appointment_id;
 
 
@@ -12,6 +21,9 @@ require_once '../../db conn.php';
 require './timeslots-function.php';
 
 $patient_id = $_SESSION['patient_id'];
+
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['appointment_id'])) {
@@ -91,38 +103,44 @@ foreach ($allPatientInfo as $patient) {
 $patient_name = $_SESSION['patient_name'];
 
 
+
 function displayAvailableSlots($date, $doctor_id, $patient_id, $conn)
 {
-    // Define slot parameters
-
-
-    // Generate all possible time slots for the day
+    date_default_timezone_set('Asia/Kuala_Lumpur'); // Set timezone
     $all_slots = timeslots();
-
-    // Prepare the SQL statement to get booked slots
-    $stmt = $conn->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
-
-    if (!$stmt) {
-        die('Prepare failed: ' . $conn->error);
+    if (empty($all_slots)) {
+        die('Error: No slots returned from timeslots function.');
     }
 
-    // Bind parameters and execute
+    $last_slot_start = substr(end($all_slots), 0, strpos(end($all_slots), ' -'));
+    $current_time = date('g:iA');
+    $current_date = date('Y-m-d');
+
+    // Check if today and the current time is after the last available time slot
+    if ($date == $current_date) {
+        if (strtotime($current_time) > strtotime($last_slot_start)) {
+            return 'Past working time'; // Time has passed, return a message instead of fully booked
+        }
+    }
+
+    // Check if the date is fully booked
+    $stmt = $conn->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
     $stmt->bind_param('sss', $date, $doctor_id, $patient_id);
     $stmt->execute();
     $result = $stmt->get_result();
+
     $booked_slots = [];
     while ($row = $result->fetch_assoc()) {
         $booked_slots[] = $row['timeslot'];
     }
     $stmt->close();
 
-    // Find available slots
-    $available_slots = array_diff($all_slots, $booked_slots);
-
-    if (empty($available_slots)) {
-
-        return true;
+    // Return true if no available slots (fully booked)
+    if (empty(array_diff($all_slots, $booked_slots))) {
+        return 'Fully booked'; // Return fully booked message
     }
+
+    return ''; // No issues, slots available
 }
 
 
@@ -150,7 +168,7 @@ function build_calendar($month, $year, $patient_id, $conn)
     $monthName = $dateComponents['month'];
     $dayOfWeek = $dateComponents['wday'];
 
-    $calendar = "<table class='table table-bordered'>";
+    $calendar = "<table class='text-center table table-bordered'>";
     $calendar .= "<center><h2>$monthName $year</h2>";
     $calendar .= "<a class='btn btn-xs btn-danger' href='?month=" . date('m', mktime(0, 0, 0, $month - 1, 1, $year)) . "&year=" . date('Y', mktime(0, 0, 0, $month - 1, 1, $year)) . "'>Previous Month</a> ";
     $calendar .= " <a class='btn btn-xs btn-success' href='?month=" . date('m') . "&year=" . date('Y') . "'>Current Month</a> ";
@@ -168,7 +186,6 @@ function build_calendar($month, $year, $patient_id, $conn)
         }
     }
 
-
     $currentDay = 1;
     $month = str_pad($month, 2, "0", STR_PAD_LEFT);
 
@@ -185,14 +202,19 @@ function build_calendar($month, $year, $patient_id, $conn)
         // $fullyBooked = isDateFullyBooked($date, $doctor_id, $conn);
         $fullyBooked = displayAvailableSlots($date, $doctor_id, $patient_id, $conn);
 
-        if ($fullyBooked || $date < date('Y-m-d')) {
-            // Date is fully booked or in the past, display as not clickable
+        if ($fullyBooked == 'Past working time' || $date < date('Y-m-d')) {
+            // Show a button or message indicating past working time
+            $calendar .= "<td class='$today'><h4>$currentDay</h4> <button class='btn btn-danger btn-xs' disabled>";
+            $calendar .= $fullyBooked ? "<span class='glyphicon glyphicon-lock'></span> Outside working hours" : "<span class='glyphicon glyphicon-ban-circle'></span> Not Available";
+            $calendar .= "</button></td>";
+        } elseif ($fullyBooked == 'Fully booked') {
+            // Show a button or message indicating fully booked
             $calendar .= "<td class='$today'><h4>$currentDay</h4> <button class='btn btn-danger btn-xs' disabled>";
             $calendar .= $fullyBooked ? "<span class='glyphicon glyphicon-lock'></span> Fully Booked" : "<span class='glyphicon glyphicon-ban-circle'></span> Not Available";
             $calendar .= "</button></td>";
         } else {
-            // Date is available for booking, include doctor_id in the URL
-            $calendar .= "<td class='$today'><h4>$currentDay</h4> <a href='timeslots.php?date=" . $date . "&appointment_id=" . $appointment_id . "' class='btn btn-success btn-xs'><span class='glyphicon glyphicon-ok'></span> Book Now</a></td>";
+            // Available slots, show booking button
+            $calendar .= "<td class='$today'><h4>$currentDay</h4> <a href='timeslots.php?date=" . $date . "' class='btn btn-success btn-xs'><span class='glyphicon glyphicon-ok'></span> Book Now</a></td>";
         }
 
         $currentDay++;

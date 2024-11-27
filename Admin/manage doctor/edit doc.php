@@ -361,6 +361,8 @@ $conn->close();
 
                                             <div class="form-group">
                                                 <label for="">IC Number</label>
+                                                <br>
+                                                <small>Format: XXXXXX-XX-XXXX</small>
                                                 <input type="text" id="icInput" name="ic_num" class="form-control" placeholder="IC Number" maxlength="14" value="<?php echo htmlspecialchars($ic); ?>" required />
                                             </div>
 
@@ -384,6 +386,8 @@ $conn->close();
 
                                             <div class="form-group">
                                                 <label for="">Contact Number</label>
+                                                <br>
+                                                <small>Format: 01X-XXX-XXXX</small>
                                                 <input type="text" name="txtNum" class="form-control" id="number" placeholder="Contact number" value="<?php echo htmlspecialchars($Num_Phone); ?>" required maxlength="13" />
                                             </div>
 

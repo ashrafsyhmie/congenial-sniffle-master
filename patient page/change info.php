@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $phone_number = $_POST['phone_number'] ?? '';
   $emergency = $_POST['emergency'] ?? '';
   $dob = $_POST['dob'] ?? '';
-  $ic_number = $_POST['ic_number'] ?? '';
+  $ic_number = $_POST['ic_num'] ?? '';
   $imageData = $_FILES['image']['name'] ?? '';
 
   // Validate required fields
@@ -371,6 +371,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                       <div class="form-group">
                         <label for="">IC Number</label>
+                        <br>
+                        <small>Format: XXXXXX-XX-XXXX</small>
                         <input type="text" id="icInput" name="ic_num" class="form-control" placeholder="IC Number" maxlength="14" value="<?php echo htmlspecialchars($ic_number); ?>" required />
                       </div>
 
@@ -394,11 +396,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                       <div class="form-group">
                         <label for="phone_number">Phone Number</label>
+                        <br>
+                        <small>Format: 01X-XXX-XXXX</small>
                         <input type="text" class="form-control" id="number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" maxlength="13" required>
                       </div>
 
                       <div class="form-group">
                         <label for="emergency">Emergency Contact</label>
+                        <br>
+                        <small>Format: 01X-XXX-XXXX</small>
                         <input type="text" class="form-control" id="emergency" name="emergency" value="<?php echo htmlspecialchars($emergency); ?>" maxlength="13" required>
                       </div>
 

@@ -226,29 +226,44 @@ $timeslots = timeslots();
             <div class="col-md-12">
                 <?php echo $msg; ?>
             </div>
+
             <?php
-            // foreach ($timeslots as $t) {
-            //     $isBooked = in_array($t, $bookings);
-            //     $buttonClass = $isBooked ? 'btn-danger' : 'btn-success book';
-            //     echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' " . ($isBooked ? "disabled" : "data-timeslot='$t'") . ">$t</button>";
-            // }
+            date_default_timezone_set('Asia/Kuala_Lumpur'); // Ensure timezone is set
+
+            // Get the current time and date
+            $currentTime = date("H:i");
+            $today = date("Y-m-d");
+
+            // Assuming $_SESSION['appointment_date'] contains the previous appointment's date
+            $previousAppointmentDate = isset($_SESSION['appointment_date']) ? $_SESSION['appointment_date'] : null;
 
             foreach ($timeslots as $t) {
-                $isBooked = in_array($t, $bookings);
-                $isPreviousAppointment = ($t == $_SESSION['appointment_timeslot']); // Check if this timeslot is the previous appointment's timeslot
+                $isBooked = in_array($t, $bookings); // Check if the timeslot is already booked
+
+                // Highlight only if the timeslot matches and is on the same date as the previous appointment
+                $isPreviousAppointment = ($t == $_SESSION['appointment_timeslot'] && $date == $previousAppointmentDate);
+
+                // Check if the date is today and the timeslot is in the past
+                $timeParts = explode(" - ", $t); // Assume timeslot format is "08:00AM - 08:30AM"
+                $slotStartTime = date("H:i", strtotime($timeParts[0]));
+                $isPast = ($date == $today && $slotStartTime < $currentTime);
 
                 // Determine the button class
                 if ($isPreviousAppointment) {
                     $buttonClass = 'btn-warning'; // Highlight the previous appointment
+                } elseif ($isBooked || $isPast) {
+                    $buttonClass = 'btn-danger'; // Disable booked or past timeslots
                 } else {
-                    $buttonClass = $isBooked ? 'btn-danger' : 'btn-success book';
+                    $buttonClass = 'btn-success book'; // Available timeslots
                 }
 
-                echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' " . ($isBooked ? "disabled" : "data-timeslot='$t'") . ">$t</button>";
+                // Output the button
+                echo "<button class='btn $buttonClass' style='margin: 10px; width:13%;' " .
+                    (($isBooked || $isPast) ? "disabled" : "data-timeslot='$t'") . ">$t</button>";
             }
-
-
             ?>
+
+
             <br><br>
             <div class="container" style="text-align: center;">
                 <a href="./calendar.php?appointment_id=<?php echo $appointment_id; ?>"><button class="btn btn-primary">BACK</button></a>

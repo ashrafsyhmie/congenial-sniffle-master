@@ -138,33 +138,7 @@ foreach ($allDoctorAppointments as $appointment) {
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
     }
 
-    .pagination-container {
-      text-align: center;
-      margin-top: 15px;
-    }
 
-    .pagination-container a {
-      color: #007bff;
-      font-size: 15px;
-      padding: 8px 10px;
-      text-decoration: none;
-      border-radius: 4px;
-      border: 1px solid #007bff;
-      margin: 0 5px;
-    }
-
-    .pagination-container a:hover {
-      background-color: #007bff;
-      color: white;
-    }
-
-    .page-number {
-      font-size: 15px;
-      padding: 8px 16px;
-      border-radius: 4px;
-      border: 1px solid #007bff;
-      margin: 0 5px;
-    }
 
     .status-done {
       background-color: green;
@@ -421,13 +395,20 @@ foreach ($allDoctorAppointments as $appointment) {
                     $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 
                     // Prepare the SQL query with the filter applied
-                    $sql = "SELECT *
-                        FROM appointment 
-                        JOIN patient ON appointment.patient_id = patient.patient_id 
-                        JOIN doctor ON appointment.doctor_id = doctor.doctor_id 
-                        JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id";
+                    $sql = "SELECT 
+                      appointment.appointment_id,
+                      appointment.status,
+                      appointment.date,
+                      appointment.timeslot,
+                      patient.patient_name,
+                      patient.patient_photo,
+                      medical_record.medical_record_id
+                    FROM appointment
+                    JOIN patient ON appointment.patient_id = patient.patient_id
+                    JOIN doctor ON appointment.doctor_id = doctor.doctor_id
+                    LEFT JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id";
 
-                    // Apply the filter to the SQL query
+                    // Apply the filter
                     if ($filter == 'upcoming') {
                       $sql .= " WHERE appointment.status = 'upcoming'";
                     } elseif ($filter == 'done') {
@@ -437,50 +418,130 @@ foreach ($allDoctorAppointments as $appointment) {
                     }
 
                     $sql .= " ORDER BY appointment.appointment_id ASC";
+
                     $result = mysqli_query($conn, $sql);
 
-                    while ($row = mysqli_fetch_assoc($result)) {
+                    // Check if there are rows
+                    if (mysqli_num_rows($result) > 0) {
+                      // Fetch and display rows
+                      while ($row = mysqli_fetch_assoc($result)) {
                     ?>
+                        <tr>
+                          <td><?= htmlspecialchars($row['appointment_id']); ?></td>
+                          <td><img src="data:image/jpeg;base64,<?= base64_encode($row['patient_photo']); ?>" alt="Patient photo" class="photo"></td>
+                          <td><?= htmlspecialchars($row['patient_name']); ?></td>
+                          <td><?= htmlspecialchars($row['date']); ?></td>
+                          <td><?= htmlspecialchars($row['timeslot']) . "<br><br>";
+                              if ($row['status'] == 'done') {
+                                echo '<span class="status-done">Done</span>';
+                              } elseif ($row['status'] == 'cancelled') {
+                                echo "<span class='status-canceled'>Cancelled</span>";
+                              } elseif ($row['status'] == 'upcoming') {
+                                echo "<span class='status-upcoming'>Upcoming</span>";
+                              } ?></td>
+                          <td>
+                            <?php if ($row['status'] == 'done' && isset($row['medical_record_id'])): ?>
+                              <!-- Show Edit button if there's a medical record ID -->
+                              <button class="btn btn-success btn-md mr-3" data-bs-toggle="modal" data-bs-target="#passwordModal"
+                                data-medical-record-id="<?= $row['medical_record_id']; ?>">
+                                <i class="fa fa-edit"></i>
+                              </button>
+                              <a href="./medical record/view medical record.php?medical_record_id=<?= $row['medical_record_id']; ?>" class="btn btn-primary btn-md">
+                                <i class="fa-solid fa-eye"></i>
+                              </a>
+                              <!-- Medical Record ID Display -->
+                              <br><br> Medical Record ID: <?= htmlspecialchars($row['medical_record_id']); ?>
+                              <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="passwordModalLabel">Enter Password to Edit Medical Record</h5>
+                                      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <form id="passwordForm" method="POST" action="validate_password.php">
+                                        <div class="mb-3 text-start">
+                                          <label for="password" class="form-label">Password</label>
+                                          <div class="input-group">
+                                            <input type="password" class="form-control" id="password" name="password" required>
+                                            <button type="button" class="btn btn-outline-secondary" id="togglePassword" aria-label="Toggle Password">
+                                              <i class="fa fa-eye"></i>
+                                            </button>
+                                          </div>
+                                        </div>
+                                        <input type="hidden" name="medical_record_id" id="medical_record_id" value="<?php echo $row['medical_record_id']; ?>">
+                                    </div>
+                                    <div class="modal-footer">
+                                      <!-- Cancel Button -->
+                                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                      <!-- Submit Button -->
+                                      <button type="submit" class="btn btn-primary">Submit</button>
+                                      </form>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <script>
+                                // Toggle password visibility
+                                document.getElementById('togglePassword').addEventListener('click', function() {
+                                  var passwordField = document.getElementById('password');
+                                  var passwordIcon = this.querySelector('i');
+
+                                  if (passwordField.type === 'password') {
+                                    passwordField.type = 'text';
+                                    passwordIcon.classList.remove('fa-eye');
+                                    passwordIcon.classList.add('fa-eye-slash');
+                                  } else {
+                                    passwordField.type = 'password';
+                                    passwordIcon.classList.remove('fa-eye-slash');
+                                    passwordIcon.classList.add('fa-eye');
+                                  }
+                                });
+                              </script>
+
+                            <?php elseif ($row['status'] == 'done' && !isset($row['medical_record_id'])): ?>
+                              <!-- Show Add button if status is done but no medical record ID -->
+                              <a href="./medical record/medical history form.php?appointment_id=<?= $row['appointment_id']; ?>" class="btn btn-primary btn-md">
+                                <i class="fa fa-plus mr-1"></i> Add Record
+                              </a>
+                            <?php else: ?>
+                              <!-- Show 'No medical record' if status is not 'done' -->
+                              No medical record
+                            <?php endif; ?>
+                          </td>
+                        </tr>
+                      <?php
+                      }
+                    } else {
+                      // Display a message if no records found
+                      ?>
                       <tr>
-                        <td><?= htmlspecialchars($row['appointment_id']); ?></td>
-                        <td><img src="data:image/jpeg;base64,<?= base64_encode($row['patient_photo']); ?>" alt="Patient photo" class="photo"></td>
-                        <td><?= htmlspecialchars($row['patient_name']); ?></td>
-                        <td><?= htmlspecialchars($row['date']); ?></td>
-                        <td><?= htmlspecialchars($row['timeslot']) . "<br><br>";
-                            if ($row['status'] == 'done') {
-                              echo '<span class="status-done">Done</span>';
-                            } elseif ($row['status'] == 'cancelled') {
-                              echo "<span class='status-canceled'>Cancelled</span>";
-                            } elseif ($row['status'] == 'upcoming') {
-                              echo "<span class='status-upcoming'>Upcoming</span>";
-                            } ?></td>
-                        <td>
-                          <?php if ($row['status'] == 'done' && isset($row['medical_record_id'])): ?>
-                            <!-- Show Edit and View buttons if there's a medical record ID -->
-                            <a href="./medical record/edit medical record.php?medical_record_id=<?= $row['medical_record_id']; ?>" class="btn btn-success btn-md mr-3">
-                              <i class="fa fa-edit"></i>
-                            </a>
-                            <a href="./medical record/view medical record.php?medical_record_id=<?= $row['medical_record_id']; ?>" class="btn btn-primary btn-md">
-                              <i class="fa-solid fa-eye"></i>
-                            </a><br><br> Medical Record ID: <?= htmlspecialchars($row['medical_record_id']); ?>
-
-                          <?php elseif ($row['status'] == 'done' && !isset($row['medical_record_id'])): ?>
-                            <!-- Show Add button if status is done but no medical record ID -->
-                            <a href="./medical record/medical history form.php?appointment_id=<?= $row['appointment_id']; ?>" class="btn btn-primary btn-md">
-                              <i class="fa fa-plus mr-1"></i> Add Record
-                            </a>
-
-                          <?php else: ?>
-                            <!-- Show 'No medical record' if status is not 'done' -->
-                            No medical record
-                          <?php endif; ?>
-                        </td>
-
+                        <td colspan="6" class="text-center">No <?= htmlspecialchars($filter); ?> appointments found.</td>
                       </tr>
                     <?php
                     }
                     ?>
                   </tbody>
+
+                  <!-- Edit Password Modal -->
+
+
+                  <script>
+                    // When the modal is shown, set the appointment ID in the hidden input field
+                    $('#passwordModal').on('show.bs.modal', function(event) {
+                      var button = $(event.relatedTarget); // Button that triggered the modal
+                      var medicalRecordId = button.data('medical-record-id'); // Extract the appointment ID from data-* attributes
+
+                      var modal = $(this);
+                      modal.find('#appointment_id').val(medicalRecordId); // Set the value of the hidden input for appointment_id
+                    });
+                  </script>
+
+
+
                 </table>
               </div>
             </div>
@@ -489,12 +550,7 @@ foreach ($allDoctorAppointments as $appointment) {
 
         </div>
 
-        <!-- Pagination Controls -->
-        <div class="pagination-container">
-          <a href="#" class="previous round">&#8249;</a>
-          <span class="page-number">1</span>
-          <a href="#" class="next round">&#8250;</a>
-        </div>
+
 
         <!-- /.container-fluid -->
       </div>
@@ -571,46 +627,9 @@ foreach ($allDoctorAppointments as $appointment) {
   <script src="js/demo/chart-area-demo.js"></script>
   <script src="js/demo/chart-pie-demo.js"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const rowsPerPage = 10; //number of row per page (kalau nak tukar kat sini tau)
-      const table = document.querySelector('#dataTable');
-      const rows = table.querySelectorAll('tbody tr');
-      const totalRows = rows.length;
-      const totalPages = Math.ceil(totalRows / rowsPerPage);
-      let currentPage = 1;
 
-      function showPage(page) {
-        const start = (page - 1) * rowsPerPage;
-        const end = page * rowsPerPage;
 
-        rows.forEach((row, index) => {
-          row.style.display = (index >= start && index < end) ? '' : 'none';
-        });
 
-        document.querySelector('.page-number').textContent = page;
-      }
-
-      function setupPagination() {
-        document.querySelector('.previous').addEventListener('click', () => {
-          if (currentPage > 1) {
-            currentPage--;
-            showPage(currentPage);
-          }
-        });
-
-        document.querySelector('.next').addEventListener('click', () => {
-          if (currentPage < totalPages) {
-            currentPage++;
-            showPage(currentPage);
-          }
-        });
-      }
-
-      showPage(currentPage);
-      setupPagination();
-    });
-  </script>
 </body>
 
 </html>

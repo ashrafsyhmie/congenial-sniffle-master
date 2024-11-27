@@ -344,6 +344,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                                             <div class="form-group">
                                                 <label for="">IC Number</label>
+                                                <br>
+                                                <small>Format: XXXXXX-XX-XXXX</small>
                                                 <input type="text" id="icInput" name="ic_num" class="form-control" placeholder="IC Number" maxlength="14" value="<?php echo htmlspecialchars($ic); ?>" required />
                                             </div>
 
@@ -367,11 +369,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                                             <div class="form-group">
                                                 <label for="">Contact Number</label>
+                                                <br>
+                                                <small>Format: XXXXXX-XX-XXXX</small>
                                                 <input type="text" name="number" class="form-control" id="number" placeholder="Contact number" value="<?php echo htmlspecialchars($Num_Phone); ?>" required maxlength="13" />
                                             </div>
 
                                             <div class="form-group">
                                                 <label for="">Emergency Number</label>
+                                                <br>
+                                                <small>Format: XXXXXX-XX-XXXX</small>
                                                 <input type="text" name="emergency_number" class="form-control" id="emergency_number" placeholder="Emergency number" value="<?php echo htmlspecialchars($emergency); ?>" required maxlength="13" />
                                             </div>
 

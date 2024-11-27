@@ -82,25 +82,7 @@ require_once "../../db conn.php";
     }
 
 
-    .pagination-container {
-      text-align: center;
-      margin-top: 15px;
-    }
 
-    .pagination-container a {
-      color: #007bff;
-      font-size: 15px;
-      padding: 8px 10px;
-      text-decoration: none;
-      border-radius: 4px;
-      border: 1px solid #007bff;
-      margin: 0 5px;
-    }
-
-    .pagination-container a:hover {
-      background-color: #007bff;
-      color: white;
-    }
 
     .page-number {
       font-size: 15px;
@@ -342,9 +324,7 @@ require_once "../../db conn.php";
             </div>
 
 
-            <div class="card-body">
 
-            </div>
 
             <div class="table-responsive">
               <table class="table table-striped table-border-0 text-center" id="dataTable" width="100%" cellspacing="0">
@@ -358,7 +338,6 @@ require_once "../../db conn.php";
                     <th>Medical Record Action</th>
                   </tr>
                 </thead>
-
                 <tbody>
                   <?php
 
@@ -366,10 +345,28 @@ require_once "../../db conn.php";
                   $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 
                   // Prepare the SQL query with the filter applied
-                  $sql = "SELECT * FROM appointment 
-                            JOIN patient ON appointment.patient_id = patient.patient_id 
-                            JOIN doctor ON appointment.doctor_id = doctor.doctor_id 
-                            LEFT JOIN medical_record ON appointment.appointment_id = medical_record.appointment_id";
+                  $sql = "SELECT 
+    appointment.appointment_id,
+    appointment.date,
+    appointment.timeslot,
+    appointment.status,
+    patient.patient_id,
+    patient.patient_name,
+    patient.patient_photo,
+    doctor.doctor_id,
+    doctor.doctor_name,
+    doctor.doctor_photo,
+    medical_record.medical_record_id
+FROM 
+    appointment
+JOIN 
+    patient ON appointment.patient_id = patient.patient_id
+JOIN 
+    doctor ON appointment.doctor_id = doctor.doctor_id
+LEFT JOIN 
+    medical_record ON appointment.appointment_id = medical_record.appointment_id
+
+";
 
                   // Apply the filter to the SQL query
                   if ($filter == 'upcoming') {
@@ -420,6 +417,7 @@ require_once "../../db conn.php";
                                         <a href="#" class="btn btn-danger btn-md" data-toggle="modal" data-target="#cancelAppModal' .  $row['appointment_id'] . '">
                                             <i class="fa-solid fa-trash"></i>
                                         </a>
+                                        <br><br> Appointment ID: ' . $row['appointment_id'] . '
                                     </td>';
                       }
 
@@ -510,14 +508,9 @@ require_once "../../db conn.php";
 
       </div>
 
-      <!-- Pagination Controls -->
-      <div class="pagination-container">
-        <a href="#" class="previous round">&#8249;</a>
-        <span class="page-number">1</span>
-        <a href="#" class="next round">&#8250;</a>
-      </div>
+      <
 
-      <!-- /.container-fluid -->
+        <!-- /.container-fluid -->
     </div>
     <!-- End of Main Content -->
 
@@ -588,46 +581,7 @@ require_once "../../db conn.php";
   <script src="../../js/demo/chart-area-demo.js"></script>
   <script src="../../js/demo/chart-pie-demo.js"></script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const rowsPerPage = 10; //number of row per page (kalau nak tukar kat sini tau)
-      const table = document.querySelector('#dataTable');
-      const rows = table.querySelectorAll('tbody tr');
-      const totalRows = rows.length;
-      const totalPages = Math.ceil(totalRows / rowsPerPage);
-      let currentPage = 1;
 
-      function showPage(page) {
-        const start = (page - 1) * rowsPerPage;
-        const end = page * rowsPerPage;
-
-        rows.forEach((row, index) => {
-          row.style.display = (index >= start && index < end) ? '' : 'none';
-        });
-
-        document.querySelector('.page-number').textContent = page;
-      }
-
-      function setupPagination() {
-        document.querySelector('.previous').addEventListener('click', () => {
-          if (currentPage > 1) {
-            currentPage--;
-            showPage(currentPage);
-          }
-        });
-
-        document.querySelector('.next').addEventListener('click', () => {
-          if (currentPage < totalPages) {
-            currentPage++;
-            showPage(currentPage);
-          }
-        });
-      }
-
-      showPage(currentPage);
-      setupPagination();
-    });
-  </script>
 </body>
 
 </html>

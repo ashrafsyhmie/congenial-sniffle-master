@@ -26,8 +26,8 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
     $Address = $_POST['add'];
     $Email = $_POST['email'];
     $gender = $_POST['sex'];
-    $Num_Phone = $_POST['txtNum'];
-    $emergency = $_POST['emerCont'];
+    $Num_Phone = $_POST['number'];
+    $emergency = $_POST['emergency_number'];
     $dob = $_POST['dob'];
     $ic = $_POST['ic_num'];
 
@@ -452,11 +452,11 @@ if (($_SERVER['REQUEST_METHOD'] == 'POST') && isset($_POST['btnSubmit'])) {
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <label for="">Contact Number</label>
-                                                        <input type="text" name="txtNum" class="form-control" id="number" placeholder="Contact number" required maxlength="13" />
+                                                        <input type="text" name="number" class="form-control" id="number" placeholder="Contact number" required maxlength="13" />
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="">Emergency Number</label>
-                                                        <input type="text" name="txtNum" class="form-control" id="emergency_number" placeholder="Contact number" required maxlength="13" />
+                                                        <input type="text" name="emergency_number" class="form-control" id="emergency_number" placeholder="Contact number" required maxlength="13" />
                                                     </div>
                                                     <div class="form-group">
                                                         <label for="">Date of Birthday</label>

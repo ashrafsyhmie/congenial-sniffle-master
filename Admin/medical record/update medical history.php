@@ -14,9 +14,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $medical_record_id = $_POST['medical_record_id'];
 
 
-
     // Flag to track overall success
     $all_success = true;
+
+    // Update medical record notes
+    $notes = $_POST['notes'];
+    $sql = "UPDATE medical_record SET notes = ? WHERE medical_record_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("si", $notes, $medical_record_id);
+    if (!$stmt->execute()) {
+        $all_success = false;
+        $messages[] = "Failed to update medical record notes.";
+    }
+    $stmt->close();
 
     // Medication data handling
     // Medication data handling

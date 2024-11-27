@@ -25,6 +25,8 @@ require_once './db conn.php';
     <link rel="stylesheet" href="./login page new/style.css" />
     <link rel="stylesheet" href="./login page new/css/style.css" />
 
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.3/js/bootstrap.min.js" integrity="sha512-8qmis31OQi6hIRgvkht0s6mCOittjMa9GMqtK9hes5iEQBQE/Ca6yGE5FsW36vyipGoWQswBj/QBm2JR086Rkw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.3/css/bootstrap.min.css" integrity="sha512-oc9+XSs1H243/FRN9Rw62Fn8EtxjEYWHXRvjS43YtueEewbS6ObfXcJNyohjHqVKFPoXXUxwc+q1K7Dee6vv9g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Bootstrap 4.5.2 CSS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.min.js" integrity="sha512-ykZ1QQr0Jy/4ZkvKuqWn4iF3lqPZyij9iRv6sGqLRdTPkY69YX6+7wvVGmsdBbiIfN/8OdsI7HABjvEok6ZopQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
@@ -54,22 +56,64 @@ require_once './db conn.php';
             display: block;
             /* Show when active */
         }
+
+        /* Style for the notification banner */
+        .alert {
+            position: relative;
+            top: -150px;
+            left: 0;
+            right: 0;
+            /* Make sure it stretches from left to right */
+            width: 81%;
+            /* Adjust width as needed */
+            padding: 10px 20px;
+            font-size: 16px;
+            text-align: center;
+            margin-left: auto;
+            /* Center the element */
+            margin-right: auto;
+            /* Center the element */
+            border-radius: 10px;
+        }
+
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .alert-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .alert strong {
+            font-weight: bold;
+        }
+
+        body {
+            padding: 0px;
+        }
+
+        .main {
+            padding-top: 200px;
+        }
     </style>
 </head>
 
 <body>
-    <?php
-    // Display success or error message
-    if (isset($_GET['message'])) {
-        $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
-        echo '<div class="alert ' . $messageType . ' mt-3" role="alert">'; // Added 'mt-3' for spacing
-        echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
-        echo '</div>';
-    }
-    ?>
+
+
     <div class="main">
 
-
+        <?php
+        // Display success or error message
+        if (isset($_GET['message'])) {
+            $messageType = $_GET['message_type'] == 'success' ? 'alert-success' : 'alert-danger';
+            echo '<div class="alert ' . $messageType . ' mt-3" role="alert">'; // Added 'mt-3' for spacing
+            echo '<strong>' . htmlspecialchars($_GET['message']) . '</strong>';
+            echo '</div>';
+        }
+        ?>
 
         <!-- Sign up form -->
         <section class="signup" id="signup-section">
@@ -145,8 +189,9 @@ require_once './db conn.php';
                                     <input
                                         type="tel"
                                         name="phone_number"
-                                        id="phone_number"
+                                        id="number"
                                         placeholder="Phone Number"
+                                        maxlength="13"
                                         required />
                                 </div>
                                 <div class="form-group">
@@ -154,8 +199,9 @@ require_once './db conn.php';
                                     <input
                                         type="tel"
                                         name="emergency_number"
-                                        id="emergency_number"
+                                        id="emergency"
                                         placeholder="Emergency Number"
+                                        maxlength="13"
                                         required />
                                 </div>
                                 <div class="form-group">
@@ -185,8 +231,9 @@ require_once './db conn.php';
                                     <input
                                         type="text"
                                         name="ic_number"
-                                        id="ic_number"
+                                        id="icInput"
                                         placeholder="IC Number"
+                                        maxlength="14"
                                         required />
                                 </div>
                                 <div class="form-group">
@@ -294,15 +341,6 @@ require_once './db conn.php';
             </div>
         </section>
 
-
-
-        <!-- <ul class="notifications"></ul>
-        <div class="buttons">
-            <button class="btn" id="success">Success</button>
-            <button class="btn" id="error">Error</button>
-            <button class="btn" id="warning">Warning</button>
-            <button class="btn" id="info">Info</button>
-        </div> -->
     </div>
 
     <!-- JS -->
@@ -454,69 +492,39 @@ require_once './db conn.php';
             return strength;
         }
     </script>
-
     <script>
-        const notifications = document.querySelector(".notifications"),
-            buttons = document.querySelectorAll(".buttons .btn");
-
-        // Object containing details for different types of toasts
-        const toastDetails = {
-            timer: 5000,
-            success: {
-                icon: "fa-circle-check",
-                text: "Success: This is a success toast.",
-            },
-            error: {
-                icon: "fa-circle-xmark",
-                text: "Error: This is an error toast.",
-            },
-            warning: {
-                icon: "fa-triangle-exclamation",
-                text: "Warning: This is a warning toast.",
-            },
-            info: {
-                icon: "fa-circle-info",
-                text: "Info: This is an information toast.",
-            },
-        };
-
-        function launchToast(params) {
-
-        }
-
-        const removeToast = (toast) => {
-            toast.classList.add("hide");
-            if (toast.timeoutId) clearTimeout(toast.timeoutId); // Clearing the timeout for the toast
-            setTimeout(() => toast.remove(), 500); // Removing the toast after 500ms
-        };
-
-        const createToast = (id) => {
-            // Getting the icon and text for the toast based on the id passed
-            const {
-                icon,
-                text
-            } = toastDetails[id];
-            const toast = document.createElement("li"); // Creating a new 'li' element for the toast
-            toast.className = `toast ${id}`; // Setting the classes for the toast
-            // Setting the inner HTML for the toast
-            toast.innerHTML = `<div class="column">
-                         <i class="fa-solid ${icon}"></i>
-                         <span>${text}</span>
-                      </div>
-                      <i class="fa-solid fa-xmark" onclick="removeToast(this.parentElement)"></i>`;
-            notifications.appendChild(toast); // Append the toast to the notification ul
-            // Setting a timeout to remove the toast after the specified duration
-            toast.timeoutId = setTimeout(
-                () => removeToast(toast),
-                toastDetails.timer
-            );
-        };
-
-        // Adding a click event listener to each button to create a toast when clicked
-        buttons.forEach((btn) => {
-            btn.addEventListener("click", () => createToast(btn.id));
+        document.getElementById('icInput').addEventListener('input', function(e) {
+            let icNumber = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+            if (icNumber.length > 6) {
+                icNumber = icNumber.slice(0, 6) + '-' + icNumber.slice(6);
+            }
+            if (icNumber.length > 9) {
+                icNumber = icNumber.slice(0, 9) + '-' + icNumber.slice(9);
+            }
+            e.target.value = icNumber; // Update the input field with the formatted value
         });
     </script>
+    <script>
+        document.getElementById('number').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+            // Insert hyphens at the correct positions
+            if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+            if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+            e.target.value = value;
+        });
+        document.getElementById('emergency').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+
+            // Insert hyphens at the correct positions
+            if (value.length > 3) value = value.slice(0, 3) + '-' + value.slice(3);
+            if (value.length > 7) value = value.slice(0, 7) + '-' + value.slice(7);
+
+            e.target.value = value;
+        });
+    </script>
+
 
 </body>
 
@@ -705,24 +713,29 @@ function insertUser($patient_name, $email, $password, $phone_number, $emergency_
     $stmt = $conn->prepare("INSERT INTO patient (patient_name, email, password, `phone number`, emerg_num, d_o_b, gender, address, `ic number`, patient_photo)
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    // Bind the initial parameters
-    $stmt->bind_param("sssssssssb", $patient_name, $email, $hashedPassword, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData);
+    if (!$stmt) {
+        die("Prepare failed: " . $conn->error); // Debugging
+    }
 
-    // Send binary data separately for the image
-    // $stmt->send_long_data(9, $imageData);
+    // Bind the initial parameters
+    $stmt->bind_param("ssssssssss", $patient_name, $email, $hashedPassword, $phone_number, $emergency_number, $dob, $gender, $address, $ic_number, $imageData);
+
+
 
     // Execute the query
-    if ($stmt->execute()) {
+    if (!$stmt->execute()) {
+        // Log the error if execution fails
+        die("Execute failed: " . $stmt->error);
+    } else {
         echo "<script>
                 alert('Successfully registered!');
                 window.location.href = './index.php';
               </script>";
-    } else {
-        echo "Error: " . $stmt->error;
     }
 
     $stmt->close();
 }
+
 
 
 // Function to handle login and password verification

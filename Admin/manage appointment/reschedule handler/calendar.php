@@ -1,37 +1,34 @@
 <?php
 session_start();
-
-$appointment_id = $_GET['appointment_id'];
-
 require_once '../../../db conn.php';
-
 require './timeslots-function.php';
 
-$admin_id = $_SESSION['admin_id'];
+// Store appointment_id in session if it's in the GET or POST request
+if (isset($_GET['appointment_id']) || isset($_POST['appointment_id'])) {
+    $_SESSION['appointment_id'] = $_GET['appointment_id'] ?? $_POST['appointment_id'];
+}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['appointment_id'])) {
-        // Get the appointment_id from the form
-        $appointment_id = $_POST['appointment_id'];
+// Retrieve the appointment_id from the session
+$appointment_id = $_SESSION['appointment_id'] ?? '';
 
-        // Fetch the appointment details using the appointment_id
-        $appointmentDetails = fetchAppointmentById($conn, $appointment_id);
+$admin_id = $_SESSION['admin_id'] ?? '';
 
-        // Process the data (e.g., reschedule, display the details, etc.)
-        if ($appointmentDetails) {
-            // Store or display the appointment details
-            $_SESSION['appointment_id'] = $appointmentDetails['appointment_id'];
-            $_SESSION['appointment_date'] = $appointmentDetails['date'];
-            $_SESSION['appointment_timeslot'] = $appointmentDetails['timeslot'];
-        } else {
-            echo "Appointment not found!";
-        }
+// Handle the POST request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['appointment_id'])) {
+    // Fetch the appointment details using the appointment_id
+    $appointmentDetails = fetchAppointmentById($conn, $_POST['appointment_id']);
+
+    if ($appointmentDetails) {
+        // Store appointment details in session
+        $_SESSION['appointment_id'] = $appointmentDetails['appointment_id'];
+        $_SESSION['appointment_date'] = $appointmentDetails['date'];
+        $_SESSION['appointment_timeslot'] = $appointmentDetails['timeslot'];
     } else {
-        echo "No appointment ID provided!";
+        echo "Appointment not found!";
     }
 }
 
-// Fetch appointment details using the appointment_id
+// Fetch appointment details by ID
 function fetchAppointmentById($conn, $appointment_id)
 {
     $sql = "SELECT * FROM appointment WHERE appointment_id = ?";
@@ -39,16 +36,10 @@ function fetchAppointmentById($conn, $appointment_id)
     mysqli_stmt_bind_param($stmt, "i", $appointment_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-
-    // Fetch the appointment details
-    if ($row = mysqli_fetch_assoc($result)) {
-        return $row; // Return the appointment details
-    } else {
-        return null; // Return null if no appointment found
-    }
+    return mysqli_fetch_assoc($result) ?: null;
 }
 
-// Fetch patient details based on patient_id
+// Fetch patient details by patient_id
 function fetchPatientInfo($conn, $patient_id)
 {
     $sql = "SELECT * FROM patient WHERE patient_id = ?";
@@ -56,29 +47,17 @@ function fetchPatientInfo($conn, $patient_id)
     mysqli_stmt_bind_param($stmt, "i", $patient_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-
-    // Fetch the patient details
-    if ($row = mysqli_fetch_assoc($result)) {
-        return $row; // Return the patient details
-    } else {
-        return null; // Return null if no patient found
-    }
+    return mysqli_fetch_assoc($result) ?: null;
 }
 
-$appointment_id = $_GET['appointment_id']; // Get the appointment_id from the query string
-
-// Fetch the appointment details
+// Fetch appointment details using appointment_id
 $appointmentDetails = fetchAppointmentById($conn, $appointment_id);
 
 if ($appointmentDetails) {
-    // Get the patient_id from the fetched appointment details
     $patient_id = $appointmentDetails['patient_id'];
-
-    // Now fetch the patient information using the patient_id
     $patientInfo = fetchPatientInfo($conn, $patient_id);
 
     if ($patientInfo) {
-        // Process or display the patient information
         $_SESSION['patient_name'] = $patientInfo['patient_name'];
         $_SESSION['patient_photo'] = $patientInfo['patient_photo'];
     } else {
@@ -88,52 +67,46 @@ if ($appointmentDetails) {
     echo "Appointment not found!";
 }
 
-
-
+// Display available slots for the given date, doctor, and patient
 function displayAvailableSlots($date, $doctor_id, $patient_id, $conn)
 {
-    // Define slot parameters
-
-
-    // Generate all possible time slots for the day
+    date_default_timezone_set('Asia/Kuala_Lumpur'); // Set timezone
     $all_slots = timeslots();
-
-    // Prepare the SQL statement to get booked slots
-    $stmt = $conn->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
-
-    if (!$stmt) {
-        die('Prepare failed: ' . $conn->error);
+    if (empty($all_slots)) {
+        die('Error: No slots returned from timeslots function.');
     }
 
-    // Bind parameters and execute
+    $last_slot_start = substr(end($all_slots), 0, strpos(end($all_slots), ' -'));
+    $current_time = date('g:iA');
+    $current_date = date('Y-m-d');
+
+    if ($date == $current_date && strtotime($current_time) > strtotime($last_slot_start)) {
+        return true; // Fully booked
+    }
+
+    $stmt = $conn->prepare("SELECT DISTINCT timeslot FROM appointment WHERE DATE = ? AND (doctor_id = ? OR patient_id = ?)");
     $stmt->bind_param('sss', $date, $doctor_id, $patient_id);
     $stmt->execute();
     $result = $stmt->get_result();
+
     $booked_slots = [];
     while ($row = $result->fetch_assoc()) {
         $booked_slots[] = $row['timeslot'];
     }
     $stmt->close();
 
-    // Find available slots
-    $available_slots = array_diff($all_slots, $booked_slots);
-
-    if (empty($available_slots)) {
-
-        return true;
-    }
+    // Return true if no available slots
+    return empty(array_diff($all_slots, $booked_slots));
 }
 
-
-
+// Build calendar with available slots
 function build_calendar($month, $year, $patient_id, $conn)
 {
-    global $doctor_id;
-    global $appointment_id;
+    global $doctor_id, $appointment_id;
+
     $stmt = $conn->prepare("SELECT DATE FROM appointment WHERE MONTH(DATE) = ? AND YEAR(DATE) = ? AND patient_id = ?");
     $stmt->bind_param('iis', $month, $year, $patient_id);
-    $bookings = array();
-
+    $bookings = [];
     if ($stmt->execute()) {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) {
@@ -142,7 +115,7 @@ function build_calendar($month, $year, $patient_id, $conn)
         $stmt->close();
     }
 
-    $daysOfWeek = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+    $daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     $firstDayOfMonth = mktime(0, 0, 0, $month, 1, $year);
     $numberDays = date('t', $firstDayOfMonth);
     $dateComponents = getdate($firstDayOfMonth);
@@ -152,7 +125,7 @@ function build_calendar($month, $year, $patient_id, $conn)
     $calendar = "<table class='table table-bordered'>";
     $calendar .= "<center><h2>$monthName $year</h2>";
     $calendar .= "<a class='btn btn-xs btn-danger' href='?month=" . date('m', mktime(0, 0, 0, $month - 1, 1, $year)) . "&year=" . date('Y', mktime(0, 0, 0, $month - 1, 1, $year)) . "'>Previous Month</a> ";
-    $calendar .= " <a class='btn btn-xs btn-success' href='?month=" . date('m') . "&year=" . date('Y') . "'>Current Month</a> ";
+    $calendar .= "<a class='btn btn-xs btn-success' href='?month=" . date('m') . "&year=" . date('Y') . "'>Current Month</a> ";
     $calendar .= "<a class='btn btn-xs btn-primary' href='?month=" . date('m', mktime(0, 0, 0, $month + 1, 1, $year)) . "&year=" . date('Y', mktime(0, 0, 0, $month + 1, 1, $year)) . "'>Next Month</a></center><br>";
 
     $calendar .= "<tr>";
@@ -161,12 +134,9 @@ function build_calendar($month, $year, $patient_id, $conn)
     }
     $calendar .= "</tr><tr>";
 
-    if ($dayOfWeek > 0) {
-        for ($k = 0; $k < $dayOfWeek; $k++) {
-            $calendar .= "<td class='empty'></td>";
-        }
+    for ($k = 0; $k < $dayOfWeek; $k++) {
+        $calendar .= "<td class='empty'></td>";
     }
-
 
     $currentDay = 1;
     $month = str_pad($month, 2, "0", STR_PAD_LEFT);
@@ -181,16 +151,13 @@ function build_calendar($month, $year, $patient_id, $conn)
         $date = "$year-$month-$currentDayRel";
         $today = $date == date('Y-m-d') ? "today" : "";
 
-        // $fullyBooked = isDateFullyBooked($date, $doctor_id, $conn);
         $fullyBooked = displayAvailableSlots($date, $doctor_id, $patient_id, $conn);
 
         if ($fullyBooked || $date < date('Y-m-d')) {
-            // Date is fully booked or in the past, display as not clickable
             $calendar .= "<td class='$today'><h4>$currentDay</h4> <button class='btn btn-danger btn-xs' disabled>";
             $calendar .= $fullyBooked ? "<span class='glyphicon glyphicon-lock'></span> Fully Booked" : "<span class='glyphicon glyphicon-ban-circle'></span> Not Available";
             $calendar .= "</button></td>";
         } else {
-            // Date is available for booking, include doctor_id in the URL
             $calendar .= "<td class='$today'><h4>$currentDay</h4> <a href='timeslots.php?date=" . $date . "&appointment_id=" . $appointment_id . "' class='btn btn-success btn-xs'><span class='glyphicon glyphicon-ok'></span> Book Now</a></td>";
         }
 
@@ -199,16 +166,12 @@ function build_calendar($month, $year, $patient_id, $conn)
     }
 
     if ($dayOfWeek != 7) {
-        $remainingDays = 7 - $dayOfWeek;
-        for ($l = 0; $l < $remainingDays; $calendar .= "<td class='empty'></td>", $l++);
+        for ($l = 0; $l < (7 - $dayOfWeek); $calendar .= "<td class='empty'></td>", $l++);
     }
 
-    $calendar .= "</tr>";
-    $calendar .= "</table>";
+    $calendar .= "</tr></table>";
     echo $calendar;
 }
-
-
 ?>
 
 <!DOCTYPE html>

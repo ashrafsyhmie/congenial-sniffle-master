@@ -357,6 +357,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                       <div class="form-group">
                         <label for="ic_number">IC Number</label>
+                        <br>
+                        <small>Format: XXXXXX-XX-XXXX</small>
                         <input type="text" class="form-control" id="icInput" name="ic_number" value="<?php echo htmlspecialchars($ic_number); ?>" maxlength="14" required>
                       </div>
 
@@ -380,6 +382,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                       <div class="form-group">
                         <label for="phone_number">Phone Number</label>
+                        <br>
+                        <small>Format: 01X-XXX-XXXX</small>
                         <input type="text" class="form-control" id="number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" maxlength="13" required>
                       </div>
 
