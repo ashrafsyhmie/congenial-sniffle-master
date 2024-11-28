@@ -8,7 +8,7 @@ require './timeslots-function.php';
 $date = isset($_GET['date']) ? $_GET['date'] : '';
 $doctor_id = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : '';
 
-$appointment_id = $_GET['appointment_id'];
+$appointment_id = $_SESSION['appointment_id'];
 
 // Fetch the appointment details using the appointment_id
 $appointmentDetails = fetchAppointmentById($conn, $appointment_id);

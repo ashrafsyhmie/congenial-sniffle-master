@@ -1,19 +1,18 @@
 <?php
 session_start();
 
-if (isset($_GET['appointment_id'])) {
-    $_SESSION['appointment_id'] = $_GET['appointment_id'];
-    $appointment_id = $_SESSION['appointment_id'];
-}
 
-
-echo $appointment_id . "<br>";
 
 // $appointment_id = $_GET['appointment_id'];
-// $_SESSION["appointment_id"] = $appointment_id;
+$appointment_id = $_GET["appointment_id"];
+$_SESSION["appointment_id"] = $appointment_id;
+echo $appointment_id . "<br>";
 global $appointment_id;
 
-
+if (isset($_GET['date'])) {
+    $_SESSION['date'] = $_GET['date'];
+    $date = $_SESSION['date'];
+}
 
 
 require_once '../../db conn.php';
