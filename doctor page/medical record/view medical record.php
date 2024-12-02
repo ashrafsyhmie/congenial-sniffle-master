@@ -47,7 +47,7 @@ $allAppointmentInfo = fetchAllAppointmentInfo($conn, $appointment_id);
 
 foreach ($allAppointmentInfo as $appointment) {
     $_SESSION['patient_id'] = $appointment['patient_id'];
-    $_SESSION['doctor_id'] = $appointment['doctor_id'];
+    $doctor_id = $appointment['doctor_id'];
 }
 
 $patient_id = $appointment['patient_id'];
@@ -96,11 +96,11 @@ function fetchAllDoctorInfo($conn, $doctor_id)
 $allDoctorInfo = fetchAllDoctorInfo($conn, $doctor_id);
 
 foreach ($allDoctorInfo as $doctor) {
-    $_SESSION['doctor_name'] = $doctor['doctor_name'];
-    $_SESSION['doctor_photo'] = $doctor['doctor_photo'];
+    $doctor_name = $doctor['doctor_name'];
+
 }
 
-$doctor_name = $_SESSION['doctor_name'];
+
 
 
 

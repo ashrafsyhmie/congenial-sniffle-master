@@ -38,10 +38,10 @@ function validate_doctor_password($doctor_id, $password)
 
     // Use password_verify to check if the entered password matches the stored hash
     if (password_verify($password, $stored_hash)) {
-        echo "Password is correct!<br>";
+        // echo "Password is correct!<br>";
         return true;
     } else {
-        echo "Password is incorrect.<br>";
+        // echo "Password is incorrect.<br>";
         return false;
     }
 }
@@ -50,16 +50,18 @@ function validate_doctor_password($doctor_id, $password)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $medical_record_id = $_POST['medical_record_id']; // Hidden field for medical_record_id
 
+
+
     $password = $_POST['password']; // Password entered by the doctor
 
     // Get the doctor's ID from the session
     $doctor_id = $_SESSION['doctor_id']; // Ensure doctor_id is stored in session during login
 
-    // Debugging: Check if doctor_id is correct
-    echo "Doctor ID from session: " . $doctor_id . "<br>";
+
 
     // Validate the doctor's password
     if (validate_doctor_password($doctor_id, $password)) {
+
         // Password is correct, allow the doctor to edit the record
         header("Location: ./medical record/edit medical record.php?medical_record_id=$medical_record_id");
         exit(); // Exit after redirect to prevent further processing

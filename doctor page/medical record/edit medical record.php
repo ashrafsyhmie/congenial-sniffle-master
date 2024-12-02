@@ -773,31 +773,38 @@ $medical_condition_result = $stmt->get_result();
 
         function addRow(tableSelector, columns) {
             let markup = "<tr>";
-            let rowIndex = $(tableSelector + ' tbody tr').length + 1;
+            let rowIndex = $(tableSelector + ' tbody tr').length + 1; // Incrementing row index
             columns.forEach((column) => {
                 if (column.type === 'radio') {
                     // For radio buttons, generate a group of radio buttons with unique names per row
                     markup += `
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="condition_${rowIndex}_${column.name}" value="${column.placeholder.toLowerCase()}" id="${column.name + rowIndex}" />
-                           
-                        </div>
-                    </td>
-                `;
+            <td>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="medical_condition_status[${rowIndex}][]" value="None" id="status_none_${rowIndex}" />
+                    <input class="form-check-input" type="radio" name="medical_condition_status[${rowIndex}][]" value="Yes" id="status_yes_${rowIndex}" />
+                    <input class="form-check-input" type="radio" name="medical_condition_status[${rowIndex}][]" value="Unsure" id="status_unsure_${rowIndex}" />
+                </div>
+            </td>
+        `;
                 } else {
                     // For text input fields
-                    markup += `<td><input type="text" name="${column.name}[]" class="form-control" placeholder="${column.placeholder}" /></td>`;
+                    markup += `<td><input type="text" name="condition_name[${rowIndex}]" class="form-control" placeholder="${column.placeholder}" /></td>`;
                 }
             });
             markup += "</tr>";
             $(tableSelector + ' tbody').append(markup);
         }
 
+
         function removeRow(tableSelector) {
             var $tableBody = $(tableSelector + ' tbody');
             if ($tableBody.find('tr').length > 1) {
-                $tableBody.find('tr:last').remove();
+                var row = $tableBody.find('tr:last');
+                var rowId = row.data('id'); // Assuming you have a data-id attribute for each row
+                row.remove();
+
+                // Add the row ID to the hidden input field for later processing
+                $('#removedRows').append(`<input type="hidden" name="removed_rows[]" value="${rowId}">`);
             }
         }
     </script>

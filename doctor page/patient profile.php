@@ -427,10 +427,15 @@ $doctor_name = $_SESSION['doctor_name'];
 
                                         if (isset($row['medical_record_id'])) {
                                             // Medical record action buttons
-                                            echo "<td class='text-center'><a href='./medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-success btn-sm mr-3'> 
-          <i class='fa fa-edit'></i> Edit</a>";
-                                            echo "<a href='./medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-primary btn-sm'> 
-             <i class='fa-solid fa-eye'></i> View</a><p></p> Medical Record ID: " . $row['medical_record_id'] . "</td>";
+                                            echo "<td class='text-center'>";
+                                            // <a href='./medical record/edit medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-success btn-sm mr-3'> 
+                                            //   <i class='fa fa-edit'></i> Edit</a>";
+                                            echo '<button class="btn btn-success btn-md mr-3" data-bs-toggle="modal" data-bs-target="#passwordModal"
+                                data-medical-record-id="<?= $row["medical_record_id"]; ?>
+                                <i class="fa fa-edit"></i>
+                              </button>';
+                                            echo "<a href='./medical record/view medical record.php?medical_record_id=" . $row['medical_record_id'] . "' class='btn btn-primary btn-md'> 
+             <i class='fa-solid fa-eye'></i></a><p></p> Medical Record ID: " . $row['medical_record_id'] . "</td>";
                                         } elseif ($row['status'] == 'done') {
                                             echo "<td class='text-center'><a href='./medical record/medical history form.php?appointment_id=" . $row['appointment_id'] . "' class='btn btn-primary btn-sm mr-3'> 
     <i class='fa fa-plus mr-1'></i>Add</a></td>";
@@ -438,8 +443,72 @@ $doctor_name = $_SESSION['doctor_name'];
                                             echo "<td class='text-center' width=20%>No medical record</td>";
                                         }
                                         echo "</tr>";
+                                    ?>
+                                        <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="passwordModalLabel">Enter Password to Edit Medical Record</h5>
+                                                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form id="passwordForm" method="POST" action="validate_password.php">
+                                                            <div class="mb-3 text-start">
+                                                                <label for="password" class="form-label">Password</label>
+                                                                <div class="input-group">
+                                                                    <input type="password" class="form-control" id="password" name="password" required>
+                                                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword" aria-label="Toggle Password">
+                                                                        <i class="fa fa-eye"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            <input type="hidden" name="medical_record_id" id="medical_record_id" value="<?php echo $row['medical_record_id']; ?>">
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <!-- Cancel Button -->
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <!-- Submit Button -->
+                                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php
                                     }
                                     ?>
+
+
+
+                                    <script>
+                                        // Toggle password visibility
+                                        document.getElementById('togglePassword').addEventListener('click', function() {
+                                            var passwordField = document.getElementById('password');
+                                            var passwordIcon = this.querySelector('i');
+
+                                            if (passwordField.type === 'password') {
+                                                passwordField.type = 'text';
+                                                passwordIcon.classList.remove('fa-eye');
+                                                passwordIcon.classList.add('fa-eye-slash');
+                                            } else {
+                                                passwordField.type = 'password';
+                                                passwordIcon.classList.remove('fa-eye-slash');
+                                                passwordIcon.classList.add('fa-eye');
+                                            }
+                                        });
+                                    </script>
+                                    <script>
+                                        // When the modal is shown, set the appointment ID in the hidden input field
+                                        $('#passwordModal').on('show.bs.modal', function(event) {
+                                            var button = $(event.relatedTarget); // Button that triggered the modal
+                                            var medicalRecordId = button.data('medical-record-id'); // Extract the appointment ID from data-* attributes
+
+                                            var modal = $(this);
+                                            modal.find('#appointment_id').val(medicalRecordId); // Set the value of the hidden input for appointment_id
+                                        });
+                                    </script>
                                 </tbody>
                             </table>
 
