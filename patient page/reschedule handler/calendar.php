@@ -4,8 +4,11 @@ session_start();
 
 
 // $appointment_id = $_GET['appointment_id'];
-$appointment_id = $_GET["appointment_id"];
-$_SESSION["appointment_id"] = $appointment_id;
+if (isset($_GET['appointment_id']) || isset($_POST['appointment_id'])) {
+    $_SESSION['appointment_id'] = $_GET['appointment_id'] ?? $_POST['appointment_id'];
+}
+
+$appointment_id = $_SESSION['appointment_id'];
 echo $appointment_id . "<br>";
 global $appointment_id;
 
