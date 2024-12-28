@@ -472,7 +472,7 @@ if (!empty($appointment)) {
 
             <div class="container text-center mt-3">
                 <button type="reset" class="btn btn-danger">Reset</button>
-                <a class="btn btn-primary previous-btn" href="../manage patient/patient_profile.php?id=<?php echo $patient_id ?>">
+                <a class="btn btn-primary previous-btn" href="../patient profile.php?id=<?php echo $patient_id ?>">
                     Back
                 </a>
                 <button type="submit" name="submit" class="btn btn-success">Submit</button>

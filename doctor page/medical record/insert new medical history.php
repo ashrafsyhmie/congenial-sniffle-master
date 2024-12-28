@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $patient_id) {
     }
     $stmt->close();
 
-    header("Location: ../manage patient/patient_profile.php?id=$patient_id&message=Medical Record ID $medical_record_id Inserted Successfully&message_type=success");
+    header("Location: ../patient profile.php?id=$patient_id&message=Medical Record ID $medical_record_id Inserted Successfully&message_type=success");
 } else {
     echo "Invalid request or session data missing.";
 }

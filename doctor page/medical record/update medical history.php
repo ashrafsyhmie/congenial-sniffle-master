@@ -13,52 +13,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $patient_id = $_POST['patient_id'];
     $medical_record_id = $_POST['medical_record_id'];
 
-    // Medication handling
-    // if (isset($_POST['medication_name']) && !empty($_POST['medication_name'])) {
-    //     $medication_names = $_POST['medication_name'];
-    //     $purposes = $_POST['purpose'];
-    //     $dosages = $_POST['dosage'];
-    //     $frequencies = $_POST['frequency'];
-
-    //     foreach ($medication_names as $i => $medication_name) {
-    //         $purpose = $purposes[$i];
-    //         $dosage = $dosages[$i];
-    //         $frequency = $frequencies[$i];
-
-    //         // Check if medication exists
-    //         $check_sql = "SELECT * FROM medication WHERE medical_record_id = ? AND medication_name = ?";
-    //         $check_stmt = $conn->prepare($check_sql);
-    //         $check_stmt->bind_param("ss", $medical_record_id, $medication_name);
-    //         $check_stmt->execute();
-    //         $result = $check_stmt->get_result();
-
-    //         if ($result->num_rows > 0) {
-    //             // Update medication
-    //             $update_sql = "UPDATE medication SET purpose = ?, dosage = ?, frequency = ? WHERE medical_record_id = ? AND medication_name = ?";
-    //             $update_stmt = $conn->prepare($update_sql);
-    //             $update_stmt->bind_param("sssss", $purpose, $dosage, $frequency, $medical_record_id, $medication_name);
-
-    //             if (!$update_stmt->execute()) {
-    //                 $messages[] = "Failed to update medication: $medication_name. Error: " . $update_stmt->error;
-    //                 $all_success = false;
-    //             }
-    //             $update_stmt->close();
-    //         } else {
-    //             // Insert medication
-    //             $insert_sql = "INSERT INTO medication (medical_record_id, medication_name, purpose, dosage, frequency) VALUES (?, ?, ?, ?, ?)";
-    //             $insert_stmt = $conn->prepare($insert_sql);
-    //             $insert_stmt->bind_param("issss", $medical_record_id, $medication_name, $purpose, $dosage, $frequency);
-
-    //             if (!$insert_stmt->execute()) {
-    //                 $messages[] = "Failed to insert medication: $medication_name. Error: " . $insert_stmt->error;
-    //                 $all_success = false;
-    //             }
-    //             $insert_stmt->close();
-    //         }
-
-    //         $check_stmt->close();
-    //     }
-    // }
+    if (isset($_POST['notes']) && !empty($_POST['notes'])) {
+        $notes = $_POST['notes'];
+        $sql = "UPDATE medical_record SET notes = ? WHERE medical_record_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("si", $notes, $medical_record_id);
+        $stmt->execute();
+        $stmt->close();
+    }
 
     if (isset($_POST['medication_name']) && !empty($_POST['medication_name'])) {
         $medication_names = $_POST['medication_name'];
